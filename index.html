@@ -300,15 +300,17 @@ function tierNum(s) {
 }
 
 function renderBoard(team) {
+  try {
   const pct = Math.min(100, (team.total/MAX)*100);
-  document.getElementById('mFill').style.height = pct+'%';
-  document.getElementById('mScore').textContent = team.total;
-  document.getElementById('mTile').textContent  = team.tilePeps;
-  document.getElementById('mBingo').textContent = team.bingoPeps;
-  document.getElementById('bTeamName').textContent = team.name;
-  document.getElementById('bTotal').textContent = team.total;
-  document.getElementById('bTile').textContent  = team.tilePeps;
-  document.getElementById('bBingo').textContent = team.bingoPeps;
+  const mFill = document.getElementById('mFill');
+  if (mFill) mFill.style.height = pct+'%';
+  const mScore = document.getElementById('mScore'); if (mScore) mScore.textContent = team.total;
+  const mTile  = document.getElementById('mTile');  if (mTile)  mTile.textContent  = team.tilePeps;
+  const mBingo = document.getElementById('mBingo'); if (mBingo) mBingo.textContent = team.bingoPeps;
+  const bTeam  = document.getElementById('bTeamName'); if (bTeam)  bTeam.textContent  = team.name;
+  const bTotal = document.getElementById('bTotal'); if (bTotal) bTotal.textContent = team.total;
+  const bTile  = document.getElementById('bTile');  if (bTile)  bTile.textContent  = team.tilePeps;
+  const bBingo = document.getElementById('bBingo'); if (bBingo) bBingo.textContent = team.bingoPeps;
 
   // Grid
   let html = '';
@@ -351,6 +353,11 @@ function renderBoard(team) {
       <div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
   });
   document.getElementById('bLines').innerHTML = lhtml;
+  } catch(err) {
+    const dbg = document.getElementById('bGrid');
+    if (dbg) dbg.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:12px;letter-spacing:0.05em;">ERROR: ' + err.message + '<br><br>' + err.stack + '</div>';
+    console.error('renderBoard error:', err);
+  }
 }
 
 // ── Init ──
