@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spicy Bingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; font-family: 'Oswald', sans-serif; padding: 20px; }
+  .outer { max-width: 1320px; margin: 0 auto; display: flex; gap: 14px; align-items: flex-start; }
+
+  .scoville-wrap { width: 56px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding-top: 110px; }
+  .scoville-title { font-family: 'Bungee', cursive; font-size: 8px; letter-spacing: 0.1em; color: #444; text-align: center; margin-bottom: 6px; writing-mode: vertical-rl; transform: rotate(180deg); height: 92px; white-space: nowrap; }
+  .scoville-track { width: 26px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 4px; overflow: hidden; min-height: 480px; display: flex; flex-direction: column-reverse; position: relative; }
+  .scoville-fill { width: 100%; background: linear-gradient(0deg, #1e7a1e 0%, #8ab800 25%, #c47a00 50%, #d44a00 75%, #cc0000 100%); }
+  .scoville-ticks { position: absolute; top: 0; left: 27px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; }
+  .tick { font-size: 7px; color: #2a2a2a; white-space: nowrap; padding-left: 3px; line-height: 1; }
+  .scoville-score { font-family: 'Bungee', cursive; font-size: 12px; color: #444; text-align: center; margin-top: 6px; }
+  .scoville-denom { font-size: 8px; color: #2a2a2a; letter-spacing: 0.04em; text-align: center; margin-top: 2px; }
+
+  .board { flex: 1; min-width: 0; }
+  .logo-wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px 12px; border-bottom: 1px solid #1a1a1a; margin-bottom: 12px; }
+  .team-label { font-size: 12px; letter-spacing: 0.22em; color: #444; text-transform: uppercase; font-weight: 700; }
+  .logo-frame { display: inline-flex; align-items: center; border: 3px solid #ff4500; border-radius: 6px; padding: 7px 24px 9px; position: relative; }
+  .logo-frame::before { content: ''; position: absolute; inset: 4px; border: 1.5px solid #ff4500; border-radius: 3px; pointer-events: none; }
+  .logo-spicy { font-family: 'Bungee', cursive; font-size: 38px; color: transparent; -webkit-text-stroke: 2.5px #f5b800; letter-spacing: 0.04em; line-height: 1; margin-right: 12px; }
+  .logo-bingo { font-family: 'Bungee', cursive; font-size: 38px; color: transparent; -webkit-text-stroke: 2.5px #ff4500; letter-spacing: 0.04em; line-height: 1; }
+  .score-box { text-align: right; }
+  .score-num { font-family: 'Bungee', cursive; font-size: 22px; color: #444; display: block; }
+  .score-label { font-size: 11px; color: #333; letter-spacing: 0.12em; font-weight: 700; text-transform: uppercase; }
+
+  .grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 7px; }
+  .tile { background: #0a0a0a; border: 2px solid var(--rc); padding: 10px 9px 9px; display: flex; flex-direction: column; align-items: center; min-height: 158px; position: relative; }
+  .tile.bingo { }
+  .complete-tag { font-family: 'Bungee', cursive; font-size: 9px; letter-spacing: 0.14em; background: #f5b800; color: #000; padding: 2px 0; text-align: center; width: calc(100% + 18px); margin: -10px -9px 8px; }
+  .tile-name { font-size: 10.5px; font-weight: 700; color: #ddd; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.3; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 9px; }
+  .tier-badges { display: flex; gap: 3px; width: 100%; margin-bottom: 9px; }
+  .badge { flex: 1; text-align: center; font-family: 'Bungee', cursive; font-size: 10px; padding: 5px 0; border: 1.5px solid #1a1a1a; color: #2a2a2a; background: #0d0d0d; }
+  .badge.s1 { background: #0a2a0a; border-color: #1e7a1e; color: #5eff5e; }
+  .badge.s2 { background: #2a1a00; border-color: #c47a00; color: #ffcc44; }
+  .badge.s3 { background: #2a0d00; border-color: #d44a00; color: #ff8844; }
+  .badge.s4 { background: #2a0000; border-color: #cc0000; color: #ff4444; }
+  .heat-meter { margin-top: auto; width: 100%; }
+  .meter-track { height: 8px; background: #111; border: 1px solid #1a1a1a; display: flex; gap: 2px; padding: 1px; overflow: hidden; }
+  .seg { flex: 1; border-radius: 1px; background: #1a1a1a; }
+  .seg.g { background: #1e7a1e; }
+  .seg.y { background: #c47a00; }
+  .seg.o { background: #d44a00; }
+  .seg.r { background: #cc0000; }
+  .meter-label { font-size: 9.5px; color: #444; text-align: center; margin-top: 4px; letter-spacing: 0.05em; font-weight: 600; }
+  .tile.complete { background: #0d0800; border: 2px solid #f5b800; }
+  .tile.complete .tile-name { color: #f5b800; }
+  .tile.complete .seg { background: #f5b800; }
+
+  .bottom-section { margin-top: 20px; display: flex; gap: 8px; }
+  .panel { border: 1px solid #1a1a1a; border-radius: 6px; overflow: hidden; }
+  .panel-header { padding: 6px 12px; background: #0d0d0d; border-bottom: 1px solid #1a1a1a; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: #444; text-transform: uppercase; }
+  .tiers-panel { flex: 0 0 160px; }
+  .tier-row { display: flex; align-items: center; gap: 10px; padding: 6px 14px; border-bottom: 1px solid #111; }
+  .tier-row:last-child { border-bottom: none; }
+  .tier-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .tier-name { font-family: 'Bungee', cursive; font-size: 10px; color: #888; min-width: 20px; }
+  .tier-val { font-size: 11px; color: #555; }
+  .bonus-panel { flex: 0 0 180px; }
+  .bonus-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 6px 14px; border-bottom: 1px solid #111; }
+  .bonus-row:last-child { border-bottom: none; }
+  .bonus-name { font-family: 'Bungee', cursive; font-size: 10px; }
+  .bonus-val { font-family: 'Bungee', cursive; font-size: 10px; }
+  .lines-panel { flex: 1; }
+  .lines-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+  .line-cell { padding: 5px 10px; border-right: 1px solid #111; border-bottom: 1px solid #111; }
+  .line-cell:nth-child(4n) { border-right: none; }
+  .line-cell:nth-last-child(-n+4) { border-bottom: none; }
+  
+  .line-name { font-family: 'Bungee', cursive; font-size: 9px; color: #555; letter-spacing: 0.04em; }
+  .line-name.bingo-t1 { color: #1e7a1e; }
+  .line-name.bingo-t2 { color: #c47a00; }
+  .line-name.bingo-t3 { color: #d44a00; }
+  .line-name.bingo-t4 { color: #cc0000; }
+  .line-tiles { font-size: 9.5px; color: #333; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="outer">
+  <div class="scoville-wrap">
+    <div class="scoville-title">SPICY METER</div>
+    <div style="position:relative;display:flex;">
+      <div class="scoville-track">
+        <div class="scoville-fill" id="scovFill" style="height:4.9%"></div>
+      </div>
+      <div class="scoville-ticks">
+        <div class="tick">MAX</div>
+        <div class="tick">75%</div>
+        <div class="tick">50%</div>
+        <div class="tick">25%</div>
+        <div class="tick">0</div>
+      </div>
+    </div>
+    <div class="scoville-score" style="color:#ff4500;">146</div>
+    <div class="scoville-denom" style="color:#444;">/ 2,950</div>
+
+  </div>
+
+  <div class="board">
+    <div class="logo-wrap">
+      <div class="team-label">Team Disco</div>
+      <div><div class="logo-frame"><span class="logo-spicy">SPICY</span><span class="logo-bingo">BINGO</span></div></div>
+      <div class="score-box">
+  <span class="score-num" style="color:#ff4500;">146</span>
+  <span class="score-label">peppers</span>
+  <div style="display:flex;gap:16px;justify-content:flex-end;margin-top:5px;">
+    <div style="text-align:right;">
+      <div style="font-size:9px;color:#444;letter-spacing:0.1em;text-transform:uppercase;font-family:'Oswald',sans-serif;">Tiles</div>
+      <div style="font-family:'Bungee',cursive;font-size:14px;color:#c47a00;">86</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:9px;color:#444;letter-spacing:0.1em;text-transform:uppercase;font-family:'Oswald',sans-serif;">Bingo</div>
+      <div style="font-family:'Bungee',cursive;font-size:14px;color:#1e7a1e;">60</div>
+    </div>
+  </div>
+</div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="bottom-section">
+      <div class="panel tiers-panel">
+        <div class="panel-header">Pepper Tiers</div>
+        <div class="tier-row"><span class="tier-swatch" style="background:#1e7a1e;"></span><span class="tier-name">T1</span><span class="tier-val">1 pepper</span></div>
+        <div class="tier-row"><span class="tier-swatch" style="background:#c47a00;"></span><span class="tier-name">T2</span><span class="tier-val">3 peppers</span></div>
+        <div class="tier-row"><span class="tier-swatch" style="background:#d44a00;"></span><span class="tier-name">T3</span><span class="tier-val">6 peppers</span></div>
+        <div class="tier-row"><span class="tier-swatch" style="background:#cc0000;"></span><span class="tier-name">T4</span><span class="tier-val">10 peppers</span></div>
+      </div>
+      <div class="panel bonus-panel">
+        <div class="panel-header">Bingo Bonuses</div>
+        <div class="bonus-row"><span class="bonus-name" style="color:#1e7a1e;">T1 bingo</span><span class="bonus-val" style="color:#1e7a1e;">+15</span></div>
+        <div class="bonus-row"><span class="bonus-name" style="color:#c47a00;">T2 bingo</span><span class="bonus-val" style="color:#c47a00;">+30</span></div>
+        <div class="bonus-row"><span class="bonus-name" style="color:#d44a00;">T3 bingo</span><span class="bonus-val" style="color:#d44a00;">+60</span></div>
+        <div class="bonus-row"><span class="bonus-name" style="color:#cc0000;">T4 bingo</span><span class="bonus-val" style="color:#cc0000;">+120</span></div>
+      </div>
+      <div class="panel lines-panel">
+        <div class="panel-header">Bingo Lines <span style="font-weight:400;color:#333;letter-spacing:0.02em;font-family:'Oswald',sans-serif;font-size:9px;">— 12 lines: rows · columns · diagonals</span></div>
+        <div class="lines-grid">
+          <div class="line-cell"><div class="line-name">Row 1</div><div class="line-tiles">1, 2, 3, 4, 5</div></div>
+          <div class="line-cell" style="position:relative;background:#1a1200;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="line-name bingo-t2">Row 2</div>
+    <div style="font-family:'Bungee',cursive;font-size:9px;color:#c47a00;">+30</div>
+  </div>
+  <div class="line-tiles">6, 7, 8, 9, 10</div>
+  <div style="position:absolute;bottom:4px;right:8px;font-family:'Bungee',cursive;font-size:8px;color:#555;">=45</div>
+</div>
+          <div class="line-cell"><div class="line-name">Row 3</div><div class="line-tiles">11, 12, 13, 14, 15</div></div>
+          <div class="line-cell"><div class="line-name">Row 4</div><div class="line-tiles">16, 17, 18, 19, 20</div></div>
+          <div class="line-cell"><div class="line-name">Row 5</div><div class="line-tiles">21, 22, 23, 24, 25</div></div>
+          <div class="line-cell"><div class="line-name">Col 1</div><div class="line-tiles">1, 6, 11, 16, 21</div></div>
+          <div class="line-cell" style="position:relative;background:#0a1a0a;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="line-name bingo-t1">Col 2</div>
+    <div style="font-family:'Bungee',cursive;font-size:9px;color:#1e7a1e;">+15</div>
+  </div>
+  <div class="line-tiles">2, 7, 12, 17, 22</div>
+  <div style="position:absolute;bottom:4px;right:8px;font-family:'Bungee',cursive;font-size:8px;color:#555;">=15</div>
+</div>
+          <div class="line-cell"><div class="line-name">Col 3</div><div class="line-tiles">3, 8, 13, 18, 23</div></div>
+          <div class="line-cell"><div class="line-name">Col 4</div><div class="line-tiles">4, 9, 14, 19, 24</div></div>
+          <div class="line-cell"><div class="line-name">Col 5</div><div class="line-tiles">5, 10, 15, 20, 25</div></div>
+          <div class="line-cell"><div class="line-name">Diag ↘</div><div class="line-tiles">1, 7, 13, 19, 25</div></div>
+          <div class="line-cell"><div class="line-name">Diag ↗</div><div class="line-tiles">5, 9, 13, 17, 21</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROW_COLORS = ['#cc0000','#d44a00','#c47a00','#8ab800','#1e7a1e'];
+
+// BINGO LINES that fired (0-indexed tile indices)
+const BINGO_TILES = new Set([5,6,7,8,9, 1,6,11,16,21]);
+
+const TILES = [
+  ["Leviathan & The Whisperer",2,3,4,6,5],
+  ["Misc. Bosses",3,8,18,21,0],
+  ["Fortis Colosseum",2,3,4,6,6],
+  ["Nex",1,2,3,4,1],
+  ["Moons of Peril",4,6,8,12,0],
+  ["Slayer Bosses A",3,5,7,10,5],
+  ["K'ril Tsutsaroth & Zilyana",2,3,4,6,4],
+  ["Muspah",3,4,5,7,4],
+  ["Doom of Mokhaiotl",1,2,3,5,3],
+  ["Zulrah",2,3,4,6,4],
+  ["Tz-Tok Jad & TzKal-Zuk",4,6,8,12,4],
+  ["Royal Titans",2,3,4,6,4],
+  ["Raids",3,5,7,9,7],
+  ["Corrupted Gauntlet",2,3,4,6,4],
+  ["Vorkath",2,3,4,6,4],
+  ["Dagannoth Kings",4,6,8,10,0],
+  ["The Maggot King",1,2,3,4,2],
+  ["Duke & Vardorvis",2,3,4,6,0],
+  ["Yama",1,2,3,4,0],
+  ["Slayer Bosses B",3,5,7,10,3],
+  ["Skilling Bosses",3,5,7,9,3],
+  ["Barrows",4,6,8,12,4],
+  ["Wilderness Bosses",3,5,7,9,0],
+  ["Kree'arra & Graardor",2,3,4,6,2],
+  ["Hueycoatl",2,3,4,5,5],
+];
+const GEM_INC=[1,2,3,4];
+
+function render(){
+  const grid=document.getElementById('grid');
+  TILES.forEach(([name,t1,t2,t3,t4,drops],i)=>{
+    const thresholds=[t1,t2,t3,t4];
+    const complete=drops>=t4;
+    const inBingo=BINGO_TILES.has(i);
+    const pct=Math.min(1,drops/t4);
+    const segs=10;
+    const filled=Math.round(pct*segs);
+    const rc=ROW_COLORS[Math.floor(i/5)];
+    const badges=thresholds.map((th,idx)=>{
+      return `<div class="badge ${drops>=th?'s'+(idx+1):''}">${th}</div>`;
+    }).join('');
+    const segHtml=Array.from({length:segs},(_,s)=>{
+      if(s>=filled) return `<div class="seg"></div>`;
+      const p=s/segs;
+      return `<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
+    }).join('');
+    const el=document.createElement('div');
+    el.className=`tile${complete?' complete':''}${inBingo?' bingo':''}`;
+    el.style.setProperty('--rc',rc);
+    el.innerHTML=`
+      ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
+      <div style="position:absolute;top:5px;left:7px;font-family:'Bungee',cursive;font-size:8px;color:rgba(255,255,255,0.18);letter-spacing:0.02em;">${i+1}</div>
+      <div class="tile-name">${name}</div>
+      <div class="tier-badges">${badges}</div>
+      <div class="heat-meter">
+        <div class="meter-track">${segHtml}</div>
+        <div class="meter-label">${drops} / ${t4} drops</div>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+render();
+</script>
+</body>
+</html>
