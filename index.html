@@ -2,171 +2,189 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Spicy Bingo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spicy Bingo — Eternal Gems</title>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #000; font-family: 'Oswald', sans-serif; padding: 20px; }
-  .outer { max-width: 1320px; margin: 0 auto; display: flex; gap: 14px; align-items: flex-start; }
+  body { background: #000; font-family: 'Oswald', sans-serif; padding: 30px 20px; }
 
-  .scoville-wrap { width: 56px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding-top: 110px; }
-  .scoville-title { font-family: 'Bungee', cursive; font-size: 8px; letter-spacing: 0.1em; color: #444; text-align: center; margin-bottom: 6px; writing-mode: vertical-rl; transform: rotate(180deg); height: 92px; white-space: nowrap; }
-  .scoville-track { width: 26px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 4px; overflow: hidden; min-height: 480px; display: flex; flex-direction: column-reverse; position: relative; }
-  .scoville-fill { width: 100%; background: linear-gradient(0deg, #1e7a1e 0%, #8ab800 25%, #c47a00 50%, #d44a00 75%, #cc0000 100%); }
-  .scoville-ticks { position: absolute; top: 0; left: 27px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; }
-  .tick { font-size: 7px; color: #2a2a2a; white-space: nowrap; padding-left: 3px; line-height: 1; }
-  .scoville-score { font-family: 'Bungee', cursive; font-size: 12px; color: #444; text-align: center; margin-top: 6px; }
-  .scoville-denom { font-size: 8px; color: #2a2a2a; letter-spacing: 0.04em; text-align: center; margin-top: 2px; }
+  /* ── LOGO ── */
+  .logo-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 32px; }
+  .logo-frame { display: inline-flex; align-items: center; border: 3px solid #ff4500; border-radius: 6px; padding: 8px 28px 10px; position: relative; }
+  .logo-frame::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
+  .logo-spicy { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #f5b800; letter-spacing:0.04em; margin-right:12px; }
+  .logo-bingo { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #ff4500; letter-spacing:0.04em; }
+  .subtitle { text-align:center; font-size:12px; letter-spacing:0.2em; color:#444; text-transform:uppercase; margin-bottom:36px; }
 
-  .board { flex: 1; min-width: 0; }
-  .logo-wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px 12px; border-bottom: 1px solid #1a1a1a; margin-bottom: 12px; }
-  .team-label { font-size: 12px; letter-spacing: 0.22em; color: #444; text-transform: uppercase; font-weight: 700; }
-  .logo-frame { display: inline-flex; align-items: center; border: 3px solid #ff4500; border-radius: 6px; padding: 7px 24px 9px; position: relative; }
-  .logo-frame::before { content: ''; position: absolute; inset: 4px; border: 1.5px solid #ff4500; border-radius: 3px; pointer-events: none; }
-  .logo-spicy { font-family: 'Bungee', cursive; font-size: 38px; color: transparent; -webkit-text-stroke: 2.5px #f5b800; letter-spacing: 0.04em; line-height: 1; margin-right: 12px; }
-  .logo-bingo { font-family: 'Bungee', cursive; font-size: 38px; color: transparent; -webkit-text-stroke: 2.5px #ff4500; letter-spacing: 0.04em; line-height: 1; }
-  .score-box { text-align: right; }
-  .score-num { font-family: 'Bungee', cursive; font-size: 22px; color: #444; display: block; }
-  .score-label { font-size: 11px; color: #333; letter-spacing: 0.12em; font-weight: 700; text-transform: uppercase; }
+  /* ── LANDING ── */
+  #landing { max-width:900px; margin:0 auto; }
+  .standings-title { font-family:'Bungee',cursive; font-size:12px; letter-spacing:0.14em; color:#555; text-align:center; margin-bottom:14px; }
+  .team-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  .team-card { background:#0a0a0a; border:2px solid #1a1a1a; border-radius:8px; overflow:hidden; cursor:pointer; transition:border-color 0.2s; }
+  .team-card:hover { border-color:#ff4500; }
+  .tc-header { padding:14px 18px 12px; display:flex; align-items:center; justify-content:space-between; }
+  .tc-rank { font-family:'Bungee',cursive; font-size:26px; color:#222; margin-right:10px; }
+  .tc-rank.r1{color:#f5b800;} .tc-rank.r2{color:#888;} .tc-rank.r3{color:#b85c00;}
+  .tc-name { font-family:'Bungee',cursive; font-size:15px; color:#ddd; flex:1; }
+  .tc-total { font-family:'Bungee',cursive; font-size:24px; color:#ff4500; }
+  .tc-label { font-size:9px; color:#444; letter-spacing:0.1em; text-transform:uppercase; text-align:right; }
+  .tc-body { padding:10px 18px 14px; border-top:1px solid #111; display:flex; gap:20px; }
+  .tc-stat-val { font-family:'Bungee',cursive; font-size:15px; }
+  .tc-stat-label { font-size:9px; color:#333; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
+  .tc-footer { padding:9px 18px; background:#0d0d0d; border-top:1px solid #111; font-size:11px; color:#444; letter-spacing:0.08em; text-align:center; text-transform:uppercase; }
+  .team-card:hover .tc-footer { color:#ff4500; }
+  .last-updated { text-align:center; font-size:10px; color:#222; letter-spacing:0.06em; margin-top:18px; }
 
-  .grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 7px; }
-  .tile { background: #0a0a0a; border: 2px solid var(--rc); padding: 10px 9px 9px; display: flex; flex-direction: column; align-items: center; min-height: 158px; position: relative; }
-  .tile.bingo { }
-  .complete-tag { font-family: 'Bungee', cursive; font-size: 9px; letter-spacing: 0.14em; background: #f5b800; color: #000; padding: 2px 0; text-align: center; width: calc(100% + 18px); margin: -10px -9px 8px; }
-  .tile-name { font-size: 10.5px; font-weight: 700; color: #ddd; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.3; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 9px; }
-  .tier-badges { display: flex; gap: 3px; width: 100%; margin-bottom: 9px; }
-  .badge { flex: 1; text-align: center; font-family: 'Bungee', cursive; font-size: 10px; padding: 5px 0; border: 1.5px solid #1a1a1a; color: #2a2a2a; background: #0d0d0d; }
-  .badge.s1 { background: #0a2a0a; border-color: #1e7a1e; color: #5eff5e; }
-  .badge.s2 { background: #2a1a00; border-color: #c47a00; color: #ffcc44; }
-  .badge.s3 { background: #2a0d00; border-color: #d44a00; color: #ff8844; }
-  .badge.s4 { background: #2a0000; border-color: #cc0000; color: #ff4444; }
-  .heat-meter { margin-top: auto; width: 100%; }
-  .meter-track { height: 8px; background: #111; border: 1px solid #1a1a1a; display: flex; gap: 2px; padding: 1px; overflow: hidden; }
-  .seg { flex: 1; border-radius: 1px; background: #1a1a1a; }
-  .seg.g { background: #1e7a1e; }
-  .seg.y { background: #c47a00; }
-  .seg.o { background: #d44a00; }
-  .seg.r { background: #cc0000; }
-  .meter-label { font-size: 9.5px; color: #444; text-align: center; margin-top: 4px; letter-spacing: 0.05em; font-weight: 600; }
-  .tile.complete { background: #0d0800; border: 2px solid #f5b800; }
-  .tile.complete .tile-name { color: #f5b800; }
-  .tile.complete .seg { background: #f5b800; }
+  /* ── BOARD ── */
+  #board-view { display:none; }
+  .back-btn { display:inline-block; margin-bottom:14px; font-size:11px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
+  .back-btn:hover { color:#ff4500; }
+  .outer { max-width:1320px; margin:0 auto; display:flex; gap:14px; align-items:flex-start; }
 
-  .bottom-section { margin-top: 20px; display: flex; gap: 8px; }
-  .panel { border: 1px solid #1a1a1a; border-radius: 6px; overflow: hidden; }
-  .panel-header { padding: 6px 12px; background: #0d0d0d; border-bottom: 1px solid #1a1a1a; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: #444; text-transform: uppercase; }
-  .tiers-panel { flex: 0 0 160px; }
-  .tier-row { display: flex; align-items: center; gap: 10px; padding: 6px 14px; border-bottom: 1px solid #111; }
-  .tier-row:last-child { border-bottom: none; }
-  .tier-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-  .tier-name { font-family: 'Bungee', cursive; font-size: 10px; color: #888; min-width: 20px; }
-  .tier-val { font-size: 11px; color: #555; }
-  .bonus-panel { flex: 0 0 180px; }
-  .bonus-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 6px 14px; border-bottom: 1px solid #111; }
-  .bonus-row:last-child { border-bottom: none; }
-  .bonus-name { font-family: 'Bungee', cursive; font-size: 10px; }
-  .bonus-val { font-family: 'Bungee', cursive; font-size: 10px; }
-  .lines-panel { flex: 1; }
-  .lines-grid { display: grid; grid-template-columns: repeat(4,1fr); }
-  .line-cell { padding: 5px 10px; border-right: 1px solid #111; border-bottom: 1px solid #111; }
-  .line-cell:nth-child(4n) { border-right: none; }
-  .line-cell:nth-last-child(-n+4) { border-bottom: none; }
-  
-  .line-name { font-family: 'Bungee', cursive; font-size: 9px; color: #555; letter-spacing: 0.04em; }
-  .line-name.bingo-t1 { color: #1e7a1e; }
-  .line-name.bingo-t2 { color: #c47a00; }
-  .line-name.bingo-t3 { color: #d44a00; }
-  .line-name.bingo-t4 { color: #cc0000; }
-  .line-tiles { font-size: 9.5px; color: #333; font-weight: 600; }
+  /* meter */
+  .meter-wrap { width:56px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:110px; }
+  .meter-title { font-family:'Bungee',cursive; font-size:8px; letter-spacing:0.1em; color:#444; margin-bottom:6px; writing-mode:vertical-rl; transform:rotate(180deg); height:80px; white-space:nowrap; }
+  .meter-track { width:26px; background:#0d0d0d; border:1px solid #1a1a1a; border-radius:4px; overflow:hidden; height:480px; display:flex; flex-direction:column-reverse; }
+  .meter-fill { width:100%; background:linear-gradient(0deg,#1e7a1e 0%,#8ab800 25%,#c47a00 50%,#d44a00 75%,#cc0000 100%); transition:height 0.8s ease; }
+  .meter-score { font-family:'Bungee',cursive; font-size:12px; color:#ff4500; text-align:center; margin-top:6px; }
+  .meter-denom { font-size:8px; color:#2a2a2a; text-align:center; margin-top:2px; }
+  .meter-sub { margin-top:10px; width:100%; text-align:center; }
+  .meter-sub-label { font-size:7px; color:#2a2a2a; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:2px; }
+  .meter-sub-val { font-family:'Bungee',cursive; font-size:10px; }
+
+  /* board */
+  .board { flex:1; min-width:0; }
+  .logo-row { display:flex; align-items:center; justify-content:space-between; padding:14px 22px 12px; border-bottom:1px solid #1a1a1a; margin-bottom:12px; }
+  .team-lbl { font-size:12px; letter-spacing:0.22em; color:#444; text-transform:uppercase; font-weight:700; }
+  .logo-sm { display:inline-flex; align-items:center; border:2.5px solid #ff4500; border-radius:5px; padding:5px 20px 7px; position:relative; }
+  .logo-sm::before { content:''; position:absolute; inset:4px; border:1px solid #ff4500; border-radius:3px; }
+  .ls-spicy { font-family:'Bungee',cursive; font-size:32px; color:transparent; -webkit-text-stroke:2px #f5b800; margin-right:10px; }
+  .ls-bingo { font-family:'Bungee',cursive; font-size:32px; color:transparent; -webkit-text-stroke:2px #ff4500; }
+  .score-box { text-align:right; }
+  .score-total { font-family:'Bungee',cursive; font-size:24px; color:#ff4500; display:block; }
+  .score-lbl { font-size:10px; color:#333; letter-spacing:0.12em; text-transform:uppercase; }
+  .score-breakdown { display:flex; gap:14px; justify-content:flex-end; margin-top:4px; }
+  .sb-val { font-family:'Bungee',cursive; font-size:13px; }
+  .sb-lbl { font-size:9px; color:#444; letter-spacing:0.08em; text-transform:uppercase; }
+
+  /* grid */
+  .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
+  .tile { background:#0a0a0a; border:2px solid var(--rc); padding:10px 9px 9px; display:flex; flex-direction:column; align-items:center; min-height:158px; position:relative; }
+  .tile.complete { background:#0d0800; border-color:#f5b800; }
+  .complete-tag { font-family:'Bungee',cursive; font-size:9px; letter-spacing:0.14em; background:#f5b800; color:#000; padding:2px 0; text-align:center; width:calc(100% + 18px); margin:-10px -9px 8px; }
+  .tile-num { position:absolute; top:5px; left:7px; font-family:'Bungee',cursive; font-size:8px; color:rgba(255,255,255,0.18); }
+  .tile-name { font-size:10.5px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; margin-bottom:9px; }
+  .tile.complete .tile-name { color:#f5b800; }
+  .tier-badges { display:flex; gap:3px; width:100%; margin-bottom:9px; }
+  .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:10px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; }
+  .badge.s1{background:#0a2a0a;border-color:#1e7a1e;color:#5eff5e;}
+  .badge.s2{background:#2a1a00;border-color:#c47a00;color:#ffcc44;}
+  .badge.s3{background:#2a0d00;border-color:#d44a00;color:#ff8844;}
+  .badge.s4{background:#2a0000;border-color:#cc0000;color:#ff4444;}
+  .heat-meter { margin-top:auto; width:100%; }
+  .heat-track { height:8px; background:#111; border:1px solid #1a1a1a; display:flex; gap:2px; padding:1px; overflow:hidden; }
+  .seg{flex:1;border-radius:1px;background:#1a1a1a;}
+  .seg.g{background:#1e7a1e;}.seg.y{background:#c47a00;}.seg.o{background:#d44a00;}.seg.r{background:#cc0000;}
+  .tile.complete .seg{background:#f5b800;}
+  .heat-label { font-size:9.5px; color:#444; text-align:center; margin-top:4px; letter-spacing:0.05em; font-weight:600; }
+
+  /* bottom panels */
+  .bottom-section { margin-top:20px; display:flex; gap:8px; }
+  .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
+  .ph { padding:6px 12px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:10px; font-weight:700; letter-spacing:0.12em; color:#444; text-transform:uppercase; }
+  .tiers-panel { flex:0 0 160px; }
+  .tier-row { display:flex; align-items:center; gap:10px; padding:6px 14px; border-bottom:1px solid #111; }
+  .tier-row:last-child{border-bottom:none;}
+  .tsw { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+  .tn { font-family:'Bungee',cursive; font-size:10px; color:#888; min-width:20px; }
+  .tv { font-size:11px; color:#555; }
+  .bonus-panel { flex:0 0 180px; }
+  .bonus-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:6px 14px; border-bottom:1px solid #111; }
+  .bonus-row:last-child{border-bottom:none;}
+  .bn { font-family:'Bungee',cursive; font-size:10px; }
+  .bv { font-family:'Bungee',cursive; font-size:10px; }
+  .lines-panel { flex:1; }
+  .lines-grid { display:grid; grid-template-columns:repeat(4,1fr); }
+  .lc { padding:5px 10px; border-right:1px solid #111; border-bottom:1px solid #111; position:relative; min-height:36px; }
+  .lc:nth-child(4n){border-right:none;}
+  .lc:nth-last-child(-n+4){border-bottom:none;}
+  .ln { font-family:'Bungee',cursive; font-size:9px; color:#555; }
+  .lt { font-size:9.5px; color:#333; font-weight:600; }
+  .lc.bt1{background:#0a1a0a;} .lc.bt2{background:#1a1200;} .lc.bt3{background:#1a0800;} .lc.bt4{background:#1a0000;}
+  .lc.bt1 .ln{color:#1e7a1e;} .lc.bt2 .ln{color:#c47a00;} .lc.bt3 .ln{color:#d44a00;} .lc.bt4 .ln{color:#cc0000;}
+  .lb { position:absolute; top:4px; right:6px; font-family:'Bungee',cursive; font-size:8px; }
+  .ltot { position:absolute; bottom:3px; right:6px; font-size:8px; color:#555; }
+
+  .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
+  @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} .logo-spicy,.logo-bingo{font-size:30px;} }
 </style>
 </head>
 <body>
-<div class="outer">
-  <div class="scoville-wrap">
-    <div class="scoville-title">SPICY METER</div>
-    <div style="position:relative;display:flex;">
-      <div class="scoville-track">
-        <div class="scoville-fill" id="scovFill" style="height:4.9%"></div>
-      </div>
-      <div class="scoville-ticks">
-        <div class="tick">MAX</div>
-        <div class="tick">75%</div>
-        <div class="tick">50%</div>
-        <div class="tick">25%</div>
-        <div class="tick">0</div>
-      </div>
-    </div>
-    <div class="scoville-score" style="color:#ff4500;">146</div>
-    <div class="scoville-denom" style="color:#444;">/ 2,950</div>
 
-  </div>
-
-  <div class="board">
-    <div class="logo-wrap">
-      <div class="team-label">Team Disco</div>
-      <div><div class="logo-frame"><span class="logo-spicy">SPICY</span><span class="logo-bingo">BINGO</span></div></div>
-      <div class="score-box">
-  <span class="score-num" style="color:#ff4500;">146</span>
-  <span class="score-label">peppers</span>
-  <div style="display:flex;gap:16px;justify-content:flex-end;margin-top:5px;">
-    <div style="text-align:right;">
-      <div style="font-size:9px;color:#444;letter-spacing:0.1em;text-transform:uppercase;font-family:'Oswald',sans-serif;">Tiles</div>
-      <div style="font-family:'Bungee',cursive;font-size:14px;color:#c47a00;">86</div>
-    </div>
-    <div style="text-align:right;">
-      <div style="font-size:9px;color:#444;letter-spacing:0.1em;text-transform:uppercase;font-family:'Oswald',sans-serif;">Bingo</div>
-      <div style="font-family:'Bungee',cursive;font-size:14px;color:#1e7a1e;">60</div>
+<!-- LANDING PAGE -->
+<div id="landing">
+  <div class="logo-wrap">
+    <div class="logo-frame">
+      <span class="logo-spicy">SPICY</span>
+      <span class="logo-bingo">BINGO</span>
     </div>
   </div>
+  <div class="subtitle">Eternal Gems — PvM Bingo Event</div>
+  <div class="standings-title">LIVE STANDINGS</div>
+  <div class="team-cards" id="cards"><div class="loading">Loading scores...</div></div>
+  <div class="last-updated" id="lastUpdated"></div>
 </div>
+
+<!-- BOARD VIEW -->
+<div id="board-view">
+  <span class="back-btn" onclick="showLanding()">← Back to standings</span>
+  <div class="outer">
+    <div class="meter-wrap">
+      <div class="meter-title">SPICY METER</div>
+      <div class="meter-track"><div class="meter-fill" id="mFill" style="height:0%"></div></div>
+      <div class="meter-score" id="mScore">0</div>
+      <div class="meter-denom">/ 2,950</div>
+      <div class="meter-sub">
+        <div class="meter-sub-label">Tile</div>
+        <div class="meter-sub-val" id="mTile" style="color:#5599ff">0</div>
+        <div style="border-top:1px solid #1a1a1a;margin:5px 4px;"></div>
+        <div class="meter-sub-label">Bingo</div>
+        <div class="meter-sub-val" id="mBingo" style="color:#1e7a1e">0</div>
+      </div>
     </div>
-
-    <div class="grid" id="grid"></div>
-
-    <div class="bottom-section">
-      <div class="panel tiers-panel">
-        <div class="panel-header">Pepper Tiers</div>
-        <div class="tier-row"><span class="tier-swatch" style="background:#1e7a1e;"></span><span class="tier-name">T1</span><span class="tier-val">1 pepper</span></div>
-        <div class="tier-row"><span class="tier-swatch" style="background:#c47a00;"></span><span class="tier-name">T2</span><span class="tier-val">3 peppers</span></div>
-        <div class="tier-row"><span class="tier-swatch" style="background:#d44a00;"></span><span class="tier-name">T3</span><span class="tier-val">6 peppers</span></div>
-        <div class="tier-row"><span class="tier-swatch" style="background:#cc0000;"></span><span class="tier-name">T4</span><span class="tier-val">10 peppers</span></div>
+    <div class="board">
+      <div class="logo-row">
+        <div class="team-lbl" id="bTeamName"></div>
+        <div><div class="logo-sm"><span class="ls-spicy">SPICY</span><span class="ls-bingo">BINGO</span></div></div>
+        <div class="score-box">
+          <span class="score-total" id="bTotal">0</span>
+          <span class="score-lbl">peppers</span>
+          <div class="score-breakdown">
+            <div><div class="sb-val" id="bTile" style="color:#5599ff">0</div><div class="sb-lbl">Tiles</div></div>
+            <div><div class="sb-val" id="bBingo" style="color:#1e7a1e">0</div><div class="sb-lbl">Bingo</div></div>
+          </div>
+        </div>
       </div>
-      <div class="panel bonus-panel">
-        <div class="panel-header">Bingo Bonuses</div>
-        <div class="bonus-row"><span class="bonus-name" style="color:#1e7a1e;">T1 bingo</span><span class="bonus-val" style="color:#1e7a1e;">+15</span></div>
-        <div class="bonus-row"><span class="bonus-name" style="color:#c47a00;">T2 bingo</span><span class="bonus-val" style="color:#c47a00;">+30</span></div>
-        <div class="bonus-row"><span class="bonus-name" style="color:#d44a00;">T3 bingo</span><span class="bonus-val" style="color:#d44a00;">+60</span></div>
-        <div class="bonus-row"><span class="bonus-name" style="color:#cc0000;">T4 bingo</span><span class="bonus-val" style="color:#cc0000;">+120</span></div>
-      </div>
-      <div class="panel lines-panel">
-        <div class="panel-header">Bingo Lines <span style="font-weight:400;color:#333;letter-spacing:0.02em;font-family:'Oswald',sans-serif;font-size:9px;">— 12 lines: rows · columns · diagonals</span></div>
-        <div class="lines-grid">
-          <div class="line-cell"><div class="line-name">Row 1</div><div class="line-tiles">1, 2, 3, 4, 5</div></div>
-          <div class="line-cell" style="position:relative;background:#1a1200;">
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <div class="line-name bingo-t2">Row 2</div>
-    <div style="font-family:'Bungee',cursive;font-size:9px;color:#c47a00;">+30</div>
-  </div>
-  <div class="line-tiles">6, 7, 8, 9, 10</div>
-  <div style="position:absolute;bottom:4px;right:8px;font-family:'Bungee',cursive;font-size:8px;color:#555;">=45</div>
-</div>
-          <div class="line-cell"><div class="line-name">Row 3</div><div class="line-tiles">11, 12, 13, 14, 15</div></div>
-          <div class="line-cell"><div class="line-name">Row 4</div><div class="line-tiles">16, 17, 18, 19, 20</div></div>
-          <div class="line-cell"><div class="line-name">Row 5</div><div class="line-tiles">21, 22, 23, 24, 25</div></div>
-          <div class="line-cell"><div class="line-name">Col 1</div><div class="line-tiles">1, 6, 11, 16, 21</div></div>
-          <div class="line-cell" style="position:relative;background:#0a1a0a;">
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <div class="line-name bingo-t1">Col 2</div>
-    <div style="font-family:'Bungee',cursive;font-size:9px;color:#1e7a1e;">+15</div>
-  </div>
-  <div class="line-tiles">2, 7, 12, 17, 22</div>
-  <div style="position:absolute;bottom:4px;right:8px;font-family:'Bungee',cursive;font-size:8px;color:#555;">=15</div>
-</div>
-          <div class="line-cell"><div class="line-name">Col 3</div><div class="line-tiles">3, 8, 13, 18, 23</div></div>
-          <div class="line-cell"><div class="line-name">Col 4</div><div class="line-tiles">4, 9, 14, 19, 24</div></div>
-          <div class="line-cell"><div class="line-name">Col 5</div><div class="line-tiles">5, 10, 15, 20, 25</div></div>
-          <div class="line-cell"><div class="line-name">Diag ↘</div><div class="line-tiles">1, 7, 13, 19, 25</div></div>
-          <div class="line-cell"><div class="line-name">Diag ↗</div><div class="line-tiles">5, 9, 13, 17, 21</div></div>
+      <div class="grid" id="bGrid"></div>
+      <div class="bottom-section">
+        <div class="panel tiers-panel">
+          <div class="ph">Pepper Tiers</div>
+          <div class="tier-row"><span class="tsw" style="background:#1e7a1e"></span><span class="tn">T1</span><span class="tv">1 pepper</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#c47a00"></span><span class="tn">T2</span><span class="tv">3 peppers</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#d44a00"></span><span class="tn">T3</span><span class="tv">6 peppers</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#cc0000"></span><span class="tn">T4</span><span class="tv">10 peppers</span></div>
+        </div>
+        <div class="panel bonus-panel">
+          <div class="ph">Bingo Bonuses</div>
+          <div class="bonus-row"><span class="bn" style="color:#1e7a1e">T1 bingo</span><span class="bv" style="color:#1e7a1e">+15</span></div>
+          <div class="bonus-row"><span class="bn" style="color:#c47a00">T2 bingo</span><span class="bv" style="color:#c47a00">+30</span></div>
+          <div class="bonus-row"><span class="bn" style="color:#d44a00">T3 bingo</span><span class="bv" style="color:#d44a00">+60</span></div>
+          <div class="bonus-row"><span class="bn" style="color:#cc0000">T4 bingo</span><span class="bv" style="color:#cc0000">+120</span></div>
+        </div>
+        <div class="panel lines-panel">
+          <div class="ph">Bingo Lines <span style="font-weight:400;color:#333;font-size:9px">— 12 lines: rows · columns · diagonals</span></div>
+          <div class="lines-grid" id="bLines"></div>
         </div>
       </div>
     </div>
@@ -174,74 +192,176 @@
 </div>
 
 <script>
-const ROW_COLORS = ['#cc0000','#d44a00','#c47a00','#8ab800','#1e7a1e'];
-
-// BINGO LINES that fired (0-indexed tile indices)
-const BINGO_TILES = new Set([5,6,7,8,9, 1,6,11,16,21]);
-
-const TILES = [
-  ["Leviathan & The Whisperer",2,3,4,6,5],
-  ["Misc. Bosses",3,8,18,21,0],
-  ["Fortis Colosseum",2,3,4,6,6],
-  ["Nex",1,2,3,4,1],
-  ["Moons of Peril",4,6,8,12,0],
-  ["Slayer Bosses A",3,5,7,10,5],
-  ["K'ril Tsutsaroth & Zilyana",2,3,4,6,4],
-  ["Muspah",3,4,5,7,4],
-  ["Doom of Mokhaiotl",1,2,3,5,3],
-  ["Zulrah",2,3,4,6,4],
-  ["Tz-Tok Jad & TzKal-Zuk",4,6,8,12,4],
-  ["Royal Titans",2,3,4,6,4],
-  ["Raids",3,5,7,9,7],
-  ["Corrupted Gauntlet",2,3,4,6,4],
-  ["Vorkath",2,3,4,6,4],
-  ["Dagannoth Kings",4,6,8,10,0],
-  ["The Maggot King",1,2,3,4,2],
-  ["Duke & Vardorvis",2,3,4,6,0],
-  ["Yama",1,2,3,4,0],
-  ["Slayer Bosses B",3,5,7,10,3],
-  ["Skilling Bosses",3,5,7,9,3],
-  ["Barrows",4,6,8,12,4],
-  ["Wilderness Bosses",3,5,7,9,0],
-  ["Kree'arra & Graardor",2,3,4,6,2],
-  ["Hueycoatl",2,3,4,5,5],
+const API = "https://script.google.com/macros/s/AKfycbzLM8st-BdZ7sp18xz2L4r6LnkO9g0JcGpgfkNfCWGem3xgxJN-zBaC5w1j9F4Y2GWS-g/exec";
+const MAX = 2950;
+const RC  = ["#cc0000","#d44a00","#c47a00","#8ab800","#1e7a1e"];
+const BINGO_LINES = [
+  {n:"Row 1",t:"1, 2, 3, 4, 5"},{n:"Row 2",t:"6, 7, 8, 9, 10"},
+  {n:"Row 3",t:"11, 12, 13, 14, 15"},{n:"Row 4",t:"16, 17, 18, 19, 20"},
+  {n:"Row 5",t:"21, 22, 23, 24, 25"},{n:"Col 1",t:"1, 6, 11, 16, 21"},
+  {n:"Col 2",t:"2, 7, 12, 17, 22"},{n:"Col 3",t:"3, 8, 13, 18, 23"},
+  {n:"Col 4",t:"4, 9, 14, 19, 24"},{n:"Col 5",t:"5, 10, 15, 20, 25"},
+  {n:"Diag ↘",t:"1, 7, 13, 19, 25"},{n:"Diag ↗",t:"5, 9, 13, 17, 21"},
 ];
-const GEM_INC=[1,2,3,4];
+const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
+const TEAM_SLUGS = {
+  "Team Jalapeno":"jalapeno","Team Habanero":"habanero",
+  "Team Ghost Pepper":"ghost","Team Carolina Reaper":"carolina"
+};
 
-function render(){
-  const grid=document.getElementById('grid');
-  TILES.forEach(([name,t1,t2,t3,t4,drops],i)=>{
-    const thresholds=[t1,t2,t3,t4];
-    const complete=drops>=t4;
-    const inBingo=BINGO_TILES.has(i);
-    const pct=Math.min(1,drops/t4);
-    const segs=10;
-    const filled=Math.round(pct*segs);
-    const rc=ROW_COLORS[Math.floor(i/5)];
-    const badges=thresholds.map((th,idx)=>{
-      return `<div class="badge ${drops>=th?'s'+(idx+1):''}">${th}</div>`;
-    }).join('');
-    const segHtml=Array.from({length:segs},(_,s)=>{
-      if(s>=filled) return `<div class="seg"></div>`;
-      const p=s/segs;
-      return `<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
-    }).join('');
-    const el=document.createElement('div');
-    el.className=`tile${complete?' complete':''}${inBingo?' bingo':''}`;
-    el.style.setProperty('--rc',rc);
-    el.innerHTML=`
-      ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
-      <div style="position:absolute;top:5px;left:7px;font-family:'Bungee',cursive;font-size:8px;color:rgba(255,255,255,0.18);letter-spacing:0.02em;">${i+1}</div>
-      <div class="tile-name">${name}</div>
-      <div class="tier-badges">${badges}</div>
-      <div class="heat-meter">
-        <div class="meter-track">${segHtml}</div>
-        <div class="meter-label">${drops} / ${t4} drops</div>
-      </div>`;
-    grid.appendChild(el);
+let cachedData = null;
+let currentTeam = null;
+
+// ── Routing ──
+function getHash() { return window.location.hash.replace('#',''); }
+function setHash(h) { window.location.hash = h; }
+
+function showLanding() {
+  setHash('');
+  document.getElementById('landing').style.display='block';
+  document.getElementById('board-view').style.display='none';
+  document.title = 'Spicy Bingo — Eternal Gems';
+}
+
+function showBoard(sheetName) {
+  currentTeam = sheetName;
+  const slug = TEAM_SLUGS[sheetName] || sheetName;
+  setHash(slug);
+  document.getElementById('landing').style.display='none';
+  document.getElementById('board-view').style.display='block';
+  document.title = 'Spicy Bingo — ' + sheetName;
+  if (cachedData) {
+    const team = cachedData.teams.find(t => t.sheetName === sheetName);
+    if (team) renderBoard(team);
+  }
+}
+
+window.addEventListener('hashchange', () => {
+  const h = getHash();
+  if (!h) { showLanding(); return; }
+  const entry = Object.entries(TEAM_SLUGS).find(([k,v]) => v === h);
+  if (entry) showBoard(entry[0]);
+});
+
+// ── Data ──
+async function load() {
+  try {
+    const res = await fetch(API);
+    const data = await res.json();
+    cachedData = data;
+    renderLanding(data);
+    if (currentTeam) {
+      const team = data.teams.find(t => t.sheetName === currentTeam);
+      if (team) renderBoard(team);
+    }
+    const ts = new Date(data.lastUpdated);
+    document.getElementById('lastUpdated').textContent = 'Last updated: ' + ts.toLocaleTimeString();
+  } catch(e) {
+    console.error('Load error:', e);
+    setTimeout(load, 15000);
+  }
+}
+
+// ── Landing ──
+function renderLanding(data) {
+  const cards = document.getElementById('cards');
+  cards.innerHTML = '';
+  data.teams.forEach(team => {
+    const rc = team.rank <= 3 ? `r${team.rank}` : '';
+    const el = document.createElement('div');
+    el.className = 'team-card';
+    el.onclick = () => showBoard(team.sheetName);
+    el.innerHTML = `
+      <div class="tc-header">
+        <span class="tc-rank ${rc}">#${team.rank}</span>
+        <span class="tc-name">${team.name}</span>
+        <div><div class="tc-total">${team.total}</div><div class="tc-label">🌶 Peppers</div></div>
+      </div>
+      <div class="tc-body">
+        <div><div class="tc-stat-val" style="color:#5599ff">${team.tilePeps}</div><div class="tc-stat-label">Tile peppers</div></div>
+        <div><div class="tc-stat-val" style="color:#1e7a1e">${team.bingoPeps}</div><div class="tc-stat-label">Bingo peppers</div></div>
+        <div><div class="tc-stat-val" style="color:#888">${team.t4Complete}</div><div class="tc-stat-label">T4 complete</div></div>
+      </div>
+      <div class="tc-footer">View board →</div>`;
+    cards.appendChild(el);
   });
 }
-render();
+
+// ── Board ──
+function parseThresholds(str) {
+  const parts = String(str).split('·').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  while (parts.length < 4) parts.push(0);
+  return parts;
+}
+
+function tierNum(s) {
+  if (s==='T4') return 4; if (s==='T3') return 3;
+  if (s==='T2') return 2; if (s==='T1') return 1; return 0;
+}
+
+function renderBoard(team) {
+  const pct = Math.min(100, (team.total/MAX)*100);
+  document.getElementById('mFill').style.height = pct+'%';
+  document.getElementById('mScore').textContent = team.total;
+  document.getElementById('mTile').textContent  = team.tilePeps;
+  document.getElementById('mBingo').textContent = team.bingoPeps;
+  document.getElementById('bTeamName').textContent = team.name;
+  document.getElementById('bTotal').textContent = team.total;
+  document.getElementById('bTile').textContent  = team.tilePeps;
+  document.getElementById('bBingo').textContent = team.bingoPeps;
+
+  // Grid
+  let html = '';
+  (team.tiles||[]).forEach((tile,i) => {
+    const [t1,t2,t3,t4] = parseThresholds(tile.thresholds);
+    const drops = tile.drops||0;
+    const complete = tierNum(tile.tier) >= 4;
+    const rc = RC[Math.floor(i/5)];
+    const badges = [t1,t2,t3,t4].map((th,idx) =>
+      `<div class="badge ${drops>=th?'s'+(idx+1):''}">${th}</div>`).join('');
+    const filled = t4>0 ? Math.round(Math.min(1,drops/t4)*10) : 0;
+    let segs='';
+    for(let s=0;s<10;s++){
+      if(s>=filled){segs+=`<div class="seg"></div>`;continue;}
+      const p=s/10; segs+=`<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
+    }
+    html+=`<div class="tile${complete?' complete':''}" style="--rc:${rc}">
+      ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
+      <div class="tile-num">${tile.num}</div>
+      <div class="tile-name">${tile.name}</div>
+      <div class="tier-badges">${badges}</div>
+      <div class="heat-meter"><div class="heat-track">${segs}</div><div class="heat-label">${drops} / ${t4} drops</div></div>
+    </div>`;
+  });
+  document.getElementById('bGrid').innerHTML = html;
+
+  // Bingo lines
+  let lhtml='';
+  BINGO_LINES.forEach((bl,i) => {
+    const b = (team.bingo||[])[i] || {};
+    let tier=0;
+    if(b.t4===true||b.t4==='TRUE'||b.t4===1) tier=4;
+    else if(b.t3==='✓') tier=3;
+    else if(b.t2==='✓') tier=2;
+    else if(b.t1==='✓') tier=1;
+    const bc=['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
+    const bonus = tier>0
+      ? `<div class="lb" style="color:${bc}">+${BONUS[tier]}</div><div class="ltot">= ${CUMUL[tier]}</div>` : '';
+    lhtml+=`<div class="lc${tier>0?' bt'+tier:''}">
+      <div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
+  });
+  document.getElementById('bLines').innerHTML = lhtml;
+}
+
+// ── Init ──
+const initHash = getHash();
+if (initHash) {
+  const entry = Object.entries(TEAM_SLUGS).find(([k,v]) => v === initHash);
+  if (entry) { currentTeam = entry[0]; document.getElementById('landing').style.display='none'; document.getElementById('board-view').style.display='block'; }
+}
+
+load();
+setInterval(load, 60000);
 </script>
 </body>
 </html>
