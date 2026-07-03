@@ -244,138 +244,51 @@ window.addEventListener('hashchange', () => {
 });
 
 // ── Data ──
+function fetchJSONP(url) {
+  return new Promise((resolve, reject) => {
+    const cb = '__sb_' + Date.now();
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      delete window[cb];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('Timeout after 15s'));
+    }, 15000);
+    window[cb] = (data) => {
+      clearTimeout(timer);
+      delete window[cb];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      resolve(data);
+    };
+    script.onerror = () => {
+      clearTimeout(timer);
+      delete window[cb];
+      reject(new Error('Script load failed'));
+    };
+    script.src = url + '?callback=' + cb;
+    document.head.appendChild(script);
+  });
+}
+
 async function load() {
-  const debug = document.getElementById('bGrid');
-  if (debug && currentTeam) debug.innerHTML = '<div style="color:#888;padding:20px;font-size:11px;">Fetching data...</div>';
+  const grid = document.getElementById('bGrid');
+  const cards = document.getElementById('cards');
   try {
-    const res = await fetch(API);
-    if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.statusText);
-    const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); }
-    catch(pe) { throw new Error('JSON parse failed: ' + text.substring(0,200)); }
+    const data = await fetchJSONP(API);
     cachedData = data;
     renderLanding(data);
     if (currentTeam) {
       const team = data.teams.find(t => t.sheetName === currentTeam);
-      if (team) { renderBoard(team); }
-      else {
-        if (debug) debug.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:11px;">Team not found: ' + currentTeam + '<br>Available: ' + data.teams.map(t=>t.sheetName).join(', ') + '</div>';
-      }
+      if (team) renderBoard(team);
+      else if (grid) grid.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:11px;">Team not found: ' + currentTeam + '</div>';
     }
-    const ts = new Date(data.lastUpdated);
     const lu = document.getElementById('lastUpdated');
-    if (lu) lu.textContent = 'Last updated: ' + ts.toLocaleTimeString();
+    if (lu) lu.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleTimeString();
   } catch(e) {
-    if (debug && currentTeam) debug.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:11px;">Fetch error: ' + e.message + '</div>';
+    if (grid && currentTeam) grid.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:11px;">Error: ' + e.message + '</div>';
+    if (cards && !currentTeam) cards.innerHTML = '<div class="loading">Failed to load. Retrying in 15s...</div>';
     console.error('Load error:', e);
     setTimeout(load, 15000);
   }
-}
-
-// ── Landing ──
-function renderLanding(data) {
-  const cards = document.getElementById('cards');
-  cards.innerHTML = '';
-  data.teams.forEach(team => {
-    const rc = team.rank <= 3 ? `r${team.rank}` : '';
-    const el = document.createElement('div');
-    el.className = 'team-card';
-    el.onclick = () => showBoard(team.sheetName);
-    el.innerHTML = `
-      <div class="tc-header">
-        <span class="tc-rank ${rc}">#${team.rank}</span>
-        <span class="tc-name">${team.name}</span>
-        <div><div class="tc-total">${team.total}</div><div class="tc-label">🌶 Peppers</div></div>
-      </div>
-      <div class="tc-body">
-        <div><div class="tc-stat-val" style="color:#5599ff">${team.tilePeps}</div><div class="tc-stat-label">Tile peppers</div></div>
-        <div><div class="tc-stat-val" style="color:#1e7a1e">${team.bingoPeps}</div><div class="tc-stat-label">Bingo peppers</div></div>
-        <div><div class="tc-stat-val" style="color:#888">${team.t4Complete}</div><div class="tc-stat-label">T4 complete</div></div>
-      </div>
-      <div class="tc-footer">View board →</div>`;
-    cards.appendChild(el);
-  });
-}
-
-// ── Board ──
-function parseThresholds(str) {
-  const parts = String(str).split('·').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-  while (parts.length < 4) parts.push(0);
-  return parts;
-}
-
-function tierNum(s) {
-  if (s==='T4') return 4; if (s==='T3') return 3;
-  if (s==='T2') return 2; if (s==='T1') return 1; return 0;
-}
-
-function renderBoard(team) {
-  try {
-  const pct = Math.min(100, (team.total/MAX)*100);
-  const mFill = document.getElementById('mFill');
-  if (mFill) mFill.style.height = pct+'%';
-  const mScore = document.getElementById('mScore'); if (mScore) mScore.textContent = team.total;
-  const mTile  = document.getElementById('mTile');  if (mTile)  mTile.textContent  = team.tilePeps;
-  const mBingo = document.getElementById('mBingo'); if (mBingo) mBingo.textContent = team.bingoPeps;
-  const bTeam  = document.getElementById('bTeamName'); if (bTeam)  bTeam.textContent  = team.name;
-  const bTotal = document.getElementById('bTotal'); if (bTotal) bTotal.textContent = team.total;
-  const bTile  = document.getElementById('bTile');  if (bTile)  bTile.textContent  = team.tilePeps;
-  const bBingo = document.getElementById('bBingo'); if (bBingo) bBingo.textContent = team.bingoPeps;
-
-  // Grid
-  let html = '';
-  (team.tiles||[]).forEach((tile,i) => {
-    const [t1,t2,t3,t4] = parseThresholds(tile.thresholds);
-    const drops = tile.drops||0;
-    const complete = tierNum(tile.tier) >= 4;
-    const rc = RC[Math.floor(i/5)];
-    const badges = [t1,t2,t3,t4].map((th,idx) =>
-      `<div class="badge ${drops>=th?'s'+(idx+1):''}">${th}</div>`).join('');
-    const filled = t4>0 ? Math.round(Math.min(1,drops/t4)*10) : 0;
-    let segs='';
-    for(let s=0;s<10;s++){
-      if(s>=filled){segs+=`<div class="seg"></div>`;continue;}
-      const p=s/10; segs+=`<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
-    }
-    html+=`<div class="tile${complete?' complete':''}" style="--rc:${rc}">
-      ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
-      <div class="tile-num">${tile.num}</div>
-      <div class="tile-name">${tile.name}</div>
-      <div class="tier-badges">${badges}</div>
-      <div class="heat-meter"><div class="heat-track">${segs}</div><div class="heat-label">${drops} / ${t4} drops</div></div>
-    </div>`;
-  });
-  document.getElementById('bGrid').innerHTML = html;
-
-  // Bingo lines
-  let lhtml='';
-  BINGO_LINES.forEach((bl,i) => {
-    const b = (team.bingo||[])[i] || {};
-    let tier=0;
-    if(b.t4===true||b.t4==='TRUE'||b.t4===1) tier=4;
-    else if(b.t3==='✓') tier=3;
-    else if(b.t2==='✓') tier=2;
-    else if(b.t1==='✓') tier=1;
-    const bc=['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
-    const bonus = tier>0
-      ? `<div class="lb" style="color:${bc}">+${BONUS[tier]}</div><div class="ltot">= ${CUMUL[tier]}</div>` : '';
-    lhtml+=`<div class="lc${tier>0?' bt'+tier:''}">
-      <div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
-  });
-  document.getElementById('bLines').innerHTML = lhtml;
-  } catch(err) {
-    const dbg = document.getElementById('bGrid');
-    if (dbg) dbg.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:12px;letter-spacing:0.05em;">ERROR: ' + err.message + '<br><br>' + err.stack + '</div>';
-    console.error('renderBoard error:', err);
-  }
-}
-
-// ── Init ──
-const initHash = getHash();
-if (initHash) {
-  const entry = Object.entries(TEAM_SLUGS).find(([k,v]) => v === initHash);
-  if (entry) { currentTeam = entry[0]; document.getElementById('landing').style.display='none'; document.getElementById('board-view').style.display='block'; }
 }
 
 load();
