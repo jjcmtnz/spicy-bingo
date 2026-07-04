@@ -289,7 +289,7 @@ async function load() {
     cachedData = data;
     if (data.tileData) {
       Object.keys(data.tileData).forEach(k => {
-        TILE_DATA[k] = data.tileData[k];
+        TILE_DATA[Number(k)] = data.tileData[k];
       });
     }
 
@@ -548,6 +548,10 @@ function openModal(tileNum, tileName) {
   html += '<div class="tm-section">T4 CA Requirements</div>';
   html += '<div class="tm-ca-val">' + (data.ca || 'None') + '</div>';
   if (data.ca && data.caNotes) html += '<div class="tm-ca-notes">' + data.caNotes + '</div>';
+  if (data.notes) {
+    html += '<div class="tm-section">Tile Notes</div>';
+    html += '<div style="font-size:12px;color:#aaa;padding:4px 0 8px;line-height:1.6;">' + data.notes.replace(/\n/g,'<br>') + '</div>';
+  }
   html += '<hr class="tm-divider">';
   html += '<div class="tm-section">Valid Drops</div><div class="tm-items">';
   data.items.forEach(item => { html += '<div class="tm-item">• ' + item + '</div>'; });
