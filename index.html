@@ -8,16 +8,12 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #000; font-family: 'Oswald', sans-serif; padding: 30px 20px; }
-
-  /* ── LOGO ── */
   .logo-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 32px; }
   .logo-frame { display: inline-flex; align-items: center; border: 3px solid #ff4500; border-radius: 6px; padding: 8px 28px 10px; position: relative; }
   .logo-frame::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
   .logo-spicy { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #f5b800; letter-spacing:0.04em; margin-right:12px; }
   .logo-bingo { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #ff4500; letter-spacing:0.04em; }
   .subtitle { text-align:center; font-size:12px; letter-spacing:0.2em; color:#444; text-transform:uppercase; margin-bottom:36px; }
-
-  /* ── LANDING ── */
   #landing { max-width:900px; margin:0 auto; }
   .standings-title { font-family:'Bungee',cursive; font-size:12px; letter-spacing:0.14em; color:#555; text-align:center; margin-bottom:14px; }
   .team-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
@@ -35,14 +31,10 @@
   .tc-footer { padding:9px 18px; background:#0d0d0d; border-top:1px solid #111; font-size:11px; color:#444; letter-spacing:0.08em; text-align:center; text-transform:uppercase; }
   .team-card:hover .tc-footer { color:#ff4500; }
   .last-updated { text-align:center; font-size:10px; color:#222; letter-spacing:0.06em; margin-top:18px; }
-
-  /* ── BOARD ── */
   #board-view { display:none; }
   .back-btn { display:inline-block; margin-bottom:14px; font-size:11px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
   .back-btn:hover { color:#ff4500; }
   .outer { max-width:1320px; margin:0 auto; display:flex; gap:14px; align-items:flex-start; }
-
-  /* meter */
   .meter-wrap { width:56px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:110px; }
   .meter-title { font-family:'Bungee',cursive; font-size:8px; letter-spacing:0.1em; color:#444; margin-bottom:6px; writing-mode:vertical-rl; transform:rotate(180deg); height:80px; white-space:nowrap; }
   .meter-track { width:26px; background:#0d0d0d; border:1px solid #1a1a1a; border-radius:4px; overflow:hidden; height:480px; display:flex; flex-direction:column-reverse; }
@@ -52,8 +44,6 @@
   .meter-sub { margin-top:10px; width:100%; text-align:center; }
   .meter-sub-label { font-size:7px; color:#2a2a2a; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:2px; }
   .meter-sub-val { font-family:'Bungee',cursive; font-size:10px; }
-
-  /* board */
   .board { flex:1; min-width:0; }
   .logo-row { display:flex; align-items:center; justify-content:space-between; padding:14px 22px 12px; border-bottom:1px solid #1a1a1a; margin-bottom:12px; }
   .team-lbl { font-size:12px; letter-spacing:0.22em; color:#444; text-transform:uppercase; font-weight:700; }
@@ -67,8 +57,6 @@
   .score-breakdown { display:flex; gap:14px; justify-content:flex-end; margin-top:4px; }
   .sb-val { font-family:'Bungee',cursive; font-size:13px; }
   .sb-lbl { font-size:9px; color:#444; letter-spacing:0.08em; text-transform:uppercase; }
-
-  /* grid */
   .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
   .tile { background:#0a0a0a; border:2px solid var(--rc); padding:10px 9px 9px; display:flex; flex-direction:column; align-items:center; min-height:158px; position:relative; }
   .tile.complete { background:#0d0800; border-color:#f5b800; }
@@ -88,8 +76,6 @@
   .seg.g{background:#1e7a1e;}.seg.y{background:#c47a00;}.seg.o{background:#d44a00;}.seg.r{background:#cc0000;}
   .tile.complete .seg{background:#f5b800;}
   .heat-label { font-size:9.5px; color:#444; text-align:center; margin-top:4px; letter-spacing:0.05em; font-weight:600; }
-
-  /* bottom panels */
   .bottom-section { margin-top:20px; display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
   .ph { padding:6px 12px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:10px; font-weight:700; letter-spacing:0.12em; color:#444; text-transform:uppercase; }
@@ -115,14 +101,12 @@
   .lc.bt1 .ln{color:#1e7a1e;} .lc.bt2 .ln{color:#c47a00;} .lc.bt3 .ln{color:#d44a00;} .lc.bt4 .ln{color:#cc0000;}
   .lb { position:absolute; top:4px; right:6px; font-family:'Bungee',cursive; font-size:8px; }
   .ltot { position:absolute; bottom:3px; right:6px; font-size:8px; color:#555; }
-
   .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
-  @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} .logo-spicy,.logo-bingo{font-size:30px;} }
+  @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 
-<!-- LANDING PAGE -->
 <div id="landing">
   <div class="logo-wrap">
     <div class="logo-frame">
@@ -136,7 +120,6 @@
   <div class="last-updated" id="lastUpdated"></div>
 </div>
 
-<!-- BOARD VIEW -->
 <div id="board-view">
   <span class="back-btn" onclick="showLanding()">← Back to standings</span>
   <div class="outer">
@@ -192,7 +175,7 @@
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbzLM8st-BdZ7sp18xz2L4r6LnkO9g0JcGpgfkNfCWGem3xgxJN-zBaC5w1j9F4Y2GWS-g/exec";
+const SHEET_ID = "1KoJlOMtU0iDYAa2NjA7CDbWLa_MIE-15U8Os7h6n4og";
 const MAX = 2950;
 const RC  = ["#cc0000","#d44a00","#c47a00","#8ab800","#1e7a1e"];
 const BINGO_LINES = [
@@ -204,15 +187,16 @@ const BINGO_LINES = [
   {n:"Diag ↘",t:"1, 7, 13, 19, 25"},{n:"Diag ↗",t:"5, 9, 13, 17, 21"},
 ];
 const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
-const TEAM_SLUGS = {
-  "Team Jalapeno":"jalapeno","Team Habanero":"habanero",
-  "Team Ghost Pepper":"ghost","Team Carolina Reaper":"carolina"
-};
+const TEAMS = [
+  {name:"Team Jalapeno",  sheet:"Team Jalapeno",  slug:"jalapeno"},
+  {name:"Team Habanero",  sheet:"Team Habanero",  slug:"habanero"},
+  {name:"Team Ghost Pepper", sheet:"Team Ghost Pepper", slug:"ghost"},
+  {name:"Team Carolina Reaper", sheet:"Team Carolina Reaper", slug:"carolina"},
+];
 
 let cachedData = null;
 let currentTeam = null;
 
-// ── Routing ──
 function getHash() { return window.location.hash.replace('#',''); }
 function setHash(h) { window.location.hash = h; }
 
@@ -223,71 +207,240 @@ function showLanding() {
   document.title = 'Spicy Bingo — Eternal Gems';
 }
 
-function showBoard(sheetName) {
-  currentTeam = sheetName;
-  const slug = TEAM_SLUGS[sheetName] || sheetName;
+function showBoard(slug) {
+  const team = TEAMS.find(t => t.slug === slug);
+  if (!team) return;
+  currentTeam = team;
   setHash(slug);
   document.getElementById('landing').style.display='none';
   document.getElementById('board-view').style.display='block';
-  document.title = 'Spicy Bingo — ' + sheetName;
-  if (cachedData) {
-    const team = cachedData.teams.find(t => t.sheetName === sheetName);
-    if (team) renderBoard(team);
-  }
+  document.title = 'Spicy Bingo — ' + team.name;
+  if (cachedData && cachedData[slug]) renderBoard(cachedData[slug]);
 }
 
 window.addEventListener('hashchange', () => {
   const h = getHash();
-  if (!h) { showLanding(); return; }
-  const entry = Object.entries(TEAM_SLUGS).find(([k,v]) => v === h);
-  if (entry) showBoard(entry[0]);
+  if (!h) showLanding();
+  else showBoard(h);
 });
 
-// ── Data ──
-function fetchJSONP(url) {
+// Fetch one sheet tab using gviz JSONP
+function fetchSheet(sheetName, range) {
   return new Promise((resolve, reject) => {
-    const cb = '__sb_' + Date.now();
+    const cb = '__gviz_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
     const script = document.createElement('script');
     const timer = setTimeout(() => {
       delete window[cb];
       if (script.parentNode) script.parentNode.removeChild(script);
-      reject(new Error('Timeout after 15s'));
+      reject(new Error('Timeout: ' + sheetName));
     }, 15000);
-    window[cb] = (data) => {
+    window[cb] = (resp) => {
       clearTimeout(timer);
       delete window[cb];
       if (script.parentNode) script.parentNode.removeChild(script);
-      resolve(data);
+      resolve(resp);
     };
     script.onerror = () => {
       clearTimeout(timer);
       delete window[cb];
-      reject(new Error('Script load failed'));
+      reject(new Error('Load error: ' + sheetName));
     };
-    script.src = url + '?callback=' + cb;
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:${cb}&sheet=${encodeURIComponent(sheetName)}&range=${range}`;
+    script.src = url;
     document.head.appendChild(script);
   });
 }
 
-async function load() {
-  const grid = document.getElementById('bGrid');
-  const cards = document.getElementById('cards');
-  try {
-    const data = await fetchJSONP(API);
-    cachedData = data;
-    renderLanding(data);
-    if (currentTeam) {
-      const team = data.teams.find(t => t.sheetName === currentTeam);
-      if (team) renderBoard(team);
-      else if (grid) grid.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:11px;">Team not found: ' + currentTeam + '</div>';
+function cellVal(row, col) {
+  if (!row || !row.c || !row.c[col]) return null;
+  return row.c[col].v;
+}
+
+function parseTeamData(sheetName, resp) {
+  const rows = (resp.table && resp.table.rows) || [];
+  // Row 0 = sheet row 1 (hero strip)
+  // We request A1:J50 so:
+  // row[0] = row 1: A=teamname, C=Total label, D=total, E=tile label, F=tilePeps, G=bingo label, H=bingoPeps, I=T4 label, J=t4done
+  const heroRow = rows[0] || {};
+  const teamName  = cellVal(heroRow, 0) || sheetName;
+  const total     = Number(cellVal(heroRow, 3)) || 0;
+  const tilePeps  = Number(cellVal(heroRow, 5)) || 0;
+  const bingoPeps = Number(cellVal(heroRow, 7)) || 0;
+  const t4Done    = Number(cellVal(heroRow, 9)) || 0;
+
+  // Rows 2-26 = sheet rows 3-27 (tile scoring)
+  const tiles = [];
+  for (let i = 2; i <= 26; i++) {
+    const row = rows[i];
+    if (!row) continue;
+    const num = cellVal(row, 0);
+    if (!num) continue;
+    tiles.push({
+      num:        num,
+      name:       String(cellVal(row, 1) || ''),
+      drops:      Number(cellVal(row, 2)) || 0,
+      thresholds: String(cellVal(row, 3) || ''),
+      tier:       String(cellVal(row, 4) || '—'),
+      peppers:    Number(cellVal(row, 5)) || 0,
+    });
+  }
+
+  // Find bingo tracker — scan for "BINGO TRACKER" label in col A
+  let bingoStart = -1;
+  for (let i = 0; i < rows.length; i++) {
+    const v = cellVal(rows[i], 0);
+    if (v && String(v).toUpperCase().includes('BINGO TRACKER')) {
+      bingoStart = i + 2; // +1 for header row, +1 for col headers
+      break;
     }
-    const lu = document.getElementById('lastUpdated');
-    if (lu) lu.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleTimeString();
+  }
+
+  const bingo = [];
+  if (bingoStart >= 0) {
+    for (let i = bingoStart; i < bingoStart + 12 && i < rows.length; i++) {
+      const row = rows[i];
+      if (!row) continue;
+      const letter = cellVal(row, 0);
+      if (!letter) continue;
+      bingo.push({
+        letter: String(letter),
+        line:   String(cellVal(row, 1) || ''),
+        t1:     cellVal(row, 3),
+        t2:     cellVal(row, 4),
+        t3:     cellVal(row, 5),
+        t4:     cellVal(row, 6),
+        peppers: Number(cellVal(row, 7)) || 0,
+      });
+    }
+  }
+
+  return { name: teamName, sheetName, total, tilePeps, bingoPeps, t4Complete: t4Done, tiles, bingo };
+}
+
+async function load() {
+  try {
+    const results = await Promise.all(
+      TEAMS.map(t => fetchSheet(t.sheet, 'A1:J50').then(resp => parseTeamData(t.sheet, resp)))
+    );
+
+    // Build data by slug
+    cachedData = {};
+    const standings = [];
+    TEAMS.forEach((t, i) => {
+      cachedData[t.slug] = results[i];
+      standings.push({ ...results[i], slug: t.slug });
+    });
+    standings.sort((a,b) => b.total - a.total);
+    standings.forEach((t,i) => t.rank = i+1);
+
+    renderLanding(standings);
+    if (currentTeam && cachedData[currentTeam.slug]) {
+      renderBoard(cachedData[currentTeam.slug]);
+    }
+    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
   } catch(e) {
-    if (grid && currentTeam) grid.innerHTML = '<div style="color:#ff4444;padding:20px;font-size:11px;">Error: ' + e.message + '</div>';
-    if (cards && !currentTeam) cards.innerHTML = '<div class="loading">Failed to load. Retrying in 15s...</div>';
     console.error('Load error:', e);
+    document.getElementById('cards').innerHTML = '<div class="loading">Failed to load. Retrying...</div>';
     setTimeout(load, 15000);
+  }
+}
+
+function renderLanding(standings) {
+  const cards = document.getElementById('cards');
+  cards.innerHTML = '';
+  standings.forEach(team => {
+    const rc = team.rank <= 3 ? `r${team.rank}` : '';
+    const el = document.createElement('div');
+    el.className = 'team-card';
+    el.onclick = () => showBoard(team.slug);
+    el.innerHTML = `
+      <div class="tc-header">
+        <span class="tc-rank ${rc}">#${team.rank}</span>
+        <span class="tc-name">${team.name}</span>
+        <div><div class="tc-total">${team.total}</div><div class="tc-label">🌶 Peppers</div></div>
+      </div>
+      <div class="tc-body">
+        <div><div class="tc-stat-val" style="color:#5599ff">${team.tilePeps}</div><div class="tc-stat-label">Tile peppers</div></div>
+        <div><div class="tc-stat-val" style="color:#1e7a1e">${team.bingoPeps}</div><div class="tc-stat-label">Bingo peppers</div></div>
+        <div><div class="tc-stat-val" style="color:#888">${team.t4Complete}</div><div class="tc-stat-label">T4 complete</div></div>
+      </div>
+      <div class="tc-footer">View board →</div>`;
+    cards.appendChild(el);
+  });
+}
+
+function parseThresholds(str) {
+  const parts = String(str).split('·').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  while (parts.length < 4) parts.push(0);
+  return parts;
+}
+
+function tierNum(s) {
+  if (s==='T4') return 4; if (s==='T3') return 3;
+  if (s==='T2') return 2; if (s==='T1') return 1; return 0;
+}
+
+function renderBoard(team) {
+  const pct = Math.min(100, (team.total/MAX)*100);
+  document.getElementById('mFill').style.height = pct+'%';
+  document.getElementById('mScore').textContent = team.total;
+  document.getElementById('mTile').textContent  = team.tilePeps;
+  document.getElementById('mBingo').textContent = team.bingoPeps;
+  document.getElementById('bTeamName').textContent = team.name;
+  document.getElementById('bTotal').textContent = team.total;
+  document.getElementById('bTile').textContent  = team.tilePeps;
+  document.getElementById('bBingo').textContent = team.bingoPeps;
+
+  let html = '';
+  (team.tiles||[]).forEach((tile,i) => {
+    const [t1,t2,t3,t4] = parseThresholds(tile.thresholds);
+    const drops = tile.drops||0;
+    const complete = tierNum(tile.tier) >= 4;
+    const rc = RC[Math.floor(i/5)];
+    const badges = [t1,t2,t3,t4].map((th,idx) =>
+      `<div class="badge ${drops>=th?'s'+(idx+1):''}">${th}</div>`).join('');
+    const filled = t4>0 ? Math.round(Math.min(1,drops/t4)*10) : 0;
+    let segs='';
+    for(let s=0;s<10;s++){
+      if(s>=filled){segs+=`<div class="seg"></div>`;continue;}
+      const p=s/10; segs+=`<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
+    }
+    html+=`<div class="tile${complete?' complete':''}" style="--rc:${rc}">
+      ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
+      <div class="tile-num">${tile.num}</div>
+      <div class="tile-name">${tile.name}</div>
+      <div class="tier-badges">${badges}</div>
+      <div class="heat-meter"><div class="heat-track">${segs}</div><div class="heat-label">${drops} / ${t4} drops</div></div>
+    </div>`;
+  });
+  document.getElementById('bGrid').innerHTML = html;
+
+  let lhtml='';
+  BINGO_LINES.forEach((bl,i) => {
+    const b = (team.bingo||[])[i] || {};
+    let tier=0;
+    if(b.t4===true||b.t4==='TRUE'||b.t4===1) tier=4;
+    else if(b.t3==='✓') tier=3;
+    else if(b.t2==='✓') tier=2;
+    else if(b.t1==='✓') tier=1;
+    const bc=['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
+    const bonus = tier>0
+      ? `<div class="lb" style="color:${bc}">+${BONUS[tier]}</div><div class="ltot">= ${CUMUL[tier]}</div>` : '';
+    lhtml+=`<div class="lc${tier>0?' bt'+tier:''}">
+      <div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
+  });
+  document.getElementById('bLines').innerHTML = lhtml;
+}
+
+// Init
+const initHash = getHash();
+if (initHash) {
+  const team = TEAMS.find(t => t.slug === initHash);
+  if (team) {
+    currentTeam = team;
+    document.getElementById('landing').style.display='none';
+    document.getElementById('board-view').style.display='block';
+    document.title = 'Spicy Bingo — ' + team.name;
   }
 }
 
