@@ -7,7 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #000; font-family: 'Oswald', sans-serif; padding: 30px 20px; }
+  body { background: #000; font-family: 'Oswald', sans-serif; padding: 0 20px 30px; }
+  #board-view { max-width: 1320px; margin: 0 auto; }
+  #site-header { display:flex; flex-direction:column; align-items:center; padding:14px 20px 8px; }
   .logo-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 32px; }
   .logo-frame { display: inline-flex; align-items: center; border: 3px solid #ff4500; border-radius: 6px; padding: 8px 28px 10px; position: relative; }
   .logo-frame::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
@@ -15,48 +17,40 @@
   .logo-bingo { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #ff4500; letter-spacing:0.04em; }
   .subtitle { text-align:center; font-size:12px; letter-spacing:0.2em; color:#444; text-transform:uppercase; margin-bottom:36px; }
   #landing { max-width:900px; margin:0 auto; }
-  .standings-title { font-family:'Bungee',cursive; font-size:12px; letter-spacing:0.14em; color:#555; text-align:center; margin-bottom:14px; }
+  .standings-title { font-family:'Bungee',cursive; font-size:14px; letter-spacing:0.2em; color:#555; text-align:center; margin-bottom:14px; }
   .team-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-  .team-card { background:#0a0a0a; border:2px solid #1a1a1a; border-radius:8px; overflow:hidden; cursor:pointer; transition:border-color 0.2s; }
-  .team-card:hover { border-color:#ff4500; }
-  .tc-header { padding:14px 18px 12px; display:flex; align-items:center; justify-content:space-between; }
-  .tc-rank { font-family:'Bungee',cursive; font-size:26px; color:#222; margin-right:10px; }
-  .tc-rank.r1{color:#f5b800;} .tc-rank.r2{color:#888;} .tc-rank.r3{color:#b85c00;}
-  .tc-name { font-family:'Bungee',cursive; font-size:15px; color:#ddd; flex:1; }
-  .tc-total { font-family:'Bungee',cursive; font-size:24px; color:#ff4500; }
-  .tc-label { font-size:9px; color:#444; letter-spacing:0.1em; text-transform:uppercase; text-align:right; }
-  .tc-body { padding:10px 18px 14px; border-top:1px solid #111; display:flex; gap:20px; }
-  .tc-stat-val { font-family:'Bungee',cursive; font-size:15px; }
+  .team-card { background:#0a0a0a; border:1px solid #1a1a1a; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform 0.15s, border-color 0.15s; border-left-width:4px; }
+  .team-card:hover { transform:translateY(-2px); border-color:#333; }
+  .tc-header { padding:16px 18px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .tc-rank { font-family:'Bungee',cursive; font-size:32px; margin-right:12px; }
+  .tc-name { font-family:'Bungee',cursive; font-size:17px; flex:1; letter-spacing:0.04em; }
+  .tc-total { font-family:'Bungee',cursive; font-size:30px; color:#ff4500; }
+  .tc-label { font-size:10px; color:#555; letter-spacing:0.1em; text-transform:uppercase; text-align:right; }
+  .tc-body { padding:12px 18px 16px; border-top:1px solid #111; display:flex; gap:24px; }
+  .tc-stat-val { font-family:'Bungee',cursive; font-size:18px; }
   .tc-stat-label { font-size:9px; color:#333; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
-  .tc-footer { padding:9px 18px; background:#0d0d0d; border-top:1px solid #111; font-size:11px; color:#444; letter-spacing:0.08em; text-align:center; text-transform:uppercase; }
-  .team-card:hover .tc-footer { color:#ff4500; }
   .last-updated { text-align:center; font-size:10px; color:#222; letter-spacing:0.06em; margin-top:18px; }
   #board-view { display:none; }
-  .back-btn { display:inline-block; margin-bottom:14px; font-size:11px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
+  .back-btn { display:inline-block; margin-bottom:8px; font-size:11px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
   .back-btn:hover { color:#ff4500; }
   .outer { max-width:1320px; margin:0 auto; display:flex; gap:14px; align-items:flex-start; }
-  .meter-wrap { width:56px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:110px; }
+  .meter-wrap { width:70px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:110px; }
   .meter-title { font-family:'Bungee',cursive; font-size:8px; letter-spacing:0.1em; color:#444; margin-bottom:6px; writing-mode:vertical-rl; transform:rotate(180deg); height:80px; white-space:nowrap; }
-  .meter-track { width:26px; background:#0d0d0d; border:1px solid #1a1a1a; border-radius:4px; overflow:hidden; height:480px; display:flex; flex-direction:column-reverse; }
+  .meter-track { width:34px; background:#0d0d0d; border:1px solid #1a1a1a; border-radius:4px; overflow:hidden; height:480px; display:flex; flex-direction:column-reverse; }
   .meter-fill { width:100%; background:linear-gradient(0deg,#1e7a1e 0%,#8ab800 25%,#c47a00 50%,#d44a00 75%,#cc0000 100%); transition:height 0.8s ease; }
-  .meter-score { font-family:'Bungee',cursive; font-size:12px; color:#ff4500; text-align:center; margin-top:6px; }
+  .meter-score { font-family:'Bungee',cursive; font-size:18px; color:#ff4500; text-align:center; margin-top:8px; }
   .meter-denom { font-size:8px; color:#2a2a2a; text-align:center; margin-top:2px; }
   .meter-sub { margin-top:10px; width:100%; text-align:center; }
   .meter-sub-label { font-size:7px; color:#2a2a2a; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:2px; }
   .meter-sub-val { font-family:'Bungee',cursive; font-size:10px; }
   .board { flex:1; min-width:0; }
-  .logo-row { display:flex; align-items:center; justify-content:space-between; padding:14px 22px 12px; border-bottom:1px solid #1a1a1a; margin-bottom:12px; }
-  .team-lbl { font-size:12px; letter-spacing:0.22em; color:#444; text-transform:uppercase; font-weight:700; }
+  .logo-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0 12px; border-top:1px solid #1a1a1a; border-bottom:1px solid #1a1a1a; margin-bottom:12px; }
+  .team-lbl { font-size:22px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; font-family:'Bungee',cursive; }
   .logo-sm { display:inline-flex; align-items:center; border:3px solid #ff4500; border-radius:6px; padding:8px 28px 10px; position:relative; }
   .logo-sm::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
   .ls-spicy { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #f5b800; letter-spacing:0.04em; margin-right:12px; }
   .ls-bingo { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #ff4500; letter-spacing:0.04em; }
-  .score-box { text-align:right; }
-  .score-total { font-family:'Bungee',cursive; font-size:24px; color:#ff4500; display:block; }
-  .score-lbl { font-size:10px; color:#333; letter-spacing:0.12em; text-transform:uppercase; }
-  .score-breakdown { display:flex; gap:14px; justify-content:flex-end; margin-top:4px; }
-  .sb-val { font-family:'Bungee',cursive; font-size:13px; }
-  .sb-lbl { font-size:9px; color:#444; letter-spacing:0.08em; text-transform:uppercase; }
+
   .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-bottom:20px; }
   .tile { background:#111; border:2px solid #333; border-radius:4px; padding:10px 9px 9px; display:flex; flex-direction:column; align-items:center; min-height:158px; position:relative; }
   .tile.complete { background:#0d0800; border-color:#f5b800 !important; }
@@ -78,24 +72,24 @@
   .heat-label { font-size:9.5px; color:#444; text-align:center; margin-top:4px; letter-spacing:0.05em; font-weight:600; }
   .bottom-section { display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
-  .ph { padding:6px 12px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:10px; font-weight:700; letter-spacing:0.12em; color:#444; text-transform:uppercase; }
+  .ph { padding:8px 14px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:11px; font-weight:700; letter-spacing:0.12em; color:#555; text-transform:uppercase; }
   .tiers-panel { flex:0 0 160px; }
   .tier-row { display:flex; align-items:center; gap:10px; padding:6px 14px; border-bottom:1px solid #111; }
   .tier-row:last-child{border-bottom:none;}
   .tsw { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
-  .tn { font-family:'Bungee',cursive; font-size:10px; color:#888; min-width:20px; }
-  .tv { font-size:11px; color:#555; }
+  .tn { font-family:'Bungee',cursive; font-size:12px; color:#888; min-width:24px; }
+  .tv { font-size:12px; color:#555; }
   .bonus-panel { flex:0 0 180px; }
   .bonus-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:6px 14px; border-bottom:1px solid #111; }
   .bonus-row:last-child{border-bottom:none;}
-  .bn { font-family:'Bungee',cursive; font-size:10px; }
-  .bv { font-family:'Bungee',cursive; font-size:10px; }
+  .bn { font-family:'Bungee',cursive; font-size:12px; }
+  .bv { font-family:'Bungee',cursive; font-size:12px; }
   .lines-panel { flex:1; }
   .lines-grid { display:grid; grid-template-columns:repeat(4,1fr); }
   .lc { padding:5px 10px; border-right:1px solid #111; border-bottom:1px solid #111; position:relative; min-height:36px; }
   .lc:nth-child(4n){border-right:none;} .lc:nth-last-child(-n+4){border-bottom:none;}
-  .ln { font-family:'Bungee',cursive; font-size:9px; color:#555; }
-  .lt { font-size:9.5px; color:#333; font-weight:600; }
+  .ln { font-family:'Bungee',cursive; font-size:11px; color:#555; }
+  .lt { font-size:11px; color:#444; font-weight:600; }
   .lc.bt1{background:#0a1a0a;} .lc.bt2{background:#1a1200;} .lc.bt3{background:#1a0800;} .lc.bt4{background:#1a0000;}
   .lc.bt1 .ln{color:#1e7a1e;} .lc.bt2 .ln{color:#c47a00;} .lc.bt3 .ln{color:#d44a00;} .lc.bt4 .ln{color:#cc0000;}
   .lb { position:absolute; top:4px; right:6px; font-family:'Bungee',cursive; font-size:8px; }
@@ -119,21 +113,23 @@
     box-shadow: 0 8px 40px rgba(0,0,0,0.9);
   }
   .tm-header {
-    padding:14px 18px 12px; border-bottom:1px solid #1a1a1a;
+    padding:16px 20px 14px; border-bottom:1px solid #1a1a1a;
     display:flex; align-items:center; justify-content:space-between;
   }
-  .tm-title { font-family:'Bungee',cursive; font-size:14px; color:#ff4500; letter-spacing:0.06em; }
-  .tm-close { font-family:'Bungee',cursive; font-size:18px; color:#444; cursor:pointer; line-height:1; }
+  .tm-title { font-family:'Bungee',cursive; font-size:17px; color:#ff4500; letter-spacing:0.06em; }
+  .tm-thresholds { font-size:13px; color:#555; letter-spacing:0.08em; margin-top:4px; }
+  .tm-close { font-family:'Bungee',cursive; font-size:20px; color:#444; cursor:pointer; line-height:1; }
   .tm-close:hover { color:#ff4500; }
-  .tm-body { padding:14px 18px; overflow-y:auto; }
-  .tm-section { font-size:9px; color:#555; letter-spacing:0.12em; text-transform:uppercase; margin:12px 0 6px; }
+  .tm-body { padding:16px 20px; overflow-y:auto; }
+  .tm-section { font-size:11px; color:#666; letter-spacing:0.1em; text-transform:uppercase; margin:14px 0 6px; font-weight:700; }
   .tm-section:first-child { margin-top:0; }
-  .tm-items { display:flex; flex-direction:column; gap:3px; }
-  .tm-item { font-size:11px; color:#888; padding:3px 0; border-bottom:1px solid #111; }
+  .tm-req-val { font-size:13px; color:#186618; padding:4px 0; }
+  .tm-ca-val  { font-size:13px; color:#a86600; padding:4px 0; }
+  .tm-ca-notes { font-size:11px; color:#555; padding:2px 0 4px; font-style:italic; }
+  .tm-divider { border:none; border-top:1px solid #1a1a1a; margin:12px 0; }
+  .tm-items { display:flex; flex-direction:column; gap:2px; }
+  .tm-item { font-size:13px; color:#888; padding:4px 0; border-bottom:1px solid #0d0d0d; line-height:1.4; }
   .tm-item:last-child { border-bottom:none; }
-  .tm-req { font-size:12px; color:#186618; padding:4px 0; }
-  .tm-ca  { font-size:12px; color:#a86600; padding:2px 0; }
-  .tm-ca-notes { font-size:10px; color:#555; padding:2px 0 4px; }
 </style>
 </head>
 <body>
@@ -141,62 +137,56 @@
 <div id="tile-modal-overlay" class="tile-modal-overlay" onclick="closeModal(event)">
   <div class="tile-modal" onclick="event.stopPropagation()">
     <div class="tm-header">
-      <div class="tm-title" id="tm-title"></div>
+      <div><div class="tm-title" id="tm-title"></div><div class="tm-thresholds" id="tm-thresholds"></div></div>
       <div class="tm-close" onclick="closeModal()">✕</div>
     </div>
     <div class="tm-body" id="tm-body"></div>
   </div>
 </div>
+<div id="site-header"><div class="logo-frame"><span class="logo-spicy">SPICY</span><span class="logo-bingo">BINGO</span></div><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:10px;">Eternal Gems</div></div>
 <div id="landing">
-  <div class="logo-wrap">
-    <div class="logo-frame">
-      <span class="logo-spicy">SPICY</span>
-      <span class="logo-bingo">BINGO</span>
-    </div>
-  </div>
-  <div class="subtitle">Eternal Gems — PvM Bingo Event</div>
+  <div style="height:48px;"></div>
   <div class="standings-title">LIVE STANDINGS</div>
   <div class="team-cards" id="cards"><div class="loading">Loading scores...</div></div>
   <div class="last-updated" id="lastUpdated"></div>
 </div>
 
 <div id="board-view">
-  <span class="back-btn" onclick="showLanding()">← Back to standings</span>
+  <div style="padding:6px 0 4px;"><span class="back-btn" onclick="showLanding()">← Return to standings</span></div>
   <div class="outer">
     <div class="meter-wrap">
       <div class="meter-title">SPICY METER</div>
       <div class="meter-track"><div class="meter-fill" id="mFill" style="height:0%"></div></div>
-      <div class="meter-score" id="mScore">0</div>
-      <div class="meter-denom">/ 2,950</div>
-      <div class="meter-sub">
-        <div class="meter-sub-label">Tile</div>
-        <div class="meter-sub-val" id="mTile" style="color:#5599ff">0</div>
-        <div style="border-top:1px solid #1a1a1a;margin:5px 4px;"></div>
-        <div class="meter-sub-label">Bingo</div>
-        <div class="meter-sub-val" id="mBingo" style="color:#1e7a1e">0</div>
-      </div>
+      <div class="meter-score" id="mScore" style="font-size:16px;">0</div>
+      <div class="meter-denom" style="color:#555;font-size:9px;">/ 2,950</div>
+      <div id="mTile" style="display:none"></div><div id="mBingo" style="display:none"></div>
     </div>
     <div class="board">
       <div class="logo-row">
         <div class="team-lbl" id="bTeamName"></div>
-        <div><div class="logo-sm"><span class="ls-spicy">SPICY</span><span class="ls-bingo">BINGO</span></div></div>
-        <div class="score-box">
-          <span class="score-total" id="bTotal">0</span>
-          <span class="score-lbl">peppers</span>
-          <div class="score-breakdown">
-            <div><div class="sb-val" id="bTile" style="color:#5599ff">0</div><div class="sb-lbl">Tiles</div></div>
-            <div><div class="sb-val" id="bBingo" style="color:#1e7a1e">0</div><div class="sb-lbl">Bingo</div></div>
+        <div style="display:flex;align-items:center;gap:0;">
+          <div style="text-align:center;padding:0 18px;border-right:1px solid #1a1a1a;">
+            <div id="bTile" style="color:#A86600;font-family:'Bungee',cursive;font-size:16px;line-height:1;">0</div>
+            <div style="color:#3d2500;font-size:8px;letter-spacing:0.08em;margin-top:3px;">TILE PTS</div>
+          </div>
+          <div style="text-align:center;padding:0 18px;border-right:1px solid #1a1a1a;">
+            <div id="bBingo" style="color:#759900;font-family:'Bungee',cursive;font-size:16px;line-height:1;">0</div>
+            <div style="color:#2a3300;font-size:8px;letter-spacing:0.08em;margin-top:3px;">BINGO PTS</div>
+          </div>
+          <div style="text-align:center;padding:0 0 0 18px;">
+            <div id="bTotal" style="font-family:'Bungee',cursive;font-size:24px;line-height:1;">0</div>
+            <div style="font-size:8px;letter-spacing:0.1em;margin-top:3px;opacity:0.5;" id="bTotalLbl">TOTAL PTS</div>
           </div>
         </div>
       </div>
       <div class="grid" id="bGrid"></div>
       <div class="bottom-section">
         <div class="panel tiers-panel">
-          <div class="ph">Pepper Tiers</div>
-          <div class="tier-row"><span class="tsw" style="background:#1e7a1e"></span><span class="tn">T1</span><span class="tv">1 pepper</span></div>
-          <div class="tier-row"><span class="tsw" style="background:#c47a00"></span><span class="tn">T2</span><span class="tv">3 peppers</span></div>
-          <div class="tier-row"><span class="tsw" style="background:#d44a00"></span><span class="tn">T3</span><span class="tv">6 peppers</span></div>
-          <div class="tier-row"><span class="tsw" style="background:#cc0000"></span><span class="tn">T4</span><span class="tv">10 peppers</span></div>
+          <div class="ph">Point Tiers</div>
+          <div class="tier-row"><span class="tsw" style="background:#1e7a1e"></span><span class="tn">T1</span><span class="tv">1 pt</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#c47a00"></span><span class="tn">T2</span><span class="tv">3 pts</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#d44a00"></span><span class="tn">T3</span><span class="tv">6 pts</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#cc0000"></span><span class="tn">T4</span><span class="tv">10 pts</span></div>
         </div>
         <div class="panel bonus-panel">
           <div class="ph">Bingo Bonuses</div>
@@ -228,9 +218,9 @@ const BINGO_LINES = [
 ];
 const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
 const TEAMS = [
-  {name:"Team Jalapeno",       slug:"jalapeno",  sheetName:"Team Jalapeno"},
-  {name:"Team Habanero",       slug:"habanero",  sheetName:"Team Habanero"},
+  {name:"Team Scotch Bonnet",   slug:"scotch",    sheetName:"Team Scotch Bonnet"},
   {name:"Team Ghost Pepper",   slug:"ghost",     sheetName:"Team Ghost Pepper"},
+  {name:"Team Naga Viper",     slug:"naga",      sheetName:"Team Naga Viper"},
   {name:"Team Carolina Reaper",slug:"carolina",  sheetName:"Team Carolina Reaper"},
 ];
 
@@ -325,18 +315,44 @@ function renderLanding(teams) {
     const el = document.createElement('div');
     el.className = 'team-card';
     el.onclick = () => showBoard(TEAMS.find(t=>t.sheetName===team.sheetName).slug);
+    const tColors = {"Team Scotch Bonnet":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
+    const tColor = tColors[team.sheetName] || '#888';
+    el.style.border = '2px solid ' + tColor;
+    el.style.borderRadius = '6px';
     el.innerHTML = `
-      <div class="tc-header">
-        <span class="tc-rank ${rc}">#${team.rank}</span>
-        <span class="tc-name">${team.name}</span>
-        <div><div class="tc-total">${team.total}</div><div class="tc-label">🌶 Peppers</div></div>
+      <div style="padding:18px 20px 14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <div>
+            <div style="color:${tColor};opacity:0.4;font-size:11px;letter-spacing:0.12em;margin-bottom:3px;">#${team.rank}</div>
+            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:16px;letter-spacing:0.04em;">${team.name}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:38px;line-height:1;">${team.total}</div>
+            <div style="color:${tColor};opacity:0.4;font-size:10px;letter-spacing:0.1em;">TOTAL PTS</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #111;padding-top:10px;display:flex;">
+          <div style="flex:1;text-align:center;border-right:1px solid #111;">
+            <div style="color:#A86600;font-family:'Bungee',cursive;font-size:17px;">${team.tilePeps}</div>
+            <div style="color:#3d2500;font-size:9px;letter-spacing:0.08em;">TILE PTS</div>
+          </div>
+          <div style="flex:1;text-align:center;">
+            <div style="color:#759900;font-family:'Bungee',cursive;font-size:17px;">${team.bingoPeps}</div>
+            <div style="color:#2a3300;font-size:9px;letter-spacing:0.08em;">BINGO PTS</div>
+          </div>
+        </div>
       </div>
-      <div class="tc-body">
-        <div><div class="tc-stat-val" style="color:#5599ff">${team.tilePeps}</div><div class="tc-stat-label">Tile peppers</div></div>
-        <div><div class="tc-stat-val" style="color:#1e7a1e">${team.bingoPeps}</div><div class="tc-stat-label">Bingo peppers</div></div>
-        <div><div class="tc-stat-val" style="color:#888">${team.t4Complete}</div><div class="tc-stat-label">T4 complete</div></div>
-      </div>
-      <div class="tc-footer">View board →</div>`;
+      <div class="tc-footer" style="padding:9px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:#333;letter-spacing:0.1em;text-transform:uppercase;text-align:center;transition:color 0.15s;">View Board →</div>`;
+    el.addEventListener('mouseover', () => {
+      el.style.transform = 'translateY(-3px)';
+      el.style.boxShadow = '0 0 18px ' + tColor + '44';
+      el.querySelector('.tc-footer').style.color = tColor;
+    });
+    el.addEventListener('mouseout', () => {
+      el.style.transform = 'translateY(0)';
+      el.style.boxShadow = 'none';
+      el.querySelector('.tc-footer').style.color = '#333';
+    });
     cards.appendChild(el);
   });
 }
@@ -357,7 +373,18 @@ function renderBoard(team) {
   document.getElementById('mScore').textContent = team.total;
   document.getElementById('mTile').textContent  = team.tilePeps;
   document.getElementById('mBingo').textContent = team.bingoPeps;
-  document.getElementById('bTeamName').textContent = team.name;
+  const boardColors = {"Team Scotch Bonnet":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
+  const bNameEl = document.getElementById('bTeamName');
+  bNameEl.textContent = team.name;
+  const tc = boardColors[team.sheetName] || '#888';
+  bNameEl.style.color = tc;
+  const bTotalEl = document.getElementById('bTotal');
+  const bTotalLbl = document.getElementById('bTotalLbl');
+  if (bTotalEl) bTotalEl.style.color = tc;
+  if (bTotalLbl) bTotalLbl.style.color = tc;
+  // Update logo row border color to match team
+  const logoRow = document.querySelector('.logo-row');
+  if (logoRow) { logoRow.style.borderBottom = '1px solid ' + (boardColors[team.sheetName] || '#1a1a1a') + '44'; }
   document.getElementById('bTotal').textContent = team.total;
   document.getElementById('bTile').textContent  = team.tilePeps;
   document.getElementById('bBingo').textContent = team.bingoPeps;
@@ -479,21 +506,45 @@ document.addEventListener('click', e => {
 function tileClick(e, el) {
   const num = parseInt(el.getAttribute('data-tilenum'));
   const nameEl = el.querySelector('.tile-name');
-  openModal(num, nameEl ? nameEl.textContent.trim() : '');
+  openModal(num, num + '. ' + (nameEl ? nameEl.textContent.trim() : ''));
 }
 
 function openModal(tileNum, tileName) {
   const data = TILE_DATA[tileNum];
   if (!data) return;
-  document.getElementById('tm-title').textContent = tileName;
-  let html = '<div class="tm-section">Qualifying Drops</div><div class="tm-items">';
-  data.items.forEach(item => { html += `<div class="tm-item">• ${item}</div>`; });
-  html += '</div>';
-  if (data.req) html += `<div class="tm-section">T4 Drop Req</div><div class="tm-req">✦ ${data.req}</div>`;
-  if (data.ca)  {
-    html += `<div class="tm-section">T4 Challenge Achievement</div><div class="tm-ca">✦ ${data.ca}</div>`;
-    if (data.caNotes) html += `<div class="tm-ca-notes">${data.caNotes}</div>`;
+  let threshStr = '';
+  if (cachedData) {
+    cachedData.teams.forEach(t => {
+      const tile = (t.tiles||[]).find(x => x.num == tileNum);
+      if (tile && tile.thresholds) threshStr = tile.thresholds;
+    });
   }
+  document.getElementById('tm-title').textContent = tileName;
+  const thEl = document.getElementById('tm-thresholds');
+  if (thEl) {
+    if (threshStr) {
+      const parts = threshStr.split('·').map(s => s.trim());
+      const labels = ['T1','T2','T3','T4'];
+      const colors = ['#186618','#A86600','#B83D00','#AA0000'];
+      thEl.innerHTML = '<div style="font-size:9px;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Drops Needed</div>' +
+        '<div style="display:flex;gap:8px;">' +
+        parts.map((v,i) => '<div style="background:#0d0d0d;border:1px solid ' + colors[i] + '55;border-radius:4px;padding:6px 12px;text-align:center;">' +
+          '<div style="color:' + colors[i] + ';font-family:Bungee,cursive;font-size:11px;letter-spacing:0.08em;">' + labels[i] + '</div>' +
+          '<div style="color:#ccc;font-size:16px;font-weight:700;line-height:1.2;">' + v + '</div>' +
+          '<div style="color:#555;font-size:8px;letter-spacing:0.06em;">unique' + (parseInt(v) !== 1 ? 's' : '') + '</div>' +
+          '</div>').join('') + '</div>';
+    } else { thEl.innerHTML = ''; }
+  }
+  let html = '';
+  html += '<div class="tm-section">T4 Drop Requirements</div>';
+  html += '<div class="tm-req-val">' + (data.req || 'None') + '</div>';
+  html += '<div class="tm-section">T4 CA Requirements</div>';
+  html += '<div class="tm-ca-val">' + (data.ca || 'None') + '</div>';
+  if (data.ca && data.caNotes) html += '<div class="tm-ca-notes">' + data.caNotes + '</div>';
+  html += '<hr class="tm-divider">';
+  html += '<div class="tm-section">Valid Drops</div><div class="tm-items">';
+  data.items.forEach(item => { html += '<div class="tm-item">• ' + item + '</div>'; });
+  html += '</div>';
   document.getElementById('tm-body').innerHTML = html;
   document.getElementById('tile-modal-overlay').classList.add('visible');
 }
