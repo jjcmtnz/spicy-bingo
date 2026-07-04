@@ -152,7 +152,6 @@
 </div>
 
 <div id="board-view">
-  <div style="padding:6px 0 4px;"><span class="back-btn" onclick="showLanding()">← Return to standings</span></div>
   <div class="outer">
     <div class="meter-wrap">
       <div class="meter-title">SPICY METER</div>
@@ -162,6 +161,7 @@
       <div id="mTile" style="display:none"></div><div id="mBingo" style="display:none"></div>
     </div>
     <div class="board">
+      <div style="padding:0 0 6px 0;"><span class="back-btn" onclick="showLanding()">← Return to standings</span></div>
       <div class="logo-row">
         <div class="team-lbl" id="bTeamName"></div>
         <div style="display:flex;align-items:center;gap:0;">
@@ -234,6 +234,7 @@ function showLanding() {
   setHash('');
   document.getElementById('landing').style.display='block';
   document.getElementById('board-view').style.display='none';
+  document.getElementById('site-header').style.paddingLeft='20px';
   document.title = 'Spicy Bingo — Eternal Gems';
 }
 
@@ -244,6 +245,7 @@ function showBoard(slug) {
   setHash(slug);
   document.getElementById('landing').style.display='none';
   document.getElementById('board-view').style.display='block';
+  document.getElementById('site-header').style.paddingLeft='104px';
   document.title = 'Spicy Bingo — ' + team.name;
   if (cachedData) {
     const td = cachedData.teams.find(t => t.sheetName === team.sheetName);
@@ -285,6 +287,11 @@ async function load() {
   try {
     const data = await fetchData();
     cachedData = data;
+    if (data.tileData) {
+      Object.keys(data.tileData).forEach(k => {
+        TILE_DATA[k] = data.tileData[k];
+      });
+    }
 
 
     // Sort by total
