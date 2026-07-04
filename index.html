@@ -517,6 +517,14 @@ document.addEventListener('click', e => {
 
 
 // Tile modal
+
+const TILE_ROW_COLORS = {
+  1:'#AA0000',2:'#AA0000',3:'#AA0000',4:'#AA0000',5:'#AA0000',
+  6:'#B83D00',7:'#B83D00',8:'#B83D00',9:'#B83D00',10:'#B83D00',
+  11:'#A86600',12:'#A86600',13:'#A86600',14:'#A86600',15:'#A86600',
+  16:'#759900',17:'#759900',18:'#759900',19:'#759900',20:'#759900',
+  21:'#186618',22:'#186618',23:'#186618',24:'#186618',25:'#186618',
+};
 function tileClick(e, el) {
   const num = parseInt(el.getAttribute('data-tilenum'));
   const nameEl = el.querySelector('.tile-name');
@@ -533,7 +541,10 @@ function openModal(tileNum, tileName) {
       if (tile && tile.thresholds) threshStr = tile.thresholds;
     });
   }
-  document.getElementById('tm-title').textContent = tileName;
+  const rowColor = TILE_ROW_COLORS[tileNum] || '#ff4500';
+  const tmTitle = document.getElementById('tm-title');
+  tmTitle.textContent = tileName;
+  tmTitle.style.color = rowColor;
   const thEl = document.getElementById('tm-thresholds');
   if (thEl) thEl.innerHTML = '';
   // Build threshold HTML for drops needed box
@@ -549,55 +560,62 @@ function openModal(tileNum, tileName) {
         '<div style="color:#444;font-size:7px;letter-spacing:0.06em;">DROPS</div>' +
         '</div>').join('') + '</div>';
   }
-  let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+  let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
 
-  // Note box
+  // Drops Needed — red label
+  html += '<div>';
+  html += '<div style="font-size:11px;font-weight:700;color:#AA0000;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Drops Needed</div>';
+  html += threshHtml;
+  html += '</div>';
+
+  html += '<div style="border-top:1px solid #1a1a1a;"></div>';
+
+  // Tile Info — orange label (only if notes exist)
   if (data.notes) {
-    html += '<div style="border:1px solid #ff450033;border-radius:6px;overflow:hidden;">';
-    html += '<div style="background:#1a0a00;padding:6px 12px;border-bottom:1px solid #ff450022;display:flex;gap:8px;align-items:center;">';
-    html += '<span style="color:#ff4500;font-size:11px;">\u24d8</span>';
-    html += '<span style="font-size:9px;color:#ff4500;letter-spacing:0.12em;text-transform:uppercase;">Note</span>';
+    html += '<div>';
+    html += '<div style="font-size:11px;font-weight:700;color:#B83D00;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Tile Info</div>';
+    html += '<div style="font-size:13px;color:#aaa;line-height:1.5;">' + data.notes.replace(/\n/g,'<br>') + '</div>';
     html += '</div>';
-    html += '<div style="padding:8px 12px;font-size:12px;color:#888;line-height:1.5;">' + data.notes.replace(/\n/g,'<br>') + '</div>';
-    html += '</div>';
+    html += '<div style="border-top:1px solid #1a1a1a;"></div>';
   }
 
-  // Drops needed box
-  html += '<div style="border:1px solid #1a1a1a;border-radius:6px;overflow:hidden;">';
-  html += '<div style="background:#0d0d0d;padding:6px 12px;border-bottom:1px solid #1a1a1a;">';
-  html += '<span style="font-size:9px;color:#555;letter-spacing:0.12em;text-transform:uppercase;">Drops Needed</span>';
-  html += '</div>';
-  html += '<div style="padding:10px 12px;">' + threshHtml + '</div>';
-  html += '</div>';
-
-  // Tile completion box
-  html += '<div style="border:1px solid #AA000033;border-radius:6px;overflow:hidden;">';
-  html += '<div style="background:#0f0a0a;padding:6px 12px;border-bottom:1px solid #AA000022;">';
-  html += '<span style="font-size:9px;color:#AA0000;letter-spacing:0.12em;text-transform:uppercase;">Tile Completion</span>';
-  html += '</div>';
-  html += '<div style="padding:8px 12px 10px;">';
-  html += '<div style="font-size:11px;color:#555;line-height:1.5;margin-bottom:10px;">In addition to the drop requirement, the following conditions must be met in order to complete T4 and finish the tile.</div>';
+  // Tile Completion — amber label
+  html += '<div>';
+  html += '<div style="font-size:11px;font-weight:700;color:#A86600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">Tier 4 Completion</div>';
+  html += '<div style="font-size:12px;color:#666;line-height:1.5;margin-bottom:10px;">In addition to the drops needed, the following conditions must be met in order to finish T4 &amp; complete the tile:</div>';
   html += '<div style="display:flex;gap:8px;">';
-  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #AA000033;border-radius:4px;padding:8px 10px;">';
-  html += '<div style="font-size:9px;color:#AA0000;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Drop Req</div>';
-  html += '<div style="font-size:12px;color:#ddd;">' + (data.req || 'None') + '</div>';
+  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #A8660044;border-radius:4px;padding:9px 11px;">';
+  html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Drop Requirement</div>';
+  if (data.req) {
+    html += '<div style="font-size:13px;color:#ddd;">' + data.req + '</div>';
+    html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">Can be met at any time</div>';
+  } else {
+    html += '<div style="font-size:13px;color:#ddd;">None</div>';
+    html += '<div style="flex:1;"></div>';
+    html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">There are no additional drop requirements for this tile.</div>';
+  }
   html += '</div>';
-  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #AA000033;border-radius:4px;padding:8px 10px;">';
-  html += '<div style="font-size:9px;color:#AA0000;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Combat Achievement</div>';
-  html += '<div style="font-size:12px;color:#ddd;">' + (data.ca || 'None') + '</div>';
-  if (data.caNotes) html += '<div style="font-size:10px;color:#555;margin-top:3px;font-style:italic;">' + data.caNotes + '</div>';
-  html += '</div>';
+  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #A8660044;border-radius:4px;padding:9px 11px;">';
+  html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Combat Achievement</div>';
+  if (data.ca) {
+    html += '<div style="font-size:13px;color:#ddd;">' + data.ca + '</div>';
+    if (data.caNotes) html += '<div style="font-size:10px;color:#666;margin-top:3px;font-style:italic;">' + data.caNotes + '</div>';
+    html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">\u26a0 T3 must be completed first</div>';
+  } else {
+    html += '<div style="font-size:13px;color:#ddd;">None</div>';
+  html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">There are no Combat Achievement requirements for this tile.</div>';
+  }
   html += '</div>';
   html += '</div>';
   html += '</div>';
 
-  // Valid drops box
-  html += '<div style="border:1px solid #1a1a1a;border-radius:6px;overflow:hidden;">';
-  html += '<div style="background:#0d0d0d;padding:6px 12px;border-bottom:1px solid #1a1a1a;">';
-  html += '<span style="font-size:9px;color:#555;letter-spacing:0.12em;text-transform:uppercase;">Valid Drops</span>';
-  html += '</div>';
-  html += '<div style="padding:10px 12px;" class="tm-items">';
-  data.items.forEach(item => { html += '<div class="tm-item">\u2022 ' + item + '</div>'; });
+  html += '<div style="border-top:1px solid #1a1a1a;"></div>';
+
+  // Valid Drops — green label
+  html += '<div>';
+  html += '<div style="font-size:11px;font-weight:700;color:#186618;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Valid Drops</div>';
+  html += '<div style="font-size:13px;color:#aaa;line-height:1.9;">';
+  data.items.forEach(item => { html += '\u2022 ' + item + '<br>'; });
   html += '</div>';
   html += '</div>';
 
