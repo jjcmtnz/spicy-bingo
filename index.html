@@ -59,7 +59,11 @@
   .tile-name { font-size:10.5px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; margin-bottom:9px; }
   .tile.complete .tile-name { color:#f5b800; }
   .tier-badges { display:flex; gap:3px; width:100%; margin-bottom:9px; }
-  .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:10px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; }
+  .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:10px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; position:relative; }
+  .badge .blabel { display:block; }
+  .badge .bnum { display:none; }
+  .tile:hover .badge .blabel { display:none; }
+  .tile:hover .badge .bnum { display:block; }
   .badge.s1{background:#0a2a0a;border-color:#1e7a1e;color:#5eff5e;}
   .badge.s2{background:#2a1a00;border-color:#c47a00;color:#ffcc44;}
   .badge.s3{background:#2a0d00;border-color:#d44a00;color:#ff8844;}
@@ -183,10 +187,10 @@
       <div class="bottom-section">
         <div class="panel tiers-panel">
           <div class="ph">Point Tiers</div>
-          <div class="tier-row"><span class="tsw" style="background:#1e7a1e"></span><span class="tn">T1</span><span class="tv">1 pt</span></div>
-          <div class="tier-row"><span class="tsw" style="background:#c47a00"></span><span class="tn">T2</span><span class="tv">3 pts</span></div>
-          <div class="tier-row"><span class="tsw" style="background:#d44a00"></span><span class="tn">T3</span><span class="tv">6 pts</span></div>
-          <div class="tier-row"><span class="tsw" style="background:#cc0000"></span><span class="tn">T4</span><span class="tv">10 pts</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#1e7a1e"></span><span class="tn">T1</span><span class="tv">+1 pt</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#c47a00"></span><span class="tn">T2</span><span class="tv">+2 pts</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#d44a00"></span><span class="tn">T3</span><span class="tv">+3 pts</span></div>
+          <div class="tier-row"><span class="tsw" style="background:#cc0000"></span><span class="tn">T4</span><span class="tv">+4 pts</span></div>
         </div>
         <div class="panel bonus-panel">
           <div class="ph">Bingo Bonuses</div>
@@ -403,8 +407,9 @@ function renderBoard(team) {
     const drops = tile.drops || 0;
     const complete = tierNum(tile.tier) >= 4;
     const rc = RC[Math.floor(i/5)] || '#555';
+    const tierLabels = ['T1','T2','T3','T4'];
     const badges = [t1,t2,t3,t4].map((th,idx) =>
-      `<div class="badge ${drops>=th?'s'+(idx+1):''}">${th}</div>`).join('');
+      `<div class="badge ${drops>=th?'s'+(idx+1):''}"><span class="blabel">${tierLabels[idx]}</span><span class="bnum">${th}</span></div>`).join('');
     const filled = t4 > 0 ? Math.round(Math.min(1, drops/t4)*10) : 0;
     let segs = '';
     for (let s=0; s<10; s++) {
