@@ -53,10 +53,11 @@
 
   .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-bottom:20px; }
   .tile { background:#111; border:2px solid #333; border-radius:4px; padding:10px 9px 9px; display:flex; flex-direction:column; align-items:center; min-height:158px; position:relative; }
-  .tile.complete { background:#0d0800; border-color:#f5b800 !important; }
-  .complete-tag { font-family:'Bungee',cursive; font-size:9px; letter-spacing:0.14em; background:#f5b800; color:#000; padding:2px 0; text-align:center; width:calc(100% + 18px); margin:-10px -9px 8px; }
+  .tile.complete { background:#1a0500; border-color:#ff4400 !important; box-shadow:0 0 14px #ff440055; }
+  .tile.complete .tile-name { color:#ff6622; }
+  .tile.complete .badge { background:#2a0800 !important; border-color:#ff4400 !important; color:#ff8844 !important; }
   .tile-num { position:absolute; top:5px; left:7px; font-family:'Bungee',cursive; font-size:8px; color:rgba(255,255,255,0.18); }
-  .tile-name { font-size:10.5px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; margin-bottom:9px; }
+  .tile-name { font-size:10.5px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; }
   .tile.complete .tile-name { color:#f5b800; }
   .tier-badges { display:flex; gap:3px; width:100%; margin-bottom:9px; }
   .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:10px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; position:relative; }
@@ -68,11 +69,11 @@
   .badge.s2{background:#2a1a00;border-color:#c47a00;color:#ffcc44;}
   .badge.s3{background:#2a0d00;border-color:#d44a00;color:#ff8844;}
   .badge.s4{background:#2a0000;border-color:#cc0000;color:#ff4444;}
-  .heat-meter { margin-top:auto; width:100%; }
-  .heat-track { height:8px; background:#111; border:1px solid #1a1a1a; display:flex; gap:2px; padding:1px; overflow:hidden; }
-  .seg{flex:1;border-radius:1px;background:#1a1a1a;}
-  .seg.g{background:#1e7a1e;}.seg.y{background:#c47a00;}.seg.o{background:#d44a00;}.seg.r{background:#cc0000;}
-  .tile.complete .seg{background:#f5b800;}
+
+  .heat-track { height:7px; background:linear-gradient(90deg,#0d2a0d,#2a1800,#2a0d00,#1a0000); border-radius:3px; overflow:hidden; }
+  .heat-fill { height:100%; border-radius:3px; transition:width 0.6s ease; }
+  .tile.complete .heat-track { background:#2a0800; }
+  .tile.complete .heat-fill { background:linear-gradient(90deg,#cc2200,#ff6600) !important; }
   .heat-label { font-size:9.5px; color:#444; text-align:center; margin-top:4px; letter-spacing:0.05em; font-weight:600; }
   .bottom-section { display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
@@ -102,7 +103,7 @@
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
 
   /* Tile hover + modal */
-  .tile { cursor:pointer; transition: filter 0.15s, transform 0.15s; }
+  .tile { cursor:pointer; transition: filter 0.15s, transform 0.15s; display:flex; flex-direction:column; }
   .tile:hover { filter:brightness(1.6); transform:translateY(-2px); }
 
   .tile-modal-overlay {
@@ -112,27 +113,27 @@
   .tile-modal-overlay.visible { display:flex; align-items:center; justify-content:center; }
   .tile-modal {
     background:#0d0d0d; border:1px solid #333; border-radius:8px;
-    padding:0; max-width:480px; width:90%; max-height:80vh;
+    padding:0; max-width:560px; width:92%; max-height:82vh;
     display:flex; flex-direction:column;
     box-shadow: 0 8px 40px rgba(0,0,0,0.9);
   }
   .tm-header {
-    padding:16px 20px 14px; border-bottom:1px solid #1a1a1a;
+    padding:18px 22px 16px; border-bottom:1px solid #1a1a1a;
     display:flex; align-items:center; justify-content:space-between;
   }
-  .tm-title { font-family:'Bungee',cursive; font-size:17px; color:#ff4500; letter-spacing:0.06em; }
+  .tm-title { font-family:'Bungee',cursive; font-size:19px; color:#ff4500; letter-spacing:0.06em; }
   .tm-thresholds { font-size:13px; color:#555; letter-spacing:0.08em; margin-top:4px; }
   .tm-close { font-family:'Bungee',cursive; font-size:20px; color:#444; cursor:pointer; line-height:1; }
   .tm-close:hover { color:#ff4500; }
-  .tm-body { padding:16px 20px; overflow-y:auto; }
-  .tm-section { font-size:11px; color:#666; letter-spacing:0.1em; text-transform:uppercase; margin:14px 0 6px; font-weight:700; }
+  .tm-body { padding:18px 22px; overflow-y:auto; }
+  .tm-section { font-size:11px; color:#666; letter-spacing:0.1em; text-transform:uppercase; margin:14px 0 8px; font-weight:700; }
   .tm-section:first-child { margin-top:0; }
   .tm-req-val { font-size:13px; color:#186618; padding:4px 0; }
   .tm-ca-val  { font-size:13px; color:#a86600; padding:4px 0; }
   .tm-ca-notes { font-size:11px; color:#555; padding:2px 0 4px; font-style:italic; }
   .tm-divider { border:none; border-top:1px solid #1a1a1a; margin:12px 0; }
   .tm-items { display:flex; flex-direction:column; gap:2px; }
-  .tm-item { font-size:13px; color:#888; padding:4px 0; border-bottom:1px solid #0d0d0d; line-height:1.4; }
+  .tm-item { font-size:13px; color:#999; padding:5px 0; border-bottom:1px solid #0d0d0d; line-height:1.4; }
   .tm-item:last-child { border-bottom:none; }
 </style>
 </head>
@@ -410,19 +411,20 @@ function renderBoard(team) {
     const tierLabels = ['T1','T2','T3','T4'];
     const badges = [t1,t2,t3,t4].map((th,idx) =>
       `<div class="badge ${drops>=th?'s'+(idx+1):''}"><span class="blabel">${tierLabels[idx]}</span><span class="bnum">${th}</span></div>`).join('');
-    const filled = t4 > 0 ? Math.round(Math.min(1, drops/t4)*10) : 0;
-    let segs = '';
-    for (let s=0; s<10; s++) {
-      if (s>=filled) { segs += '<div class="seg"></div>'; continue; }
-      const p = s/10;
-      segs += `<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
-    }
+    const fillPct = t4 > 0 ? Math.min(100, (drops/t4)*100) : 0;
+    const fillColor = fillPct >= 100 ? 'linear-gradient(90deg,#cc2200,#ff6600)' :
+      fillPct > 66 ? 'linear-gradient(90deg,#1e7a1e,#c47a00 40%,#d44a00)' :
+      fillPct > 33 ? 'linear-gradient(90deg,#1e7a1e,#c47a00)' : '#1e7a1e';
     html += `<div class="tile${complete?' complete':''}" style="border-color:${rc}" data-tilenum="${tile.num}" onclick="tileClick(event,this)">
-      ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
+      <div style="height:0"></div>
       <div class="tile-num">${tile.num}</div>
       <div class="tile-name">${tile.name}</div>
+      <div style="flex:1;min-height:16px;"></div>
       <div class="tier-badges">${badges}</div>
-      <div class="heat-meter"><div class="heat-track">${segs}</div><div class="heat-label">${drops} / ${t4} drops</div></div>
+      <div style="width:100%;margin-top:6px;">
+        <div class="heat-track" style="width:100%;"><div class="heat-fill" style="width:${fillPct}%;background:${fillColor};"></div></div>
+        <div class="heat-label">${drops} / ${t4} drops</div>
+      </div>
     </div>`;
   });
 
@@ -533,35 +535,75 @@ function openModal(tileNum, tileName) {
   }
   document.getElementById('tm-title').textContent = tileName;
   const thEl = document.getElementById('tm-thresholds');
-  if (thEl) {
-    if (threshStr) {
-      const parts = threshStr.split('·').map(s => s.trim());
-      const labels = ['T1','T2','T3','T4'];
-      const colors = ['#186618','#A86600','#B83D00','#AA0000'];
-      thEl.innerHTML = '<div style="font-size:9px;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Drops Needed</div>' +
-        '<div style="display:flex;gap:8px;">' +
-        parts.map((v,i) => '<div style="background:#0d0d0d;border:1px solid ' + colors[i] + '55;border-radius:4px;padding:6px 12px;text-align:center;">' +
-          '<div style="color:' + colors[i] + ';font-family:Bungee,cursive;font-size:11px;letter-spacing:0.08em;">' + labels[i] + '</div>' +
-          '<div style="color:#ccc;font-size:16px;font-weight:700;line-height:1.2;">' + v + '</div>' +
-          '<div style="color:#555;font-size:8px;letter-spacing:0.06em;">unique' + (parseInt(v) !== 1 ? 's' : '') + '</div>' +
-          '</div>').join('') + '</div>';
-    } else { thEl.innerHTML = ''; }
+  if (thEl) thEl.innerHTML = '';
+  // Build threshold HTML for drops needed box
+  let threshHtml = '';
+  if (threshStr) {
+    const parts = threshStr.split('·').map(s => s.trim());
+    const labels = ['T1','T2','T3','T4'];
+    const colors = ['#186618','#A86600','#B83D00','#AA0000'];
+    threshHtml = '<div style="display:flex;gap:6px;">' +
+      parts.map((v,i) => '<div style="flex:1;background:#0a0a0a;border:1px solid ' + colors[i] + '55;border-radius:4px;padding:6px;text-align:center;">' +
+        '<div style="color:' + colors[i] + ';font-family:Bungee,cursive;font-size:10px;">' + labels[i] + '</div>' +
+        '<div style="color:#ddd;font-size:15px;font-weight:700;line-height:1.2;">' + v + '</div>' +
+        '<div style="color:#444;font-size:7px;letter-spacing:0.06em;">DROPS</div>' +
+        '</div>').join('') + '</div>';
   }
-  let html = '';
-  html += '<div class="tm-section">T4 Drop Requirements</div>';
-  html += '<div class="tm-req-val">' + (data.req || 'None') + '</div>';
-  html += '<div class="tm-section">T4 CA Requirements</div>';
-  html += '<div class="tm-ca-val">' + (data.ca || 'None') + '</div>';
-  if (data.ca && data.caNotes) html += '<div class="tm-ca-notes">' + data.caNotes + '</div>';
+  let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+
+  // Note box
   if (data.notes) {
-    html += '<div class="tm-section">Tile Notes</div>';
-    html += '<div style="font-size:12px;color:#aaa;padding:4px 0 8px;line-height:1.6;">' + data.notes.replace(/\n/g,'<br>') + '</div>';
+    html += '<div style="border:1px solid #ff450033;border-radius:6px;overflow:hidden;">';
+    html += '<div style="background:#1a0a00;padding:6px 12px;border-bottom:1px solid #ff450022;display:flex;gap:8px;align-items:center;">';
+    html += '<span style="color:#ff4500;font-size:11px;">\u24d8</span>';
+    html += '<span style="font-size:9px;color:#ff4500;letter-spacing:0.12em;text-transform:uppercase;">Note</span>';
+    html += '</div>';
+    html += '<div style="padding:8px 12px;font-size:12px;color:#888;line-height:1.5;">' + data.notes.replace(/\n/g,'<br>') + '</div>';
+    html += '</div>';
   }
-  html += '<hr class="tm-divider">';
-  html += '<div class="tm-section">Valid Drops</div><div class="tm-items">';
-  data.items.forEach(item => { html += '<div class="tm-item">• ' + item + '</div>'; });
+
+  // Drops needed box
+  html += '<div style="border:1px solid #1a1a1a;border-radius:6px;overflow:hidden;">';
+  html += '<div style="background:#0d0d0d;padding:6px 12px;border-bottom:1px solid #1a1a1a;">';
+  html += '<span style="font-size:9px;color:#555;letter-spacing:0.12em;text-transform:uppercase;">Drops Needed</span>';
   html += '</div>';
-  document.getElementById('tm-body').innerHTML = html;
+  html += '<div style="padding:10px 12px;">' + threshHtml + '</div>';
+  html += '</div>';
+
+  // Tile completion box
+  html += '<div style="border:1px solid #AA000033;border-radius:6px;overflow:hidden;">';
+  html += '<div style="background:#0f0a0a;padding:6px 12px;border-bottom:1px solid #AA000022;">';
+  html += '<span style="font-size:9px;color:#AA0000;letter-spacing:0.12em;text-transform:uppercase;">Tile Completion</span>';
+  html += '</div>';
+  html += '<div style="padding:8px 12px 10px;">';
+  html += '<div style="font-size:11px;color:#555;line-height:1.5;margin-bottom:10px;">In addition to the drop requirement, the following conditions must be met in order to complete T4 and finish the tile.</div>';
+  html += '<div style="display:flex;gap:8px;">';
+  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #AA000033;border-radius:4px;padding:8px 10px;">';
+  html += '<div style="font-size:9px;color:#AA0000;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Drop Req</div>';
+  html += '<div style="font-size:12px;color:#ddd;">' + (data.req || 'None') + '</div>';
+  html += '</div>';
+  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #AA000033;border-radius:4px;padding:8px 10px;">';
+  html += '<div style="font-size:9px;color:#AA0000;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Combat Achievement</div>';
+  html += '<div style="font-size:12px;color:#ddd;">' + (data.ca || 'None') + '</div>';
+  if (data.caNotes) html += '<div style="font-size:10px;color:#555;margin-top:3px;font-style:italic;">' + data.caNotes + '</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // Valid drops box
+  html += '<div style="border:1px solid #1a1a1a;border-radius:6px;overflow:hidden;">';
+  html += '<div style="background:#0d0d0d;padding:6px 12px;border-bottom:1px solid #1a1a1a;">';
+  html += '<span style="font-size:9px;color:#555;letter-spacing:0.12em;text-transform:uppercase;">Valid Drops</span>';
+  html += '</div>';
+  html += '<div style="padding:10px 12px;" class="tm-items">';
+  data.items.forEach(item => { html += '<div class="tm-item">\u2022 ' + item + '</div>'; });
+  html += '</div>';
+  html += '</div>';
+
+  html += '</div>';
+  
+    document.getElementById('tm-body').innerHTML = html;
   document.getElementById('tile-modal-overlay').classList.add('visible');
 }
 
