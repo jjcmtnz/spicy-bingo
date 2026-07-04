@@ -47,10 +47,10 @@
   .board { flex:1; min-width:0; }
   .logo-row { display:flex; align-items:center; justify-content:space-between; padding:14px 22px 12px; border-bottom:1px solid #1a1a1a; margin-bottom:12px; }
   .team-lbl { font-size:12px; letter-spacing:0.22em; color:#444; text-transform:uppercase; font-weight:700; }
-  .logo-sm { display:inline-flex; align-items:center; border:2.5px solid #ff4500; border-radius:5px; padding:5px 20px 7px; position:relative; }
-  .logo-sm::before { content:''; position:absolute; inset:4px; border:1px solid #ff4500; border-radius:3px; }
-  .ls-spicy { font-family:'Bungee',cursive; font-size:32px; color:transparent; -webkit-text-stroke:2px #f5b800; margin-right:10px; }
-  .ls-bingo { font-family:'Bungee',cursive; font-size:32px; color:transparent; -webkit-text-stroke:2px #ff4500; }
+  .logo-sm { display:inline-flex; align-items:center; border:3px solid #ff4500; border-radius:6px; padding:8px 28px 10px; position:relative; }
+  .logo-sm::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
+  .ls-spicy { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #f5b800; letter-spacing:0.04em; margin-right:12px; }
+  .ls-bingo { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #ff4500; letter-spacing:0.04em; }
   .score-box { text-align:right; }
   .score-total { font-family:'Bungee',cursive; font-size:24px; color:#ff4500; display:block; }
   .score-lbl { font-size:10px; color:#333; letter-spacing:0.12em; text-transform:uppercase; }
@@ -102,10 +102,51 @@
   .ltot { position:absolute; bottom:3px; right:6px; font-size:8px; color:#555; }
   .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
+
+  /* Tile hover + modal */
+  .tile { cursor:pointer; transition: filter 0.15s, transform 0.15s; }
+  .tile:hover { filter:brightness(1.6); transform:translateY(-2px); }
+
+  .tile-modal-overlay {
+    display:none; position:fixed; inset:0; z-index:900;
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(2px);
+  }
+  .tile-modal-overlay.visible { display:flex; align-items:center; justify-content:center; }
+  .tile-modal {
+    background:#0d0d0d; border:1px solid #333; border-radius:8px;
+    padding:0; max-width:480px; width:90%; max-height:80vh;
+    display:flex; flex-direction:column;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.9);
+  }
+  .tm-header {
+    padding:14px 18px 12px; border-bottom:1px solid #1a1a1a;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .tm-title { font-family:'Bungee',cursive; font-size:14px; color:#ff4500; letter-spacing:0.06em; }
+  .tm-close { font-family:'Bungee',cursive; font-size:18px; color:#444; cursor:pointer; line-height:1; }
+  .tm-close:hover { color:#ff4500; }
+  .tm-body { padding:14px 18px; overflow-y:auto; }
+  .tm-section { font-size:9px; color:#555; letter-spacing:0.12em; text-transform:uppercase; margin:12px 0 6px; }
+  .tm-section:first-child { margin-top:0; }
+  .tm-items { display:flex; flex-direction:column; gap:3px; }
+  .tm-item { font-size:11px; color:#888; padding:3px 0; border-bottom:1px solid #111; }
+  .tm-item:last-child { border-bottom:none; }
+  .tm-req { font-size:12px; color:#186618; padding:4px 0; }
+  .tm-ca  { font-size:12px; color:#a86600; padding:2px 0; }
+  .tm-ca-notes { font-size:10px; color:#555; padding:2px 0 4px; }
 </style>
 </head>
 <body>
 
+<div id="tile-modal-overlay" class="tile-modal-overlay" onclick="closeModal(event)">
+  <div class="tile-modal" onclick="event.stopPropagation()">
+    <div class="tm-header">
+      <div class="tm-title" id="tm-title"></div>
+      <div class="tm-close" onclick="closeModal()">✕</div>
+    </div>
+    <div class="tm-body" id="tm-body"></div>
+  </div>
+</div>
 <div id="landing">
   <div class="logo-wrap">
     <div class="logo-frame">
@@ -174,7 +215,7 @@
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbyrSk0p8vtoFcCFwDM52YJ2gFGiLEQ7kOcO5kCMY1S8PcLIn22_-OHC6z99PdfzCII-/exec";
+const API = "https://script.google.com/macros/s/AKfycbxtnvsgtnXlRK43zSkFpMsLUeqwkhmHloiVhAaHXogX3RV1Yvpg71kOZycOEOrooEbQ/exec";
 const MAX = 2950;
 const RC  = ["#cc0000","#d44a00","#c47a00","#8ab800","#1e7a1e"];
 const BINGO_LINES = [
@@ -266,6 +307,7 @@ async function load() {
     const data = await fetchData();
     cachedData = data;
 
+
     // Sort by total
     data.teams.sort((a,b) => (b.total||0) - (a.total||0));
     data.teams.forEach((t,i) => t.rank = i+1);
@@ -347,7 +389,7 @@ function renderBoard(team) {
       const p = s/10;
       segs += `<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
     }
-    html += `<div class="tile${complete?' complete':''}" style="border-color:${rc}">
+    html += `<div class="tile${complete?' complete':''}" style="border-color:${rc}" data-tilenum="${tile.num}" onclick="tileClick(event,this)">
       ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
       <div class="tile-num">${tile.num}</div>
       <div class="tile-name">${tile.name}</div>
@@ -373,6 +415,108 @@ function renderBoard(team) {
   });
   document.getElementById('bLines').innerHTML = lhtml;
 }
+
+
+const TILE_DATA = {
+  1:  { items: ["Leviathan: Chromium Ingot","Leviathan: Venator Vestige","Leviathan: Leviathan's Lure","Leviathan: Virtus Mask","Leviathan: Virtus Robe Top","Leviathan: Virtus Robe Bottom","Leviathan: Lil' Leviathan","Leviathan: Gold Ring","Whisperer: Chromium Ingot","Whisperer: Bellator Vestige","Whisperer: Siren's Staff","Whisperer: Virtus Mask","Whisperer: Virtus Robe Top","Whisperer: Virtus Robe Bottom","Whisperer: Wisp","Whisperer: Gold Ring"], req:"2 from each boss", ca:"Unconventional", caNotes:"Kill Levi with mith ammo & max 25hp" },
+  2:  { items: ["Amoxliatl: Glacial Temotli","Amoxliatl: Moxi","Sarachnis: Pristine Spider Silk","Sarachnis: Sarachnis Cudgel","Sarachnis: Sraracha","Giant Mole: Immaculate Mole Skin","Giant Mole: Baby Mole","Kalphite Queen: KQ Head","Kalphite Queen: Dragon Pickaxe","Kalphite Queen: Dragon 2h Sword","Kalphite Queen: Dragon Chainbody","Kalphite Queen: Jar of Sand","Kalphite Queen: Kalphite Princess"], req:"T1:Amox 3 / T2:Sarachnis 5 / T3:Mole 10 / T4:KQ 3", ca:"", caNotes:"" },
+  3:  { items: ["Tonalztics of Ralos","Echo Crystal","Uncut Onyx","Sunfire Fanatic Helm","Sunfire Fanatic Cuirass","Sunfire Fanatic Chausses","Smol heredit"], req:"", ca:"", caNotes:"" },
+  4:  { items: ["Torva Full Helm","Torva Platebody","Torva Platelegs","Nihil Horn","Zaryte Vambraces","Ancient Hilt","Nexling"], req:"", ca:"Nex Duo CA", caNotes:"" },
+  5:  { items: ["Eclipse Moon Helm","Eclipse Moon Chestplate","Eclipse Moon Tassets","Eclipse Atlatl","Blood Moon Helm","Blood Moon Chestplate","Blood Moon Tassets","Dual Macuahuitl","Blue Moon Helm","Blue Moon Chestplate","Blue Moon Tassets","Blue Moon Spear"], req:"2 matched sets", ca:"", caNotes:"" },
+  6:  { items: ["Shellbane Gryphon: Belle's Folly","Shellbane Gryphon: Jar of Feathers","Shellbane Gryphon: Gull","Abyssal Sire: Abyssal Whip","Abyssal Sire: Abyssal Dagger","Abyssal Sire: Bludgeon Axon","Abyssal Sire: Bludgeon Spine","Abyssal Sire: Bludgeon Claw","Abyssal Sire: Unsired","Abyssal Sire: Jar of Miasma","Abyssal Sire: Abyssal Orphan","Thermy: Occult Necklace","Thermy: Smoke Battlestaff","Thermy: Dragon Chainbody","Thermy: Jar of Smoke","Thermy: Pet Smoke Devil","Alchemical Hydra: Hydra's Eye","Alchemical Hydra: Hydra's Fang","Alchemical Hydra: Hydra's Heart","Alchemical Hydra: Hydra Tail","Alchemical Hydra: Hydra Leather","Alchemical Hydra: Hydra's Claw","Alchemical Hydra: Jar of Chemicals","Alchemical Hydra: Ikkle Hydra"], req:"2 from each of 4 bosses", ca:"", caNotes:"" },
+  7:  { items: ["K'ril: Steam Battlestaff","K'ril: Zamorakian Spear","K'ril: Staff of the Dead","K'ril: Zamorak Hilt","K'ril: Pet K'ril Tsutsaroth","Zilyana: Saradomin Sword","Zilyana: Saradomin's Light","Zilyana: Armadyl Crossbow","Zilyana: Saradomin Hilt","Zilyana: Pet Zilyana"], req:"2 from each boss", ca:"Peach Conjurer", caNotes:"50 kc w/o leaving" },
+  8:  { items: ["Ancient Icon","Venator Shard","Muphin"], req:"3 Venator Shards", ca:"More Than Just a Ranged Weapon", caNotes:"Kill w/ salamander" },
+  9:  { items: ["Mokhaiotl Cloth","Eye of Ayak","Avernic Treads","Dom"], req:"", ca:"", caNotes:"" },
+  10: { items: ["Tanzanite Fang","Magic Fang","Serpentine Visage","Uncut Onyx","Tanzanite Mutagen","Magma Mutagen","Pet Snakeling"], req:"", ca:"", caNotes:"" },
+  11: { items: ["Fire Cape","Infernal Cape"], req:"2 Infernal Capes", ca:"Facing Jad Head-On", caNotes:"Melee only Fight Caves" },
+  12: { items: ["Fire Element Staff Crown","Ice Element Staff Crown","Bran (no gamble)"], req:"2 fire + 2 ice crowns", ca:"Titan Killer", caNotes:"15 kills w/o leaving" },
+  13: { items: ["ToB: Avernic Defender Hilt","ToB: Ghrazi Rapier","ToB: Sanguinesti Staff","ToB: Justiciar Faceguard","ToB: Justiciar Chestguard","ToB: Justiciar Legguards","ToB: Scythe of Vitur","ToB: Holy ornament kit","ToB: Sanguine ornament kit","ToB: Sanguine dust","ToB: Lil' Zik","CoX: Twisted Bow","CoX: Elder Maul","CoX: Dragon Claws","CoX: Kodai Insignia","CoX: Ancestral Hat","CoX: Ancestral Robe Top","CoX: Ancestral Robe Bottom","CoX: Dragon Hunter Crossbow","CoX: Twisted Buckler","CoX: Dinh's Bulwark","CoX: Dexterous prayer scroll","CoX: Arcane prayer scroll","CoX: Twisted ancestral colour kit","CoX: Metamorphic dust","ToA: Tumeken's Shadow","ToA: Masori Mask","ToA: Masori Body","ToA: Masori Chaps","ToA: Elidinis' Ward","ToA: Osmumten's Fang","ToA: Lightbearer","ToA: Tumeken's Guardian"], req:"2 from each of 3 raids", ca:"But... Damage", caNotes:"t75 at ToA" },
+  14: { items: ["Crystal Weapon Seed","Crystal Armour Seed","Enhanced Crystal Weapon Seed","Youngllef"], req:"", ca:"Speed-Chaser CA", caNotes:"5 minutes (master)" },
+  15: { items: ["Vorkath's Head","Dragonbone Necklace","Draconic Visage","Skeletal Visage","Vorki"], req:"1 non-head unique", ca:"The Freminik Way", caNotes:"Kill w/ only fists" },
+  16: { items: ["Rex: Berserker Ring","Rex: Warrior Ring","Rex: Pet dagannoth rex","Prime: Seers Ring","Prime: Mud Battlestaff","Prime: Pet dagannoth prime","Supreme: Archers Ring","Supreme: Seercull","Supreme: Pet dagannoth supreme"], req:"All 4 rings", ca:"", caNotes:"" },
+  17: { items: ["Crimson Kisten","Elder Venator Fang","Maggot marquess"], req:"", ca:"", caNotes:"" },
+  18: { items: ["Duke: Chromium Ingot","Duke: Magus Vestige","Duke: Eye of the Duke","Duke: Virtus Mask","Duke: Virtus Robe Top","Duke: Virtus Robe Bottom","Duke: Baron","Duke: Gold Ring","Vardorvis: Chromium Ingot","Vardorvis: Ultor Vestige","Vardorvis: Executioner's Axe Head","Vardorvis: Virtus Mask","Vardorvis: Virtus Robe Top","Vardorvis: Virtus Robe Bottom","Vardorvis: Butch","Vardorvis: Gold Ring"], req:"2 from each boss", ca:"Axe Enthusiast", caNotes:"" },
+  19: { items: ["Soulflame Horn","Oathplate Helm","Oathplate Chest","Oathplate Legs","Yami"], req:"", ca:"No toppings, no drinks, thanks", caNotes:"Only plain pizza, no pots" },
+  20: { items: ["Kraken: Trident of the Seas","Kraken: Kraken Tentacle","Kraken: Jar of Dirt","Kraken: Pet Kraken","Grotesque Guardians: Granite Maul","Grotesque Guardians: Granite Gloves","Grotesque Guardians: Granite Ring","Grotesque Guardians: Granite Hammer","Grotesque Guardians: Black Tourmaline Core","Grotesque Guardians: Jar of Stone","Grotesque Guardians: Noon","Cerberus: Primordial Crystal","Cerberus: Pegasian Crystal","Cerberus: Eternal Crystal","Cerberus: Smouldering Stone","Cerberus: Jar of Souls","Cerberus: Hellpuppy","Araxxor: Noxious Point","Araxxor: Noxious Pommel","Araxxor: Noxious Blade","Araxxor: Araxyte Fang","Araxxor: Araxyte Head","Araxxor: Jar of Venom","Araxxor: Nid"], req:"2 from each of 4 bosses", ca:"Perfect Araxxor 2", caNotes:"Perfect kill, w/o hitting during enrage" },
+  21: { items: ["Wintertodt: Pyromancer Hood","Wintertodt: Pyromancer Garb","Wintertodt: Pyromancer Robe","Wintertodt: Pyromancer Boots","Wintertodt: Tome of Fire","Wintertodt: Phoenix","Wintertodt: Dragon Axe","Tempoross: Fish Barrel","Tempoross: Tackle Box","Tempoross: Tome of Water","Tempoross: x25 Soaked Pages","Tempoross: Big Harpoonfish","Tempoross: Dragon Harpoon","Tempoross: Tiny Tempor","Zalcano: Zalcano Shard","Zalcano: Crystal Tool Seed","Zalcano: Uncut Onyx","Zalcano: Smolcano"], req:"Must include 1 Zalcano + 2 WT + 2 Tempy drops", ca:"", caNotes:"" },
+  22: { items: ["Ahrim's Hood","Ahrim's Robetop","Ahrim's Robeskirt","Ahrim's Staff","Dharok's Helm","Dharok's Platebody","Dharok's Platelegs","Dharok's Greataxe","Guthan's Helm","Guthan's Platebody","Guthan's Chainskirt","Guthan's Warspear","Karil's Coif","Karil's Leathertop","Karil's Leatherskirt","Karil's Crossbow","Torag's Helm","Torag's Platebody","Torag's Platelegs","Torag's Hammers","Verac's Helm","Verac's Brassard","Verac's Plateskirt","Verac's Flail"], req:"", ca:"", caNotes:"" },
+  23: { items: ["Artio/Callisto: Claws of Callisto","Artio/Callisto: Dragon 2h Sword","Artio/Callisto: Dragon Pickaxe","Artio/Callisto: Tyrannical Ring","Artio/Callisto: Voidwaker Hilt","Artio/Callisto: Callisto cub","Spindel/Venenatis: Fangs of Venenatis","Spindel/Venenatis: Dragon 2h Sword","Spindel/Venenatis: Dragon Pickaxe","Spindel/Venenatis: Voidwaker Gem","Spindel/Venenatis: Treasonous Ring","Spindel/Venenatis: Venenatis spiderling","Calvarion/Vet'ion: Skull of Vet'ion","Calvarion/Vet'ion: Dragon 2h Sword","Calvarion/Vet'ion: Dragon Pickaxe","Calvarion/Vet'ion: Voidwaker Blade","Calvarion/Vet'ion: Ring of the Gods","Calvarion/Vet'ion: Vet'ion jr."], req:"2 from each of 3 bosses", ca:"", caNotes:"" },
+  24: { items: ["Kree'arra: Armadyl Helmet","Kree'arra: Armadyl Chestplate","Kree'arra: Armadyl Chainskirt","Kree'arra: Armadyl Hilt","Kree'arra: Pet kree'arra","Graardor: Bandos Chestplate","Graardor: Bandos Tassets","Graardor: Bandos Boots","Graardor: Bandos Hilt","Graardor: Pet general graardor"], req:"2 from each boss", ca:"", caNotes:"" },
+  25: { items: ["Hueycoatl Hide","Tome of Earth","Dragon Hunter Wand","Huberte"], req:"1 non-Hide drop", ca:"Huey Speed-Runner", caNotes:"2:30 in trios" },
+};
+
+
+// Tooltip logic
+const tooltip = document.getElementById('tile-tooltip');
+let tooltipVisible = false;
+
+function showTooltip(e, tileNum, tileName) {
+  const data = TILE_DATA[tileNum];
+  if (!data) return;
+  let html = `<div class="tt-title">${tileName}</div>`;
+  html += `<div class="tt-section">Qualifying Drops</div>`;
+  data.items.forEach(item => { html += `<div class="tt-item">• ${item}</div>`; });
+  if (data.req) { html += `<div class="tt-section">T4 Drop Req</div><div class="tt-req">✦ ${data.req}</div>`; }
+  if (data.ca)  { html += `<div class="tt-section">T4 CA</div><div class="tt-ca">✦ ${data.ca}${data.caNotes ? ' — ' + data.caNotes : ''}</div>`; }
+  tooltip.innerHTML = html;
+  positionTooltip(e);
+  tooltip.classList.add('visible');
+  tooltipVisible = true;
+}
+
+function positionTooltip(e) {
+  const x = e.clientX + 14;
+  const y = e.clientY + 14;
+  const tw = tooltip.offsetWidth || 280;
+  const th = tooltip.offsetHeight || 200;
+  tooltip.style.left = (x + tw > window.innerWidth ? x - tw - 28 : x) + 'px';
+  tooltip.style.top  = (y + th > window.innerHeight ? y - th - 28 : y) + 'px';
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+  tooltipVisible = false;
+}
+
+document.addEventListener('mousemove', e => {
+  if (tooltipVisible) positionTooltip(e);
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.tile')) hideTooltip();
+});
+
+
+// Tile modal
+function tileClick(e, el) {
+  const num = parseInt(el.getAttribute('data-tilenum'));
+  const nameEl = el.querySelector('.tile-name');
+  openModal(num, nameEl ? nameEl.textContent.trim() : '');
+}
+
+function openModal(tileNum, tileName) {
+  const data = TILE_DATA[tileNum];
+  if (!data) return;
+  document.getElementById('tm-title').textContent = tileName;
+  let html = '<div class="tm-section">Qualifying Drops</div><div class="tm-items">';
+  data.items.forEach(item => { html += `<div class="tm-item">• ${item}</div>`; });
+  html += '</div>';
+  if (data.req) html += `<div class="tm-section">T4 Drop Req</div><div class="tm-req">✦ ${data.req}</div>`;
+  if (data.ca)  {
+    html += `<div class="tm-section">T4 Challenge Achievement</div><div class="tm-ca">✦ ${data.ca}</div>`;
+    if (data.caNotes) html += `<div class="tm-ca-notes">${data.caNotes}</div>`;
+  }
+  document.getElementById('tm-body').innerHTML = html;
+  document.getElementById('tile-modal-overlay').classList.add('visible');
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('tile-modal-overlay')) return;
+  document.getElementById('tile-modal-overlay').classList.remove('visible');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('tile-modal-overlay').classList.remove('visible');
+});
 
 // Init
 const initHash = getHash();
