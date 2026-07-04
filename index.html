@@ -57,9 +57,9 @@
   .score-breakdown { display:flex; gap:14px; justify-content:flex-end; margin-top:4px; }
   .sb-val { font-family:'Bungee',cursive; font-size:13px; }
   .sb-lbl { font-size:9px; color:#444; letter-spacing:0.08em; text-transform:uppercase; }
-  .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
-  .tile { background:#0a0a0a; border:2px solid var(--rc); padding:10px 9px 9px; display:flex; flex-direction:column; align-items:center; min-height:158px; position:relative; }
-  .tile.complete { background:#0d0800; border-color:#f5b800; }
+  .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-bottom:20px; }
+  .tile { background:#111; border:2px solid #333; border-radius:4px; padding:10px 9px 9px; display:flex; flex-direction:column; align-items:center; min-height:158px; position:relative; }
+  .tile.complete { background:#0d0800; border-color:#f5b800 !important; }
   .complete-tag { font-family:'Bungee',cursive; font-size:9px; letter-spacing:0.14em; background:#f5b800; color:#000; padding:2px 0; text-align:center; width:calc(100% + 18px); margin:-10px -9px 8px; }
   .tile-num { position:absolute; top:5px; left:7px; font-family:'Bungee',cursive; font-size:8px; color:rgba(255,255,255,0.18); }
   .tile-name { font-size:10.5px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; margin-bottom:9px; }
@@ -76,7 +76,7 @@
   .seg.g{background:#1e7a1e;}.seg.y{background:#c47a00;}.seg.o{background:#d44a00;}.seg.r{background:#cc0000;}
   .tile.complete .seg{background:#f5b800;}
   .heat-label { font-size:9.5px; color:#444; text-align:center; margin-top:4px; letter-spacing:0.05em; font-weight:600; }
-  .bottom-section { margin-top:20px; display:flex; gap:8px; }
+  .bottom-section { display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
   .ph { padding:6px 12px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:10px; font-weight:700; letter-spacing:0.12em; color:#444; text-transform:uppercase; }
   .tiers-panel { flex:0 0 160px; }
@@ -93,8 +93,7 @@
   .lines-panel { flex:1; }
   .lines-grid { display:grid; grid-template-columns:repeat(4,1fr); }
   .lc { padding:5px 10px; border-right:1px solid #111; border-bottom:1px solid #111; position:relative; min-height:36px; }
-  .lc:nth-child(4n){border-right:none;}
-  .lc:nth-last-child(-n+4){border-bottom:none;}
+  .lc:nth-child(4n){border-right:none;} .lc:nth-last-child(-n+4){border-bottom:none;}
   .ln { font-family:'Bungee',cursive; font-size:9px; color:#555; }
   .lt { font-size:9.5px; color:#333; font-weight:600; }
   .lc.bt1{background:#0a1a0a;} .lc.bt2{background:#1a1200;} .lc.bt3{background:#1a0800;} .lc.bt4{background:#1a0000;}
@@ -175,7 +174,7 @@
 </div>
 
 <script>
-const SHEET_ID = "1KoJlOMtU0iDYAa2NjA7CDbWLa_MIE-15U8Os7h6n4og";
+const API = "https://script.google.com/macros/s/AKfycbyrSk0p8vtoFcCFwDM52YJ2gFGiLEQ7kOcO5kCMY1S8PcLIn22_-OHC6z99PdfzCII-/exec";
 const MAX = 2950;
 const RC  = ["#cc0000","#d44a00","#c47a00","#8ab800","#1e7a1e"];
 const BINGO_LINES = [
@@ -188,10 +187,10 @@ const BINGO_LINES = [
 ];
 const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
 const TEAMS = [
-  {name:"Team Jalapeno",  sheet:"Team Jalapeno",  slug:"jalapeno"},
-  {name:"Team Habanero",  sheet:"Team Habanero",  slug:"habanero"},
-  {name:"Team Ghost Pepper", sheet:"Team Ghost Pepper", slug:"ghost"},
-  {name:"Team Carolina Reaper", sheet:"Team Carolina Reaper", slug:"carolina"},
+  {name:"Team Jalapeno",       slug:"jalapeno",  sheetName:"Team Jalapeno"},
+  {name:"Team Habanero",       slug:"habanero",  sheetName:"Team Habanero"},
+  {name:"Team Ghost Pepper",   slug:"ghost",     sheetName:"Team Ghost Pepper"},
+  {name:"Team Carolina Reaper",slug:"carolina",  sheetName:"Team Carolina Reaper"},
 ];
 
 let cachedData = null;
@@ -215,7 +214,10 @@ function showBoard(slug) {
   document.getElementById('landing').style.display='none';
   document.getElementById('board-view').style.display='block';
   document.title = 'Spicy Bingo — ' + team.name;
-  if (cachedData && cachedData[slug]) renderBoard(cachedData[slug]);
+  if (cachedData) {
+    const td = cachedData.teams.find(t => t.sheetName === team.sheetName);
+    if (td) renderBoard(td);
+  }
 }
 
 window.addEventListener('hashchange', () => {
@@ -224,119 +226,74 @@ window.addEventListener('hashchange', () => {
   else showBoard(h);
 });
 
-// Fetch one sheet tab using gviz JSON endpoint
-async function fetchSheet(sheetName, range) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&range=${range}`;
-  const res = await fetch(url);
-  const text = await res.text();
-  // gviz wraps response in /*O_o*/\ngoogle.visualization.Query.setResponse({...});
-  // Strip the wrapper to get pure JSON
-  const clean = text.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-  return JSON.parse(clean);
-}
+// JSONP fetch using Apps Script
+function fetchData() {
+  return new Promise((resolve, reject) => {
+    const cbName = 'sbcb' + Date.now();
+    let done = false;
 
-function cellVal(row, col) {
-  if (!row || !row.c || !row.c[col]) return null;
-  return row.c[col].v;
-}
+    window[cbName] = function(data) {
+      done = true;
+      try { delete window[cbName]; } catch(e) {}
+      const s = document.getElementById('jsonp-script');
+      if (s) s.parentNode.removeChild(s);
+      resolve(data);
+    };
 
-function parseTeamData(sheetName, resp) {
-  const rows = (resp.table && resp.table.rows) || [];
-  // Row 0 = sheet row 1 (hero strip)
-  // We request A1:J50 so:
-  // row[0] = row 1: A=teamname, C=Total label, D=total, E=tile label, F=tilePeps, G=bingo label, H=bingoPeps, I=T4 label, J=t4done
-  const heroRow = rows[0] || {};
-  const teamName  = cellVal(heroRow, 0) || sheetName;
-  const total     = Number(cellVal(heroRow, 3)) || 0;
-  const tilePeps  = Number(cellVal(heroRow, 5)) || 0;
-  const bingoPeps = Number(cellVal(heroRow, 7)) || 0;
-  const t4Done    = Number(cellVal(heroRow, 9)) || 0;
+    const timer = setTimeout(() => {
+      if (!done) {
+        try { delete window[cbName]; } catch(e) {}
+        reject(new Error('Timeout'));
+      }
+    }, 20000);
 
-  // Rows 2-26 = sheet rows 3-27 (tile scoring)
-  const tiles = [];
-  for (let i = 2; i <= 26; i++) {
-    const row = rows[i];
-    if (!row) continue;
-    const num = cellVal(row, 0);
-    if (!num) continue;
-    tiles.push({
-      num:        num,
-      name:       String(cellVal(row, 1) || ''),
-      drops:      Number(cellVal(row, 2)) || 0,
-      thresholds: String(cellVal(row, 3) || ''),
-      tier:       String(cellVal(row, 4) || '—'),
-      peppers:    Number(cellVal(row, 5)) || 0,
-    });
-  }
-
-  // Find bingo tracker — scan for "BINGO TRACKER" label in col A
-  let bingoStart = -1;
-  for (let i = 0; i < rows.length; i++) {
-    const v = cellVal(rows[i], 0);
-    if (v && String(v).toUpperCase().includes('BINGO TRACKER')) {
-      bingoStart = i + 2; // +1 for header row, +1 for col headers
-      break;
-    }
-  }
-
-  const bingo = [];
-  if (bingoStart >= 0) {
-    for (let i = bingoStart; i < bingoStart + 12 && i < rows.length; i++) {
-      const row = rows[i];
-      if (!row) continue;
-      const letter = cellVal(row, 0);
-      if (!letter) continue;
-      bingo.push({
-        letter: String(letter),
-        line:   String(cellVal(row, 1) || ''),
-        t1:     cellVal(row, 3),
-        t2:     cellVal(row, 4),
-        t3:     cellVal(row, 5),
-        t4:     cellVal(row, 6),
-        peppers: Number(cellVal(row, 7)) || 0,
-      });
-    }
-  }
-
-  return { name: teamName, sheetName, total, tilePeps, bingoPeps, t4Complete: t4Done, tiles, bingo };
+    const script = document.createElement('script');
+    script.id = 'jsonp-script';
+    script.src = API + '?callback=' + cbName;
+    script.onerror = function() {
+      clearTimeout(timer);
+      if (!done) {
+        try { delete window[cbName]; } catch(e) {}
+        reject(new Error('Script load error'));
+      }
+    };
+    document.body.appendChild(script);
+  });
 }
 
 async function load() {
   try {
-    const results = await Promise.all(
-      TEAMS.map(t => fetchSheet(t.sheet, 'A1:J50').then(resp => parseTeamData(t.sheet, resp)))
-    );
+    const data = await fetchData();
+    cachedData = data;
 
-    // Build data by slug
-    cachedData = {};
-    const standings = [];
-    TEAMS.forEach((t, i) => {
-      cachedData[t.slug] = results[i];
-      standings.push({ ...results[i], slug: t.slug });
-    });
-    standings.sort((a,b) => b.total - a.total);
-    standings.forEach((t,i) => t.rank = i+1);
+    // Sort by total
+    data.teams.sort((a,b) => (b.total||0) - (a.total||0));
+    data.teams.forEach((t,i) => t.rank = i+1);
 
-    renderLanding(standings);
-    if (currentTeam && cachedData[currentTeam.slug]) {
-      renderBoard(cachedData[currentTeam.slug]);
+    renderLanding(data.teams);
+
+    if (currentTeam) {
+      const td = data.teams.find(t => t.sheetName === currentTeam.sheetName);
+      if (td) renderBoard(td);
     }
-    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+
+    const lu = document.getElementById('lastUpdated');
+    if (lu) lu.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
   } catch(e) {
-    console.error('Load error:', e);
-    document.getElementById('cards').innerHTML = '<div class="loading">Failed to load. Retrying...</div>';
+    console.error(e);
+    document.getElementById('cards').innerHTML = '<div class="loading">Failed to load: ' + e.message + '</div>';
     setTimeout(load, 15000);
   }
 }
 
-function renderLanding(standings) {
+function renderLanding(teams) {
   const cards = document.getElementById('cards');
   cards.innerHTML = '';
-  standings.forEach(team => {
-    const rc = team.rank <= 3 ? `r${team.rank}` : '';
+  teams.forEach(team => {
+    const rc = team.rank <= 3 ? 'r'+team.rank : '';
     const el = document.createElement('div');
     el.className = 'team-card';
-    el.onclick = () => showBoard(team.slug);
+    el.onclick = () => showBoard(TEAMS.find(t=>t.sheetName===team.sheetName).slug);
     el.innerHTML = `
       <div class="tc-header">
         <span class="tc-rank ${rc}">#${team.rank}</span>
@@ -365,8 +322,7 @@ function tierNum(s) {
 }
 
 function renderBoard(team) {
-  const pct = Math.min(100, (team.total/MAX)*100);
-  document.getElementById('mFill').style.height = pct+'%';
+  document.getElementById('mFill').style.height = Math.min(100,(team.total/MAX)*100)+'%';
   document.getElementById('mScore').textContent = team.total;
   document.getElementById('mTile').textContent  = team.tilePeps;
   document.getElementById('mBingo').textContent = team.bingoPeps;
@@ -375,21 +331,23 @@ function renderBoard(team) {
   document.getElementById('bTile').textContent  = team.tilePeps;
   document.getElementById('bBingo').textContent = team.bingoPeps;
 
+  const tiles = team.tiles || [];
   let html = '';
-  (team.tiles||[]).forEach((tile,i) => {
+  tiles.forEach((tile, i) => {
     const [t1,t2,t3,t4] = parseThresholds(tile.thresholds);
-    const drops = tile.drops||0;
+    const drops = tile.drops || 0;
     const complete = tierNum(tile.tier) >= 4;
-    const rc = RC[Math.floor(i/5)];
+    const rc = RC[Math.floor(i/5)] || '#555';
     const badges = [t1,t2,t3,t4].map((th,idx) =>
       `<div class="badge ${drops>=th?'s'+(idx+1):''}">${th}</div>`).join('');
-    const filled = t4>0 ? Math.round(Math.min(1,drops/t4)*10) : 0;
-    let segs='';
-    for(let s=0;s<10;s++){
-      if(s>=filled){segs+=`<div class="seg"></div>`;continue;}
-      const p=s/10; segs+=`<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
+    const filled = t4 > 0 ? Math.round(Math.min(1, drops/t4)*10) : 0;
+    let segs = '';
+    for (let s=0; s<10; s++) {
+      if (s>=filled) { segs += '<div class="seg"></div>'; continue; }
+      const p = s/10;
+      segs += `<div class="seg ${p<0.3?'g':p<0.6?'y':p<0.82?'o':'r'}"></div>`;
     }
-    html+=`<div class="tile${complete?' complete':''}" style="--rc:${rc}">
+    html += `<div class="tile${complete?' complete':''}" style="border-color:${rc}">
       ${complete?'<div class="complete-tag">COMPLETE</div>':'<div style="height:0"></div>'}
       <div class="tile-num">${tile.num}</div>
       <div class="tile-name">${tile.name}</div>
@@ -397,21 +355,21 @@ function renderBoard(team) {
       <div class="heat-meter"><div class="heat-track">${segs}</div><div class="heat-label">${drops} / ${t4} drops</div></div>
     </div>`;
   });
+
+  if (!html) html = '<div style="color:#ff4444;padding:20px">No tile data (tiles: ' + tiles.length + ')</div>';
   document.getElementById('bGrid').innerHTML = html;
 
-  let lhtml='';
+  let lhtml = '';
   BINGO_LINES.forEach((bl,i) => {
     const b = (team.bingo||[])[i] || {};
-    let tier=0;
-    if(b.t4===true||b.t4==='TRUE'||b.t4===1) tier=4;
-    else if(b.t3==='✓') tier=3;
-    else if(b.t2==='✓') tier=2;
-    else if(b.t1==='✓') tier=1;
-    const bc=['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
-    const bonus = tier>0
-      ? `<div class="lb" style="color:${bc}">+${BONUS[tier]}</div><div class="ltot">= ${CUMUL[tier]}</div>` : '';
-    lhtml+=`<div class="lc${tier>0?' bt'+tier:''}">
-      <div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
+    let tier = 0;
+    if (b.t4===true||b.t4==='TRUE'||b.t4===1) tier=4;
+    else if (b.t3==='✓') tier=3;
+    else if (b.t2==='✓') tier=2;
+    else if (b.t1==='✓') tier=1;
+    const bc = ['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
+    const bonus = tier>0 ? `<div class="lb" style="color:${bc}">+${BONUS[tier]}</div><div class="ltot">= ${CUMUL[tier]}</div>` : '';
+    lhtml += `<div class="lc${tier>0?' bt'+tier:''}"><div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
   });
   document.getElementById('bLines').innerHTML = lhtml;
 }
@@ -424,7 +382,6 @@ if (initHash) {
     currentTeam = team;
     document.getElementById('landing').style.display='none';
     document.getElementById('board-view').style.display='block';
-    document.title = 'Spicy Bingo — ' + team.name;
   }
 }
 
