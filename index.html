@@ -579,31 +579,46 @@ function openModal(tileNum, tileName) {
     html += '<div style="border-top:1px solid #1a1a1a;"></div>';
   }
 
-  // Tile Completion — amber label
+  // Tier 4 Completion — with status badges
+  let reqDone = false, caDone = false;
+  if (cachedData && currentTeam) {
+    const td = cachedData.teams.find(t => t.sheetName === currentTeam.sheetName);
+    if (td) {
+      const tl = (td.tiles||[]).find(t => t.num == tileNum);
+      if (tl) { reqDone = !!tl.reqDone; caDone = !!tl.caDone; }
+    }
+  }
+  const mkBadge = (done) => done
+    ? '<div style="position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:3px;background:#0a1a0a;border:1px solid #18661844;border-radius:3px;padding:2px 5px;"><span style="color:#186618;font-size:10px;">&#10003;</span><span style="font-size:8px;color:#186618;letter-spacing:0.06em;">Complete</span></div>'
+    : '<div style="position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:3px;background:#1a1a1a;border:1px solid #33333344;border-radius:3px;padding:2px 5px;"><span style="color:#555;font-size:10px;">&#10005;</span><span style="font-size:8px;color:#555;letter-spacing:0.06em;">Incomplete</span></div>';
+
   html += '<div>';
   html += '<div style="font-size:11px;font-weight:700;color:#A86600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">Tier 4 Completion</div>';
   html += '<div style="font-size:12px;color:#666;line-height:1.5;margin-bottom:10px;">In addition to the drops needed, the following conditions must be met in order to finish T4 &amp; complete the tile:</div>';
   html += '<div style="display:flex;gap:8px;">';
-  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #A8660044;border-radius:4px;padding:9px 11px;">';
+
+  html += '<div style="flex:1;background:#0a0a0a;border:1px solid ' + (data.req ? '#A8660044' : '#1a1a1a') + ';border-radius:4px;padding:9px 11px;position:relative;display:flex;flex-direction:column;opacity:' + (data.req ? '1' : '0.45') + ';">';
+  html += data.req ? mkBadge(reqDone) : '';
   html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Drop Requirement</div>';
   if (data.req) {
-    html += '<div style="font-size:13px;color:#ddd;">' + data.req + '</div>';
-    html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">Can be met at any time</div>';
+    html += '<div style="font-size:12px;color:#ddd;padding-right:72px;">' + data.req + '</div>';
+    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">Can be met at any time</div>';
   } else {
     html += '<div style="font-size:13px;color:#ddd;">None</div>';
-    html += '<div style="flex:1;"></div>';
-    html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">There are no additional drop requirements for this tile.</div>';
+    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">There are no additional drop requirements for this tile.</div>';
   }
   html += '</div>';
-  html += '<div style="flex:1;background:#0a0a0a;border:1px solid #A8660044;border-radius:4px;padding:9px 11px;">';
-  html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Combat Achievement</div>';
+
+  html += '<div style="flex:1;background:#0a0a0a;border:1px solid ' + (data.ca ? '#A8660044' : '#1a1a1a') + ';border-radius:4px;padding:9px 11px;position:relative;display:flex;flex-direction:column;opacity:' + (data.ca ? '1' : '0.45') + ';">';
+  html += data.ca ? mkBadge(caDone) : '';
+  html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Combat Achievement Requirements</div>';
   if (data.ca) {
-    html += '<div style="font-size:13px;color:#ddd;">' + data.ca + '</div>';
+    html += '<div style="font-size:12px;color:#ddd;padding-right:72px;">' + data.ca + '</div>';
     if (data.caNotes) html += '<div style="font-size:10px;color:#666;margin-top:3px;font-style:italic;">' + data.caNotes + '</div>';
-    html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">\u26a0 T3 must be completed first</div>';
+    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">&#9888; T3 must be completed first before attempting the CA</div>';
   } else {
     html += '<div style="font-size:13px;color:#ddd;">None</div>';
-  html += '<div style="font-size:10px;color:#A8660099;margin-top:6px;">There are no Combat Achievement requirements for this tile.</div>';
+    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">There are no CA Requirements for this tile.</div>';
   }
   html += '</div>';
   html += '</div>';
