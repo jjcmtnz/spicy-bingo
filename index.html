@@ -31,7 +31,7 @@
   .tc-stat-label { font-size:9px; color:#333; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
   .last-updated { text-align:center; font-size:10px; color:#222; letter-spacing:0.06em; margin-top:18px; }
   #board-view { display:none; }
-  .back-btn { display:inline-block; margin-bottom:8px; font-size:11px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
+  .back-btn { display:inline-block; margin-bottom:8px; font-size:12px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
   .back-btn:hover { color:#ff4500; }
   .outer { max-width:1320px; margin:0 auto; display:flex; gap:14px; align-items:flex-start; }
   .meter-wrap { width:70px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:110px; }
@@ -45,7 +45,7 @@
   .meter-sub-val { font-family:'Bungee',cursive; font-size:10px; }
   .board { flex:1; min-width:0; }
   .logo-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0 12px; border-top:1px solid #1a1a1a; border-bottom:1px solid #1a1a1a; margin-bottom:12px; }
-  .team-lbl { font-size:22px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; font-family:'Bungee',cursive; }
+  .team-lbl { font-size:24px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; font-family:'Bungee',cursive; }
   .logo-sm { display:inline-flex; align-items:center; border:3px solid #ff4500; border-radius:6px; padding:8px 28px 10px; position:relative; }
   .logo-sm::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
   .ls-spicy { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #f5b800; letter-spacing:0.04em; margin-right:12px; }
@@ -57,10 +57,10 @@
   .tile.complete .tile-name { color:#ff6622; }
   .tile.complete .badge { background:#2a0800 !important; border-color:#ff4400 !important; color:#ff8844 !important; }
   .tile-num { position:absolute; top:5px; left:7px; font-family:'Bungee',cursive; font-size:8px; color:rgba(255,255,255,0.18); }
-  .tile-name { font-size:10.5px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; }
+  .tile-name { font-size:12px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; }
   .tile.complete .tile-name { color:#f5b800; }
   .tier-badges { display:flex; gap:3px; width:100%; margin-bottom:9px; }
-  .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:10px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; position:relative; }
+  .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:11px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; position:relative; }
   .badge .blabel { display:block; }
   .badge .bnum { display:none; }
   .tile:hover .badge .blabel { display:none; }
@@ -77,28 +77,32 @@
   .heat-label { font-size:9.5px; color:#444; text-align:center; margin-top:4px; letter-spacing:0.05em; font-weight:600; }
   .bottom-section { display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
-  .ph { padding:8px 14px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:11px; font-weight:700; letter-spacing:0.12em; color:#555; text-transform:uppercase; }
+  .ph { padding:9px 14px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:11px; font-weight:700; letter-spacing:0.12em; color:#555; text-transform:uppercase; }
   .tiers-panel { flex:0 0 160px; }
   .tier-row { display:flex; align-items:center; gap:10px; padding:6px 14px; border-bottom:1px solid #111; }
   .tier-row:last-child{border-bottom:none;}
   .tsw { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
-  .tn { font-family:'Bungee',cursive; font-size:12px; color:#888; min-width:24px; }
-  .tv { font-size:12px; color:#555; }
+  .tn { font-family:'Bungee',cursive; font-size:13px; color:#888; min-width:24px; }
+  .tv { font-size:13px; color:#555; }
   .bonus-panel { flex:0 0 180px; }
   .bonus-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:6px 14px; border-bottom:1px solid #111; }
   .bonus-row:last-child{border-bottom:none;}
   .bn { font-family:'Bungee',cursive; font-size:12px; }
-  .bv { font-family:'Bungee',cursive; font-size:12px; }
+  .bv { font-family:'Bungee',cursive; font-size:18px; }
   .lines-panel { flex:1; }
   .lines-grid { display:grid; grid-template-columns:repeat(4,1fr); }
-  .lc { padding:5px 10px; border-right:1px solid #111; border-bottom:1px solid #111; position:relative; min-height:36px; }
+  .lc { padding:5px 10px; border-right:1px solid #111; border-bottom:1px solid #111; position:relative; min-height:36px; cursor:pointer; transition:background 0.15s, border-color 0.15s; }
+  .lc:hover { background:#1a1a1a !important; border-color:#333; }
   .lc:nth-child(4n){border-right:none;} .lc:nth-last-child(-n+4){border-bottom:none;}
-  .ln { font-family:'Bungee',cursive; font-size:11px; color:#555; }
-  .lt { font-size:11px; color:#444; font-weight:600; }
+  .ln { font-family:'Bungee',cursive; font-size:12px; color:#555; }
+  .lt { font-size:12px; color:#444; font-weight:600; }
+  .line-row { cursor:default; transition:background 0.15s; border-radius:3px; }
+  .line-row:hover { background:#1a1a1a; }
+  .tile.line-highlight { filter:brightness(1.6); transform:scale(1.03); transition:filter 0.2s, transform 0.2s; }
   .lc.bt1{background:#0a1a0a;} .lc.bt2{background:#1a1200;} .lc.bt3{background:#1a0800;} .lc.bt4{background:#1a0000;}
   .lc.bt1 .ln{color:#1e7a1e;} .lc.bt2 .ln{color:#c47a00;} .lc.bt3 .ln{color:#d44a00;} .lc.bt4 .ln{color:#cc0000;}
-  .lb { position:absolute; top:4px; right:6px; font-family:'Bungee',cursive; font-size:8px; }
-  .ltot { position:absolute; bottom:3px; right:6px; font-size:8px; color:#555; }
+  .lb { position:absolute; top:4px; right:6px; font-family:'Bungee',cursive; font-size:12px; }
+  .ltot { position:absolute; bottom:3px; right:6px; font-size:10px; color:#555; }
   .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
 
@@ -441,13 +445,14 @@ function renderBoard(team) {
   BINGO_LINES.forEach((bl,i) => {
     const b = (team.bingo||[])[i] || {};
     let tier = 0;
-    if (b.t4===true||b.t4==='TRUE'||b.t4===1) tier=4;
+    if (b.t4===true||b.t4==='TRUE'||b.t4===1||b.t4==='✓') tier=4;
     else if (b.t3==='✓') tier=3;
     else if (b.t2==='✓') tier=2;
     else if (b.t1==='✓') tier=1;
     const bc = ['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
-    const bonus = tier>0 ? `<div class="lb" style="color:${bc}">+${BONUS[tier]}</div><div class="ltot">= ${CUMUL[tier]}</div>` : '';
-    lhtml += `<div class="lc${tier>0?' bt'+tier:''}"><div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
+    const bonus = tier>0 ? `<div class="lb" style="color:${bc}">+${BONUS[tier]} pts</div><div class="ltot">${CUMUL[tier]} pts total</div>` : '';
+    const tileNums = bl.t.split(',').map(s => parseInt(s.trim()));
+    lhtml += `<div class="lc${tier>0?' bt'+tier:''}" style="cursor:pointer;" onmouseenter="highlightLine([${tileNums.join(',')}])" onmouseleave="clearHighlight()"><div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
   });
   document.getElementById('bLines').innerHTML = lhtml;
 }
@@ -531,6 +536,15 @@ const TILE_ROW_COLORS = {
   16:'#759900',17:'#759900',18:'#759900',19:'#759900',20:'#759900',
   21:'#186618',22:'#186618',23:'#186618',24:'#186618',25:'#186618',
 };
+function highlightLine(nums) {
+  document.querySelectorAll('.tile').forEach(t => {
+    const n = parseInt(t.getAttribute('data-tilenum'));
+    if (nums.includes(n)) t.classList.add('line-highlight');
+  });
+}
+function clearHighlight() {
+  document.querySelectorAll('.tile').forEach(t => t.classList.remove('line-highlight'));
+}
 function tileClick(e, el) {
   const num = parseInt(el.getAttribute('data-tilenum'));
   const nameEl = el.querySelector('.tile-name');
