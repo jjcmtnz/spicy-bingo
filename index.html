@@ -78,31 +78,33 @@
   .bottom-section { display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
   .ph { padding:9px 14px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:11px; font-weight:700; letter-spacing:0.12em; color:#555; text-transform:uppercase; }
-  .tiers-panel { flex:0 0 160px; }
-  .tier-row { display:flex; align-items:center; gap:10px; padding:6px 14px; border-bottom:1px solid #111; }
-  .tier-row:last-child{border-bottom:none;}
+  .tiers-panel { flex:0 0 160px; display:flex; flex-direction:column; }
+  .tier-row { display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid #111; flex:1; }
+  .tier-row:last-child { border-bottom:none; flex:1; }
   .tsw { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
-  .tn { font-family:'Bungee',cursive; font-size:13px; color:#888; min-width:24px; }
-  .tv { font-size:13px; color:#555; }
-  .bonus-panel { flex:0 0 180px; }
-  .bonus-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:6px 14px; border-bottom:1px solid #111; }
-  .bonus-row:last-child{border-bottom:none;}
+  .tn { font-family:'Bungee',cursive; font-size:15px; color:#888; min-width:28px; }
+  .tv { font-size:14px; color:#555; }
+  .bonus-panel { flex:0 0 180px; display:flex; flex-direction:column; }
+  .tier-panel .panel-body, .bonus-panel .panel-body, .tiers-panel .panel-body { display:flex; flex-direction:column; flex:1; }
+  .bonus-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:0 14px; border-bottom:1px solid #111; flex:1; }
+  .bonus-row:last-child{border-bottom:none;flex:1;}
   .bn { font-family:'Bungee',cursive; font-size:12px; }
   .bv { font-family:'Bungee',cursive; font-size:18px; }
   .lines-panel { flex:1; }
   .lines-grid { display:grid; grid-template-columns:repeat(4,1fr); }
-  .lc { padding:5px 10px; border-right:1px solid #111; border-bottom:1px solid #111; position:relative; min-height:36px; cursor:pointer; transition:background 0.15s, border-color 0.15s; }
+  .lc { padding:8px 14px; border-right:1px solid #111; border-bottom:1px solid #111; cursor:pointer; transition:background 0.15s; display:flex; flex-direction:column; justify-content:center; height:54px; box-sizing:border-box; }
   .lc:hover { background:#1a1a1a !important; border-color:#333; }
   .lc:nth-child(4n){border-right:none;} .lc:nth-last-child(-n+4){border-bottom:none;}
-  .ln { font-family:'Bungee',cursive; font-size:12px; color:#555; }
+  .ln { font-family:'Bungee',cursive; font-size:14px; color:#888; }
   .lt { font-size:12px; color:#444; font-weight:600; }
   .line-row { cursor:default; transition:background 0.15s; border-radius:3px; }
   .line-row:hover { background:#1a1a1a; }
   .tile.line-highlight { filter:brightness(1.6); transform:scale(1.03); transition:filter 0.2s, transform 0.2s; }
+  .lc-front, .lc-back { display:flex; flex-direction:column; justify-content:center; height:100%; }
   .lc.bt1{background:#0a1a0a;} .lc.bt2{background:#1a1200;} .lc.bt3{background:#1a0800;} .lc.bt4{background:#1a0000;}
   .lc.bt1 .ln{color:#1e7a1e;} .lc.bt2 .ln{color:#c47a00;} .lc.bt3 .ln{color:#d44a00;} .lc.bt4 .ln{color:#cc0000;}
-  .lb { position:absolute; top:4px; right:6px; font-family:'Bungee',cursive; font-size:12px; }
-  .ltot { position:absolute; bottom:3px; right:6px; font-size:10px; color:#555; }
+  .lb { font-family:'Bungee',cursive; font-size:13px; }
+  .ltot { font-size:9px; color:#555; }
   .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
 
@@ -192,20 +194,24 @@
       <div class="bottom-section">
         <div class="panel tiers-panel">
           <div class="ph">Point Tiers</div>
+          <div class="panel-body" style="display:flex;flex-direction:column;flex:1;">
           <div class="tier-row"><span class="tsw" style="background:#1e7a1e"></span><span class="tn">T1</span><span class="tv">+1 pt</span></div>
           <div class="tier-row"><span class="tsw" style="background:#c47a00"></span><span class="tn">T2</span><span class="tv">+2 pts</span></div>
           <div class="tier-row"><span class="tsw" style="background:#d44a00"></span><span class="tn">T3</span><span class="tv">+3 pts</span></div>
           <div class="tier-row"><span class="tsw" style="background:#cc0000"></span><span class="tn">T4</span><span class="tv">+4 pts</span></div>
+          </div>
         </div>
         <div class="panel bonus-panel">
           <div class="ph">Bingo Bonuses</div>
+          <div class="panel-body" style="display:flex;flex-direction:column;flex:1;">
           <div class="bonus-row"><span class="bn" style="color:#1e7a1e">T1 bingo</span><span class="bv" style="color:#1e7a1e">+15</span></div>
           <div class="bonus-row"><span class="bn" style="color:#c47a00">T2 bingo</span><span class="bv" style="color:#c47a00">+30</span></div>
           <div class="bonus-row"><span class="bn" style="color:#d44a00">T3 bingo</span><span class="bv" style="color:#d44a00">+60</span></div>
           <div class="bonus-row"><span class="bn" style="color:#cc0000">T4 bingo</span><span class="bv" style="color:#cc0000">+120</span></div>
+          </div>
         </div>
         <div class="panel lines-panel">
-          <div class="ph">Bingo Lines <span style="font-weight:400;color:#333;font-size:9px">— 12 lines: rows · columns · diagonals</span></div>
+          <div class="ph">Bingo Lines <span style="font-weight:400;color:#333;font-size:9px">— Hover to highlight tiles · Click to see Bingo Bonus Pts</span></div>
           <div class="lines-grid" id="bLines"></div>
         </div>
       </div>
@@ -220,10 +226,10 @@ const RC  = ["#cc0000","#d44a00","#c47a00","#8ab800","#1e7a1e"];
 const BINGO_LINES = [
   {n:"Row 1",t:"1, 2, 3, 4, 5"},{n:"Row 2",t:"6, 7, 8, 9, 10"},
   {n:"Row 3",t:"11, 12, 13, 14, 15"},{n:"Row 4",t:"16, 17, 18, 19, 20"},
-  {n:"Row 5",t:"21, 22, 23, 24, 25"},{n:"Col 1",t:"1, 6, 11, 16, 21"},
-  {n:"Col 2",t:"2, 7, 12, 17, 22"},{n:"Col 3",t:"3, 8, 13, 18, 23"},
-  {n:"Col 4",t:"4, 9, 14, 19, 24"},{n:"Col 5",t:"5, 10, 15, 20, 25"},
-  {n:"Diag ↘",t:"1, 7, 13, 19, 25"},{n:"Diag ↗",t:"5, 9, 13, 17, 21"},
+  {n:"Row 5",t:"21, 22, 23, 24, 25"},{n:"Column A",t:"1, 6, 11, 16, 21"},
+  {n:"Column B",t:"2, 7, 12, 17, 22"},{n:"Column C",t:"3, 8, 13, 18, 23"},
+  {n:"Column D",t:"4, 9, 14, 19, 24"},{n:"Column E",t:"5, 10, 15, 20, 25"},
+  {n:"Diagonal \u2198",t:"1, 7, 13, 19, 25"},{n:"Diagonal \u2197",t:"5, 9, 13, 17, 21"},
 ];
 const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
 const TEAMS = [
@@ -450,9 +456,13 @@ function renderBoard(team) {
     else if (b.t2==='✓') tier=2;
     else if (b.t1==='✓') tier=1;
     const bc = ['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
-    const bonus = tier>0 ? `<div class="lb" style="color:${bc}">+${BONUS[tier]} pts</div><div class="ltot">${CUMUL[tier]} pts total</div>` : '';
+    const bonus = tier>0 ? `<div style="margin-top:4px;display:flex;align-items:baseline;gap:8px;"><span class="lb" style="color:${bc};">+${BONUS[tier]} pts</span><span class="ltot">${CUMUL[tier]} total</span></div>` : '<div style="font-size:10px;color:#333;margin-top:4px;">No pts yet</div>';
     const tileNums = bl.t.split(',').map(s => parseInt(s.trim()));
-    lhtml += `<div class="lc${tier>0?' bt'+tier:''}" style="cursor:pointer;" onmouseenter="highlightLine([${tileNums.join(',')}])" onmouseleave="clearHighlight()"><div class="ln">${bl.n}</div><div class="lt">${bl.t}</div>${bonus}</div>`;
+    lhtml += `<div class="lc${tier>0?' bt'+tier:''}" onclick="toggleLine(this,'${bl.t}')" onmouseenter="highlightLine([${tileNums.join(',')}])" onmouseleave="clearHighlight()">
+      <div class="ln">${bl.n}</div>
+      <div class="lc-front"><div style="font-size:12px;color:#555;margin-top:2px;">${bl.t}</div></div>
+      <div class="lc-back" style="display:none;">${bonus||'<div style="font-size:10px;color:#333;margin-top:2px;">—</div>'}</div>
+    </div>`;
   });
   document.getElementById('bLines').innerHTML = lhtml;
 }
@@ -536,6 +546,13 @@ const TILE_ROW_COLORS = {
   16:'#759900',17:'#759900',18:'#759900',19:'#759900',20:'#759900',
   21:'#186618',22:'#186618',23:'#186618',24:'#186618',25:'#186618',
 };
+function toggleLine(el, tiles) {
+  const front = el.querySelector('.lc-front');
+  const back = el.querySelector('.lc-back');
+  const isFlipped = back.style.display !== 'none';
+  front.style.display = isFlipped ? 'block' : 'none';
+  back.style.display = isFlipped ? 'none' : 'block';
+}
 function highlightLine(nums) {
   document.querySelectorAll('.tile').forEach(t => {
     const n = parseInt(t.getAttribute('data-tilenum'));
