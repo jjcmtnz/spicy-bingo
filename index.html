@@ -53,12 +53,8 @@
 
   .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-bottom:20px; }
   .tile { background:#111; border:2px solid #333; border-radius:4px; padding:10px 9px 9px; display:flex; flex-direction:column; align-items:center; min-height:158px; position:relative; }
-  .tile.complete { background:#1a0500; border-color:#ff4400 !important; box-shadow:0 0 14px #ff440055; }
-  .tile.complete .tile-name { color:#ff6622; }
-  .tile.complete .badge { background:#2a0800 !important; border-color:#ff4400 !important; color:#ff8844 !important; }
   .tile-num { position:absolute; top:5px; left:7px; font-family:'Bungee',cursive; font-size:8px; color:rgba(255,255,255,0.18); }
   .tile-name { font-size:12px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; }
-  .tile.complete .tile-name { color:#f5b800; }
   .tier-badges { display:flex; gap:3px; width:100%; margin-bottom:9px; }
   .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:11px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; position:relative; }
   .badge .blabel { display:block; }
@@ -72,8 +68,6 @@
 
   .heat-track { height:7px; background:linear-gradient(90deg,#0d2a0d,#2a1800,#2a0d00,#1a0000); border-radius:3px; overflow:hidden; }
   .heat-fill { height:100%; border-radius:3px; transition:width 0.6s ease; }
-  .tile.complete .heat-track { background:#2a0800; }
-  .tile.complete .heat-fill { background:linear-gradient(90deg,#cc2200,#ff6600) !important; }
   .heat-label { font-size:9.5px; color:#444; text-align:center; margin-top:4px; letter-spacing:0.05em; font-weight:600; }
   .bottom-section { display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
@@ -100,6 +94,22 @@
   .line-row { cursor:default; transition:background 0.15s; border-radius:3px; }
   .line-row:hover { background:#1a1a1a; }
   .tile.line-highlight { filter:brightness(1.6); transform:scale(1.03); transition:filter 0.2s, transform 0.2s; }
+  @keyframes soft-glow{0%,100%{box-shadow:0 0 6px #AA000044}50%{box-shadow:0 0 14px #AA000077}}
+  @keyframes smoke-waft{0%{transform:translateY(0) translateX(0) scale(1);opacity:0.12}100%{transform:translateY(-50px) translateX(6px) scale(2);opacity:0}}
+  @keyframes smoke-waft2{0%{transform:translateY(0) translateX(0) scale(1);opacity:0.08}100%{transform:translateY(-44px) translateX(-6px) scale(1.5);opacity:0}}
+  @keyframes shimmer-sweep{0%{left:-100%}100%{left:200%}}
+  @keyframes card-glow{0%,100%{box-shadow:0 0 8px var(--gc,#888)44}50%{box-shadow:0 0 22px var(--gc,#888)88,0 0 40px var(--gc,#888)33}}
+  .smoke{position:absolute;border-radius:50%;bottom:8px;background:#777;}
+  .smoke1{width:8px;height:8px;left:28%;animation:smoke-waft 3.5s ease-out infinite;}
+  .smoke2{width:6px;height:6px;left:62%;animation:smoke-waft2 4s ease-out infinite 1.2s;}
+  @keyframes spark1{0%{transform:translateY(0) translateX(0);opacity:0.7}100%{transform:translateY(-38px) translateX(3px);opacity:0}}
+  @keyframes spark2{0%{transform:translateY(0) translateX(0);opacity:0.6}100%{transform:translateY(-32px) translateX(-4px);opacity:0}}
+  @keyframes spark3{0%{transform:translateY(0) translateX(0);opacity:0.5}100%{transform:translateY(-42px) translateX(2px);opacity:0}}
+  .tile.complete {background:#1a0000!important;border-color:#AA000088!important;animation:soft-glow 3s ease-in-out infinite;}
+  .spark{position:absolute;border-radius:50%;bottom:6px;}
+  .spark1{width:2px;height:2px;background:#ff6600;left:22%;animation:spark1 2.2s ease-out infinite;}
+  .spark2{width:2px;height:2px;background:#ff4400;left:52%;animation:spark2 1.8s ease-out infinite 0.6s;}
+  .spark3{width:1px;height:1px;background:#ff8800;left:72%;animation:spark3 2.5s ease-out infinite 1.1s;}
   .lc-front, .lc-back { display:flex; flex-direction:column; justify-content:center; height:100%; }
   .lc.bt1{background:#0a1a0a;} .lc.bt2{background:#1a1200;} .lc.bt3{background:#1a0800;} .lc.bt4{background:#1a0000;}
   .lc.bt1 .ln{color:#1e7a1e;} .lc.bt2 .ln{color:#c47a00;} .lc.bt3 .ln{color:#d44a00;} .lc.bt4 .ln{color:#cc0000;}
@@ -154,7 +164,7 @@
     <div class="tm-body" id="tm-body"></div>
   </div>
 </div>
-<div id="site-header"><div class="logo-frame"><span class="logo-spicy">SPICY</span><span class="logo-bingo">BINGO</span></div><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:10px;">Eternal Gems</div></div>
+<div id="site-header" style="text-align:center;padding:20px 0 8px;"><img src="https://jjcmtnz.github.io/spicy-bingo/logo.png" alt="Spicy Bingo" style="max-width:640px;width:88%;height:auto;"><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:8px;">Eternal Gems</div></div>
 <div id="landing">
   <div style="height:48px;"></div>
   <div class="standings-title">LIVE STANDINGS</div>
@@ -338,15 +348,19 @@ async function load() {
 function renderLanding(teams) {
   const cards = document.getElementById('cards');
   cards.innerHTML = '';
-  teams.forEach(team => {
+  teams.forEach((team, idx) => {
     const rc = team.rank <= 3 ? 'r'+team.rank : '';
     const el = document.createElement('div');
     el.className = 'team-card';
     el.onclick = () => showBoard(TEAMS.find(t=>t.sheetName===team.sheetName).slug);
     const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
     const tColor = tColors[team.sheetName] || '#888';
+    const isFirst = idx === 0;
     el.style.border = '2px solid ' + tColor;
     el.style.borderRadius = '6px';
+    el.style.position = 'relative';
+    el.style.overflow = 'hidden';
+    if (isFirst) { el.style.animation = 'card-glow 3s ease-in-out infinite'; el.style.setProperty('--gc', tColor); }
     el.innerHTML = `
       <div style="padding:18px 20px 14px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
@@ -361,12 +375,12 @@ function renderLanding(teams) {
         </div>
         <div style="border-top:1px solid #111;padding-top:10px;display:flex;">
           <div style="flex:1;text-align:center;border-right:1px solid #111;">
-            <div style="color:#A86600;font-family:'Bungee',cursive;font-size:17px;">${team.tilePeps}</div>
-            <div style="color:#3d2500;font-size:9px;letter-spacing:0.08em;">TILE PTS</div>
+            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:17px;">${team.tilePeps}</div>
+            <div style="color:${tColor};opacity:0.4;font-size:9px;letter-spacing:0.08em;">TILE PTS</div>
           </div>
           <div style="flex:1;text-align:center;">
-            <div style="color:#759900;font-family:'Bungee',cursive;font-size:17px;">${team.bingoPeps}</div>
-            <div style="color:#2a3300;font-size:9px;letter-spacing:0.08em;">BINGO PTS</div>
+            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:17px;">${team.bingoPeps}</div>
+            <div style="color:${tColor};opacity:0.4;font-size:9px;letter-spacing:0.08em;">BINGO PTS</div>
           </div>
         </div>
       </div>
@@ -432,9 +446,11 @@ function renderBoard(team) {
       fillPct > 66 ? 'linear-gradient(90deg,#1e7a1e,#c47a00 40%,#d44a00)' :
       fillPct > 33 ? 'linear-gradient(90deg,#1e7a1e,#c47a00)' : '#1e7a1e';
     html += `<div class="tile${complete?' complete':''}" style="border-color:${rc}" data-tilenum="${tile.num}" onclick="tileClick(event,this)">
+      ${complete ? '<div class="spark spark1"></div><div class="spark spark2"></div><div class="spark spark3"></div>' : ''}
       <div style="height:0"></div>
       <div class="tile-num">${tile.num}</div>
       <div class="tile-name">${tile.name}</div>
+      ${complete ? '<div style="text-align:center;font-size:7px;color:#AA0000;letter-spacing:0.12em;font-family:Bungee,cursive;margin-top:2px;">✓ COMPLETE</div>' : ''}
       <div style="flex:1;min-height:16px;"></div>
       <div class="tier-badges">${badges}</div>
       <div style="width:100%;margin-top:6px;">
