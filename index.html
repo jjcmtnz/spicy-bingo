@@ -98,7 +98,10 @@
   @keyframes smoke-waft{0%{transform:translateY(0) translateX(0) scale(1);opacity:0.12}100%{transform:translateY(-50px) translateX(6px) scale(2);opacity:0}}
   @keyframes smoke-waft2{0%{transform:translateY(0) translateX(0) scale(1);opacity:0.08}100%{transform:translateY(-44px) translateX(-6px) scale(1.5);opacity:0}}
   @keyframes shimmer-sweep{0%{left:-100%}100%{left:200%}}
-  @keyframes card-glow{0%,100%{box-shadow:0 0 8px var(--gc,#888)44}50%{box-shadow:0 0 22px var(--gc,#888)88,0 0 40px var(--gc,#888)33}}
+  @keyframes card-glow-g{0%,100%{box-shadow:0 0 8px #18661844}50%{box-shadow:0 0 22px #18661888,0 0 40px #18661833}}
+  @keyframes card-glow-o{0%,100%{box-shadow:0 0 8px #B83D0044}50%{box-shadow:0 0 22px #B83D0088,0 0 40px #B83D0033}}
+  @keyframes card-glow-a{0%,100%{box-shadow:0 0 8px #A8660044}50%{box-shadow:0 0 22px #A8660088,0 0 40px #A8660033}}
+  @keyframes card-glow-r{0%,100%{box-shadow:0 0 8px #AA000044}50%{box-shadow:0 0 22px #AA000088,0 0 40px #AA000033}}
   .smoke{position:absolute;border-radius:50%;bottom:8px;background:#777;}
   .smoke1{width:8px;height:8px;left:28%;animation:smoke-waft 3.5s ease-out infinite;}
   .smoke2{width:6px;height:6px;left:62%;animation:smoke-waft2 4s ease-out infinite 1.2s;}
@@ -106,6 +109,7 @@
   @keyframes spark2{0%{transform:translateY(0) translateX(0);opacity:0.6}100%{transform:translateY(-32px) translateX(-4px);opacity:0}}
   @keyframes spark3{0%{transform:translateY(0) translateX(0);opacity:0.5}100%{transform:translateY(-42px) translateX(2px);opacity:0}}
   .tile.complete {background:#1a0000!important;border-color:#AA000088!important;animation:soft-glow 3s ease-in-out infinite;}
+  .tile.complete .badge,.badge.s-complete{background:#AA000022!important;border-color:#AA0000!important;color:#AA0000!important;}
   .spark{position:absolute;border-radius:50%;bottom:6px;}
   .spark1{width:2px;height:2px;background:#ff6600;left:22%;animation:spark1 2.2s ease-out infinite;}
   .spark2{width:2px;height:2px;background:#ff4400;left:52%;animation:spark2 1.8s ease-out infinite 0.6s;}
@@ -164,7 +168,7 @@
     <div class="tm-body" id="tm-body"></div>
   </div>
 </div>
-<div id="site-header" style="text-align:center;padding:20px 0 8px;"><img src="https://jjcmtnz.github.io/spicy-bingo/logo.png" alt="Spicy Bingo" style="max-width:640px;width:88%;height:auto;"><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:8px;">Eternal Gems</div></div>
+<div id="site-header"><div class="logo-frame"><span class="logo-spicy">SPICY</span><span class="logo-bingo">BINGO</span></div><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:10px;">Eternal Gems</div></div>
 <div id="landing">
   <div style="height:48px;"></div>
   <div class="standings-title">LIVE STANDINGS</div>
@@ -360,7 +364,10 @@ function renderLanding(teams) {
     el.style.borderRadius = '6px';
     el.style.position = 'relative';
     el.style.overflow = 'hidden';
-    if (isFirst) { el.style.animation = 'card-glow 3s ease-in-out infinite'; el.style.setProperty('--gc', tColor); }
+    if (isFirst) {
+      const glowMap = {'#186618':'card-glow-g','#B83D00':'card-glow-o','#A86600':'card-glow-a','#AA0000':'card-glow-r'};
+      el.style.animation = (glowMap[tColor]||'card-glow-g') + ' 3s ease-in-out infinite';
+    }
     el.innerHTML = `
       <div style="padding:18px 20px 14px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
@@ -440,9 +447,9 @@ function renderBoard(team) {
     const rc = RC[Math.floor(i/5)] || '#555';
     const tierLabels = ['T1','T2','T3','T4'];
     const badges = [t1,t2,t3,t4].map((th,idx) =>
-      `<div class="badge ${drops>=th?'s'+(idx+1):''}"><span class="blabel">${tierLabels[idx]}</span><span class="bnum">${th}</span></div>`).join('');
+      `<div class="badge ${complete?'s-complete':drops>=th?'s'+(idx+1):''}"><span class="blabel">${tierLabels[idx]}</span><span class="bnum">${th}</span></div>`).join('');
     const fillPct = t4 > 0 ? Math.min(100, (drops/t4)*100) : 0;
-    const fillColor = fillPct >= 100 ? 'linear-gradient(90deg,#cc2200,#ff6600)' :
+    const fillColor = complete ? 'linear-gradient(90deg,#AA0000,#ff4400)' :
       fillPct > 66 ? 'linear-gradient(90deg,#1e7a1e,#c47a00 40%,#d44a00)' :
       fillPct > 33 ? 'linear-gradient(90deg,#1e7a1e,#c47a00)' : '#1e7a1e';
     html += `<div class="tile${complete?' complete':''}" style="border-color:${rc}" data-tilenum="${tile.num}" onclick="tileClick(event,this)">
