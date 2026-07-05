@@ -223,7 +223,7 @@ const BINGO_LINES = [
 ];
 const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
 const TEAMS = [
-  {name:"Team Scotch Bonnet",   slug:"scotch",    sheetName:"Team Scotch Bonnet"},
+  {name:"Team Jalapeño",   slug:"scotch",    sheetName:"Team Jalapeño"},
   {name:"Team Ghost Pepper",   slug:"ghost",     sheetName:"Team Ghost Pepper"},
   {name:"Team Naga Viper",     slug:"naga",      sheetName:"Team Naga Viper"},
   {name:"Team Carolina Reaper",slug:"carolina",  sheetName:"Team Carolina Reaper"},
@@ -327,7 +327,7 @@ function renderLanding(teams) {
     const el = document.createElement('div');
     el.className = 'team-card';
     el.onclick = () => showBoard(TEAMS.find(t=>t.sheetName===team.sheetName).slug);
-    const tColors = {"Team Scotch Bonnet":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
+    const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
     const tColor = tColors[team.sheetName] || '#888';
     el.style.border = '2px solid ' + tColor;
     el.style.borderRadius = '6px';
@@ -385,7 +385,7 @@ function renderBoard(team) {
   document.getElementById('mScore').textContent = team.total;
   document.getElementById('mTile').textContent  = team.tilePeps;
   document.getElementById('mBingo').textContent = team.bingoPeps;
-  const boardColors = {"Team Scotch Bonnet":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
+  const boardColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
   const bNameEl = document.getElementById('bTeamName');
   bNameEl.textContent = team.name;
   const tc = boardColors[team.sheetName] || '#888';
