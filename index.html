@@ -33,18 +33,18 @@
   #board-view { display:none; }
   .back-btn { display:inline-block; margin-bottom:8px; font-size:12px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
   .back-btn:hover { color:#ff4500; }
-  .outer { max-width:1320px; margin:0 auto; display:flex; gap:14px; align-items:flex-start; }
-  .meter-wrap { width:70px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:110px; }
+  .outer { max-width:1320px; margin:0 auto; display:flex; gap:14px; align-items:stretch; }
+  .meter-wrap { width:42px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; justify-content:flex-end; }
   .meter-title { font-family:'Bungee',cursive; font-size:8px; letter-spacing:0.1em; color:#444; margin-bottom:6px; writing-mode:vertical-rl; transform:rotate(180deg); height:80px; white-space:nowrap; }
-  .meter-track { width:34px; background:#0d0d0d; border:1px solid #1a1a1a; border-radius:4px; overflow:hidden; height:480px; display:flex; flex-direction:column-reverse; }
-  .meter-fill { width:100%; background:linear-gradient(0deg,#1e7a1e 0%,#8ab800 25%,#c47a00 50%,#d44a00 75%,#cc0000 100%); transition:height 0.8s ease; }
+  .meter-track { width:34px; border:1px solid #AA000066; border-radius:17px; overflow:hidden; flex:1; position:relative; box-shadow:0 0 10px #AA000033,inset 0 0 10px #00000066; }
+  .meter-fill { position:absolute; bottom:0; left:2px; right:2px; background:linear-gradient(0deg,#186618,#8ab800 30%,#c47a00 60%,#cc0000); border-radius:0 0 14px 14px; transition:height 0.8s ease; }
   .meter-score { font-family:'Bungee',cursive; font-size:18px; color:#ff4500; text-align:center; margin-top:8px; }
   .meter-denom { font-size:8px; color:#2a2a2a; text-align:center; margin-top:2px; }
   .meter-sub { margin-top:10px; width:100%; text-align:center; }
   .meter-sub-label { font-size:7px; color:#2a2a2a; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:2px; }
   .meter-sub-val { font-family:'Bungee',cursive; font-size:10px; }
   .board { flex:1; min-width:0; }
-  .logo-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0 12px; border-top:1px solid #1a1a1a; border-bottom:1px solid #1a1a1a; margin-bottom:12px; }
+  .logo-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0 12px; border-top:1px solid #1a1a1a; margin-bottom:12px; }
   .team-lbl { font-size:24px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; font-family:'Bungee',cursive; }
   .logo-sm { display:inline-flex; align-items:center; border:3px solid #ff4500; border-radius:6px; padding:8px 28px 10px; position:relative; }
   .logo-sm::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
@@ -57,6 +57,10 @@
   .tile-name { font-size:12px; font-weight:700; color:#ddd; text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; width:100%; }
   .tier-badges { display:flex; gap:3px; width:100%; margin-bottom:9px; }
   .badge { flex:1; text-align:center; font-family:'Bungee',cursive; font-size:11px; padding:5px 0; border:1.5px solid #1a1a1a; color:#2a2a2a; background:#0d0d0d; position:relative; }
+  .badge-t1 { border-color:#1e7a1e55 !important; color:#1e7a1e66 !important; }
+  .badge-t2 { border-color:#c47a0055 !important; color:#c47a0066 !important; }
+  .badge-t3 { border-color:#d44a0055 !important; color:#d44a0066 !important; }
+  .badge-t4 { border-color:#cc000055 !important; color:#cc000066 !important; }
   .badge .blabel { display:block; }
   .badge .bnum { display:none; }
   .tile:hover .badge .blabel { display:none; }
@@ -72,13 +76,13 @@
   .bottom-section { display:flex; gap:8px; }
   .panel { border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; }
   .ph { padding:9px 14px; background:#0d0d0d; border-bottom:1px solid #1a1a1a; font-size:11px; font-weight:700; letter-spacing:0.12em; color:#555; text-transform:uppercase; }
-  .tiers-panel { flex:0 0 160px; display:flex; flex-direction:column; }
+  .tiers-panel { flex:0 1 14%; min-width:110px; display:flex; flex-direction:column; }
   .tier-row { display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid #111; flex:1; }
   .tier-row:last-child { border-bottom:none; flex:1; }
   .tsw { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
   .tn { font-family:'Bungee',cursive; font-size:15px; color:#888; min-width:28px; }
   .tv { font-size:14px; color:#555; }
-  .bonus-panel { flex:0 0 180px; display:flex; flex-direction:column; }
+  .bonus-panel { flex:0 1 16%; min-width:130px; display:flex; flex-direction:column; }
   .tier-panel .panel-body, .bonus-panel .panel-body, .tiers-panel .panel-body { display:flex; flex-direction:column; flex:1; }
   .bonus-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:0 14px; border-bottom:1px solid #111; flex:1; }
   .bonus-row:last-child{border-bottom:none;flex:1;}
@@ -141,7 +145,7 @@
     padding:18px 22px 16px; border-bottom:1px solid #1a1a1a;
     display:flex; align-items:center; justify-content:space-between;
   }
-  .tm-title { font-family:'Bungee',cursive; font-size:19px; color:#ff4500; letter-spacing:0.06em; }
+  .tm-title { font-family:'Bungee',cursive; font-size:19px; color:#A86600; letter-spacing:0.06em; }
   .tm-thresholds { font-size:13px; color:#555; letter-spacing:0.08em; margin-top:4px; }
   .tm-close { font-family:'Bungee',cursive; font-size:20px; color:#444; cursor:pointer; line-height:1; }
   .tm-close:hover { color:#ff4500; }
@@ -177,37 +181,34 @@
 </div>
 
 <div id="board-view">
-  <div class="outer">
-    <div class="meter-wrap">
-      <div class="meter-title">SPICY METER</div>
-      <div class="meter-track"><div class="meter-fill" id="mFill" style="height:0%"></div></div>
-      <div class="meter-score" id="mScore" style="font-size:16px;">0</div>
-      <div class="meter-denom" style="color:#555;font-size:9px;">/ 2,950</div>
-      <div id="mTile" style="display:none"></div><div id="mBingo" style="display:none"></div>
-    </div>
-    <div class="board">
-      <div style="padding:0 0 6px 0;"><span class="back-btn" onclick="showLanding()">← Return to standings</span></div>
-      <div class="logo-row">
+  <div class="board">
+    <div style="padding:0 0 6px 0;"><span class="back-btn" onclick="showLanding()">← Return to standings</span></div>
+    <div class="logo-row">
         <div class="team-lbl" id="bTeamName"></div>
         <div style="display:flex;align-items:center;gap:0;">
           <div style="text-align:center;padding:0 18px;border-right:1px solid #1a1a1a;">
-            <div id="bTile" style="color:#A86600;font-family:'Bungee',cursive;font-size:16px;line-height:1;">0</div>
-            <div style="color:#3d2500;font-size:8px;letter-spacing:0.08em;margin-top:3px;">TILE PTS</div>
+            <div id="bTileLbl" style="font-size:8px;letter-spacing:0.08em;margin-bottom:4px;color:#A86600;opacity:0.6;">TIER PTS</div>
+            <div id="bTile" style="font-family:'Bungee',cursive;font-size:22px;line-height:1;color:#A86600;">0</div>
           </div>
-          <div style="text-align:center;padding:0 18px;border-right:1px solid #1a1a1a;">
-            <div id="bBingo" style="color:#759900;font-family:'Bungee',cursive;font-size:16px;line-height:1;">0</div>
-            <div style="color:#2a3300;font-size:8px;letter-spacing:0.08em;margin-top:3px;">BINGO PTS</div>
+          <div style="text-align:center;padding:0 18px;border-right:2px solid #75990066;">
+            <div id="bBingoLbl" style="font-size:8px;letter-spacing:0.08em;margin-bottom:4px;color:#ccaa00;opacity:0.6;">BINGO PTS</div>
+            <div id="bBingo" style="font-family:'Bungee',cursive;font-size:22px;line-height:1;color:#ccaa00;">0</div>
           </div>
-          <div style="text-align:center;padding:0 0 0 18px;">
-            <div id="bTotal" style="font-family:'Bungee',cursive;font-size:24px;line-height:1;">0</div>
-            <div style="font-size:8px;letter-spacing:0.1em;margin-top:3px;opacity:0.5;" id="bTotalLbl">TOTAL PTS</div>
+          <div style="text-align:center;padding:0 0 0 22px;">
+            <div id="bTotalLbl" style="font-size:8px;letter-spacing:0.1em;margin-bottom:4px;color:#759900;opacity:0.6;">TOTAL PTS</div>
+            <div id="bTotal" style="font-family:'Bungee',cursive;font-size:22px;line-height:1;color:#759900;">0</div>
           </div>
+
         </div>
       </div>
+      <div id="mTile" style="display:none"></div><div id="mBingo" style="display:none"></div>
+        <div id="mScore" style="display:none"></div>
+        <div id="mFill" style="display:none"></div>
+      <div style="padding:6px 0 8px;"><div style="height:4px;background:#1a1a1a;border-radius:3px;margin-bottom:3px;overflow:hidden;"><div id="bProgressFill" style="height:100%;width:0%;background:linear-gradient(90deg,#186618,#8ab800 50%,#c47a00 80%,#cc0000);border-radius:3px;transition:width 0.8s ease;"></div></div><div style="display:flex;justify-content:flex-end;"><div id="bProgressPts" style="font-size:8px;color:#555;">MAX 2,950</div></div></div>
       <div class="grid" id="bGrid"></div>
       <div class="bottom-section">
         <div class="panel tiers-panel">
-          <div class="ph">Point Tiers</div>
+          <div class="ph">Tier Points</div>
           <div class="panel-body" style="display:flex;flex-direction:column;flex:1;">
           <div class="tier-row"><span class="tsw" style="background:#1e7a1e"></span><span class="tn">T1</span><span class="tv">+1 pt</span></div>
           <div class="tier-row"><span class="tsw" style="background:#c47a00"></span><span class="tn">T2</span><span class="tv">+2 pts</span></div>
@@ -216,7 +217,7 @@
           </div>
         </div>
         <div class="panel bonus-panel">
-          <div class="ph">Bingo Bonuses</div>
+          <div class="ph">Bingo Points</div>
           <div class="panel-body" style="display:flex;flex-direction:column;flex:1;">
           <div class="bonus-row"><span class="bn" style="color:#1e7a1e">T1 bingo</span><span class="bv" style="color:#1e7a1e">+15</span></div>
           <div class="bonus-row"><span class="bn" style="color:#c47a00">T2 bingo</span><span class="bv" style="color:#c47a00">+30</span></div>
@@ -225,12 +226,11 @@
           </div>
         </div>
         <div class="panel lines-panel">
-          <div class="ph">Bingo Lines <span style="font-weight:400;color:#333;font-size:9px">— Hover to highlight tiles · Click to see Bingo Bonus Pts</span></div>
+          <div class="ph">Bingo Lines <span style="font-weight:400;color:#333;font-size:9px">— Hover to highlight bingo lines · Click to see Bingo Points</span></div>
           <div class="lines-grid" id="bLines"></div>
         </div>
       </div>
     </div>
-  </div>
 </div>
 
 <script>
@@ -383,12 +383,21 @@ function renderLanding(teams) {
         <div style="border-top:1px solid #111;padding-top:10px;display:flex;">
           <div style="flex:1;text-align:center;border-right:1px solid #111;">
             <div style="color:${tColor};font-family:'Bungee',cursive;font-size:17px;">${team.tilePeps}</div>
-            <div style="color:${tColor};opacity:0.4;font-size:9px;letter-spacing:0.08em;">TILE PTS</div>
+            <div style="color:${tColor};opacity:0.4;font-size:9px;letter-spacing:0.08em;">TIER PTS</div>
           </div>
           <div style="flex:1;text-align:center;">
             <div style="color:${tColor};font-family:'Bungee',cursive;font-size:17px;">${team.bingoPeps}</div>
             <div style="color:${tColor};opacity:0.4;font-size:9px;letter-spacing:0.08em;">BINGO PTS</div>
           </div>
+        </div>
+      </div>
+      <div style="padding:0 20px 12px;">
+        <div style="height:4px;background:#1a1a1a;border-radius:3px;margin-bottom:4px;overflow:hidden;">
+          <div style="height:100%;width:${Math.round((team.total/2950)*100)}%;background:${(()=>{const p=Math.round((team.total/2950)*100);return p<25?'#186618':p<50?'linear-gradient(90deg,#186618,#8ab800)':p<75?'linear-gradient(90deg,#186618,#8ab800 40%,#c47a00)':'linear-gradient(90deg,#186618,#8ab800 30%,#c47a00 60%,#cc0000)'})()};border-radius:3px;min-width:${team.total>0?2:0}px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <div style="font-size:8px;color:${tColor};opacity:0.4;">${team.total} pts</div>
+          <div style="font-size:8px;color:${tColor};opacity:0.4;">MAX 2,950</div>
         </div>
       </div>
       <div class="tc-footer" style="padding:9px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:#333;letter-spacing:0.1em;text-transform:uppercase;text-align:center;transition:color 0.15s;">View Board →</div>`;
@@ -429,14 +438,25 @@ function renderBoard(team) {
   bNameEl.style.color = tc;
   const bTotalEl = document.getElementById('bTotal');
   const bTotalLbl = document.getElementById('bTotalLbl');
-  if (bTotalEl) bTotalEl.style.color = tc;
-  if (bTotalLbl) bTotalLbl.style.color = tc;
+
   // Update logo row border color to match team
   const logoRow = document.querySelector('.logo-row');
-  if (logoRow) { logoRow.style.borderBottom = '1px solid ' + (boardColors[team.sheetName] || '#1a1a1a') + '44'; }
+  if (logoRow) { logoRow.style.borderBottom = 'none'; }
   document.getElementById('bTotal').textContent = team.total;
+  const pct = Math.round((team.total/2950)*100);
+  document.getElementById('bProgressFill').style.width = pct + '%';
+  const grad = pct < 25 ? '#186618' :
+    pct < 50 ? 'linear-gradient(90deg,#186618,#8ab800)' :
+    pct < 75 ? 'linear-gradient(90deg,#186618,#8ab800 40%,#c47a00)' :
+    'linear-gradient(90deg,#186618,#8ab800 30%,#c47a00 60%,#cc0000)';
+  document.getElementById('bProgressFill').style.background = grad;
   document.getElementById('bTile').textContent  = team.tilePeps;
+  // colors set via HTML
   document.getElementById('bBingo').textContent = team.bingoPeps;
+
+  const bTileLbl = document.getElementById('bTileLbl');
+  const bBingoLbl = document.getElementById('bBingoLbl');
+
 
   const tiles = team.tiles || [];
   let html = '';
@@ -446,13 +466,17 @@ function renderBoard(team) {
     const complete = tierNum(tile.tier) >= 4;
     const rc = RC[Math.floor(i/5)] || '#555';
     const tierLabels = ['T1','T2','T3','T4'];
-    const badges = [t1,t2,t3,t4].map((th,idx) =>
-      `<div class="badge ${complete?'s-complete':drops>=th?'s'+(idx+1):''}"><span class="blabel">${tierLabels[idx]}</span><span class="bnum">${th}</span></div>`).join('');
+    const tNum = {'T1':1,'T2':2,'T3':3,'T4':4}[tile.tier] || 0;
+    const dimCls = ['badge-t1','badge-t2','badge-t3','badge-t4'];
+    const badges = [t1,t2,t3,t4].map((th,idx) => {
+      let cls = complete ? 's-complete' : idx < 3 && drops >= th ? 's'+(idx+1) : idx === 3 && tNum >= 4 ? 's4' : dimCls[idx];
+      return `<div class="badge ${cls}"><span class="blabel">${tierLabels[idx]}</span><span class="bnum">${th}</span></div>`;
+    }).join('');
     const fillPct = t4 > 0 ? Math.min(100, (drops/t4)*100) : 0;
     const fillColor = complete ? 'linear-gradient(90deg,#AA0000,#ff4400)' :
       fillPct > 66 ? 'linear-gradient(90deg,#1e7a1e,#c47a00 40%,#d44a00)' :
       fillPct > 33 ? 'linear-gradient(90deg,#1e7a1e,#c47a00)' : '#1e7a1e';
-    html += `<div class="tile${complete?' complete':''}" style="border-color:${rc}" data-tilenum="${tile.num}" onclick="tileClick(event,this)">
+    html += `<div class="tile${complete?' complete':''}" style="border-color:${complete ? rc : ({T1:'#1e7a1e',T2:'#c47a00',T3:'#d44a00',T4:'#cc0000'}[tile.tier] || '#2a2a2a')}" data-tilenum="${tile.num}" onclick="tileClick(event,this)">
       ${complete ? '<div class="spark spark1"></div><div class="spark spark2"></div><div class="spark spark3"></div>' : ''}
       <div style="height:0"></div>
       <div class="tile-num">${tile.num}</div>
@@ -479,7 +503,7 @@ function renderBoard(team) {
     else if (b.t2==='✓') tier=2;
     else if (b.t1==='✓') tier=1;
     const bc = ['','#1e7a1e','#c47a00','#d44a00','#cc0000'][tier]||'';
-    const bonus = tier>0 ? `<div style="margin-top:4px;display:flex;align-items:baseline;gap:8px;"><span class="lb" style="color:${bc};">+${BONUS[tier]} pts</span><span class="ltot">${CUMUL[tier]} total</span></div>` : '<div style="font-size:10px;color:#333;margin-top:4px;">No pts yet</div>';
+    const bonus = tier>0 ? `<div style="display:flex;flex-direction:column;justify-content:center;height:100%;"><span class="lb" style="color:${bc};">+${BONUS[tier]} <span style="font-size:11px;color:#555;font-weight:400;font-family:inherit;">(${CUMUL[tier]} total bingo pts)</span></span></div>` : '<div style="font-size:10px;color:#444;line-height:1.4;">No bingo pts earned for this bingo line yet.</div>';
     const tileNums = bl.t.split(',').map(s => parseInt(s.trim()));
     lhtml += `<div class="lc${tier>0?' bt'+tier:''}" onclick="toggleLine(this,'${bl.t}')" onmouseenter="highlightLine([${tileNums.join(',')}])" onmouseleave="clearHighlight()">
       <div class="ln">${bl.n}</div>
@@ -601,10 +625,9 @@ function openModal(tileNum, tileName) {
       if (tile && tile.thresholds) threshStr = tile.thresholds;
     });
   }
-  const rowColor = TILE_ROW_COLORS[tileNum] || '#ff4500';
   const tmTitle = document.getElementById('tm-title');
   tmTitle.textContent = tileName;
-  tmTitle.style.color = rowColor;
+  tmTitle.style.color = '';
   const thEl = document.getElementById('tm-thresholds');
   if (thEl) thEl.innerHTML = '';
   // Build threshold HTML for drops needed box
@@ -614,10 +637,10 @@ function openModal(tileNum, tileName) {
     const labels = ['T1','T2','T3','T4'];
     const colors = ['#186618','#A86600','#B83D00','#AA0000'];
     threshHtml = '<div style="display:flex;gap:6px;">' +
-      parts.map((v,i) => '<div style="flex:1;background:#0a0a0a;border:1px solid ' + colors[i] + '55;border-radius:4px;padding:6px;text-align:center;">' +
-        '<div style="color:' + colors[i] + ';font-family:Bungee,cursive;font-size:10px;">' + labels[i] + '</div>' +
-        '<div style="color:#ddd;font-size:15px;font-weight:700;line-height:1.2;">' + v + '</div>' +
-        '<div style="color:#444;font-size:7px;letter-spacing:0.06em;">DROPS</div>' +
+      parts.map((v,i) => '<div style="flex:1;background:#0a0a0a;border:1px solid ' + colors[i] + '55;border-radius:4px;padding:8px 6px;text-align:center;">' +
+        '<div style="color:' + colors[i] + ';font-family:Bungee,cursive;font-size:11px;">' + labels[i] + '</div>' +
+        '<div style="color:#ddd;font-size:20px;font-weight:700;line-height:1.2;">' + v + '</div>' +
+        '<div style="color:#444;font-size:8px;letter-spacing:0.06em;">DROPS</div>' +
         '</div>').join('') + '</div>';
   }
   let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
@@ -662,7 +685,7 @@ function openModal(tileNum, tileName) {
   html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Drop Requirement</div>';
   if (data.req) {
     html += '<div style="font-size:12px;color:#ddd;padding-right:72px;">' + data.req + '</div>';
-    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">Can be met at any time</div>';
+    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">This condition can be met at any time.</div>';
   } else {
     html += '<div style="font-size:13px;color:#ddd;">None</div>';
     html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">There are no additional drop requirements for this tile.</div>';
@@ -671,11 +694,11 @@ function openModal(tileNum, tileName) {
 
   html += '<div style="flex:1;background:#0a0a0a;border:1px solid ' + (data.ca ? '#A8660044' : '#1a1a1a') + ';border-radius:4px;padding:9px 11px;position:relative;display:flex;flex-direction:column;opacity:' + (data.ca ? '1' : '0.45') + ';">';
   html += data.ca ? mkBadge(caDone) : '';
-  html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Combat Achievement Requirements</div>';
+  html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Combat Achievement Requirement</div>';
   if (data.ca) {
     html += '<div style="font-size:12px;color:#ddd;padding-right:72px;">' + data.ca + '</div>';
     if (data.caNotes) html += '<div style="font-size:10px;color:#666;margin-top:3px;font-style:italic;">' + data.caNotes + '</div>';
-    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">&#9888; T3 must be completed first before attempting the CA</div>';
+    html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">&#9888; T3 must be completed first before starting this CA.</div>';
   } else {
     html += '<div style="font-size:13px;color:#ddd;">None</div>';
     html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">There are no CA Requirements for this tile.</div>';
