@@ -126,6 +126,28 @@
   .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
 
+  /* Mobile/tablet: hover doesn't exist, so simplify badges to dots and truncate long tile names */
+  @media(max-width:768px){
+    .grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; }
+    .tile { padding:7px 5px 6px; min-width:0; }
+    .tier-badges { gap:3px; justify-content:center; margin-bottom:7px; }
+    .badge { flex:0 0 auto; width:8px; height:8px; padding:0; border-radius:50%; overflow:hidden; }
+    .badge .blabel, .badge .bnum { display:none !important; }
+    .tile-name { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; white-space:normal; min-height:auto; }
+
+    .bottom-section { flex-wrap:wrap; }
+    .lines-panel { order:-1; flex:1 1 100%; }
+    .tiers-panel { order:1; flex:1 1 calc(50% - 4px); }
+    .bonus-panel { order:2; flex:1 1 calc(50% - 4px); }
+
+    .lines-grid { grid-template-columns:repeat(2,1fr); }
+    .lc { height:auto; min-height:54px; padding:8px 10px; }
+    .lc-nums { font-size:10px !important; line-height:1.4; }
+    .lc:nth-child(2n){ border-right:none; }
+    .lc:nth-last-child(3), .lc:nth-last-child(4){ border-bottom:1px solid #111; }
+    .lc:nth-last-child(-n+2){ border-bottom:none; }
+  }
+
   /* Tile hover + modal */
   .tile { cursor:pointer; transition: filter 0.15s, transform 0.15s; display:flex; flex-direction:column; }
   .tile:hover { filter:brightness(1.6); transform:translateY(-2px); }
@@ -507,7 +529,7 @@ function renderBoard(team) {
     const tileNums = bl.t.split(',').map(s => parseInt(s.trim()));
     lhtml += `<div class="lc${tier>0?' bt'+tier:''}" onclick="toggleLine(this,'${bl.t}')" onmouseenter="highlightLine([${tileNums.join(',')}])" onmouseleave="clearHighlight()">
       <div class="ln">${bl.n}</div>
-      <div class="lc-front"><div style="font-size:12px;color:#555;margin-top:2px;">${bl.t}</div></div>
+      <div class="lc-front"><div class="lc-nums" style="font-size:12px;color:#555;margin-top:2px;">${bl.t}</div></div>
       <div class="lc-back" style="display:none;">${bonus||'<div style="font-size:10px;color:#333;margin-top:2px;">—</div>'}</div>
     </div>`;
   });
