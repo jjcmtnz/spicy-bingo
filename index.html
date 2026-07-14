@@ -18,7 +18,7 @@
   .subtitle { text-align:center; font-size:12px; letter-spacing:0.2em; color:#444; text-transform:uppercase; margin-bottom:36px; }
   #landing { max-width:900px; margin:0 auto; }
   .standings-title { font-family:'Bungee',cursive; font-size:14px; letter-spacing:0.2em; color:#555; text-align:center; margin-bottom:14px; }
-  .team-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  .team-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   .team-card { background:#0a0a0a; border:1px solid #1a1a1a; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform 0.15s, border-color 0.15s; border-left-width:4px; }
   .team-card:hover { transform:translateY(-2px); border-color:#333; }
   .tc-header { padding:16px 18px 14px; display:flex; align-items:center; justify-content:space-between; }
@@ -197,14 +197,29 @@
 <div id="site-header"><div class="logo-frame"><span class="logo-spicy">SPICY</span><span class="logo-bingo">BINGO</span></div><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:10px;">Eternal Gems</div></div>
 <div id="landing">
   <div style="height:48px;"></div>
-  <div class="standings-title">LIVE STANDINGS</div>
+  <div style="display:flex;justify-content:flex-end;max-width:1320px;margin:0 auto 4px;padding:0 20px;">
+    <div onclick="isUnlocked('ref') ? showRefView() : showRefGate();" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#666;border:1px solid #333;border-radius:5px;padding:7px 14px;cursor:pointer;">👁 Ref View</div>
+  </div>
+  <div class="standings-title">TEAM BOARDS</div>
   <div class="team-cards" id="cards"><div class="loading">Loading scores...</div></div>
+  <div id="leaderboardPanel"></div>
+  <div id="leaderboardReminder" style="text-align:center; font-size:10.5px; color:#666; margin-top:14px; line-height:1.5; display:none;">Spicy Leaderboard Standings are not live. Updates will be released periodically throughout the event.</div>
   <div class="last-updated" id="lastUpdated"></div>
 </div>
 
 <div id="board-view">
+  <div id="passwordGate" style="display:none; text-align:center; padding:50px 20px 100px;">
+    <div style="width:340px; max-width:100%; box-sizing:border-box; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; padding:32px 28px; margin:0 auto;">
+      <div id="gateTeamName" style="font-family:'Bungee',cursive; font-size:20px; margin-bottom:6px;"></div>
+      <div style="font-size:12px; color:#666; margin-bottom:24px; line-height:1.5;">This board is locked. Enter your team password to view progress.</div>
+      <input id="gateInput" type="password" placeholder="TEAM PASSWORD" style="width:100%; box-sizing:border-box; background:#111; border:1px solid #2a2a2a; border-radius:6px; padding:12px 14px; color:#ddd; font-size:14px; letter-spacing:0.1em; text-align:center; margin-bottom:14px; font-family:sans-serif;">
+      <button onclick="attemptUnlock()" style="width:100%; background:linear-gradient(90deg,#c47a00,#cc0000); border:none; border-radius:6px; padding:12px; color:#fff; font-family:'Bungee',cursive; font-size:13px; letter-spacing:0.05em; cursor:pointer;">UNLOCK BOARD</button>
+      <div id="gateError" style="font-size:11px; color:#ff5555; margin-top:12px; display:none;">✕ Incorrect password. Try again.</div>
+      <div id="gateBackRow" style="margin-top:18px;"><span class="back-btn" onclick="goBackFromBoard()">← Return to team boards</span></div>
+    </div>
+  </div>
   <div class="board">
-    <div style="padding:0 0 6px 0;"><span class="back-btn" onclick="showLanding()">← Return to standings</span></div>
+    <div id="boardBackRow" style="padding:0 0 6px 0;"><span class="back-btn" onclick="goBackFromBoard()">← Return to team boards</span></div>
     <div class="logo-row">
         <div class="team-lbl" id="bTeamName"></div>
         <div style="display:flex;align-items:center;gap:0;">
@@ -255,6 +270,24 @@
     </div>
 </div>
 
+<div id="refGate" style="display:none; text-align:center; padding:50px 20px 100px;">
+  <div style="width:340px; max-width:100%; box-sizing:border-box; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; padding:32px 28px; margin:0 auto;">
+    <div style="font-family:'Bungee',cursive; font-size:16px; color:#ff8844; margin-bottom:6px; letter-spacing:0.03em;">👁 Ref View</div>
+    <div style="font-size:12px; color:#666; margin-bottom:24px; line-height:1.5;">Event Ref access only.</div>
+    <input id="refGateInput" type="password" placeholder="REF PASSWORD" style="width:100%; box-sizing:border-box; background:#111; border:1px solid #2a2a2a; border-radius:6px; padding:12px 14px; color:#ddd; font-size:14px; letter-spacing:0.1em; text-align:center; margin-bottom:14px; font-family:sans-serif;">
+    <button onclick="attemptRefUnlock()" style="width:100%; background:linear-gradient(90deg,#c47a00,#cc0000); border:none; border-radius:6px; padding:12px; color:#fff; font-family:'Bungee',cursive; font-size:13px; letter-spacing:0.05em; cursor:pointer;">ENTER</button>
+    <div id="refGateError" style="font-size:11px; color:#ff5555; margin-top:12px; display:none;">✕ Incorrect password. Try again.</div>
+    <div style="margin-top:18px;"><span class="back-btn" onclick="showLanding()">← Return to team boards</span></div>
+  </div>
+</div>
+
+<div id="refView" style="display:none; max-width:1320px; margin:0 auto; padding:0 20px 60px;">
+  <div style="padding:10px 0 6px;"><span class="back-btn" onclick="showLanding()">← Return to team boards</span></div>
+  <div class="standings-title">👁 Ref View</div>
+  <div class="team-cards" id="refCards"></div>
+  <div id="refBoardSlot"></div>
+</div>
+
 <script>
 const API = "https://script.google.com/macros/s/AKfycbwsDA5ZLOK7FPBT0lkrZXRtYEZHYoJM8vRQqK3yvwJcpJLyDot7oNFEQ3f32-ZsBU_MAA/exec";
 const MAX = 2950;
@@ -271,21 +304,249 @@ const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
 const TEAMS = [
   {name:"Team Jalapeño",   slug:"jalapeno",    sheetName:"Team Jalapeño"},
   {name:"Team Ghost Pepper",   slug:"ghost",     sheetName:"Team Ghost Pepper"},
-  {name:"Team Naga Viper",     slug:"naga",      sheetName:"Team Naga Viper"},
   {name:"Team Carolina Reaper",slug:"carolina",  sheetName:"Team Carolina Reaper"},
 ];
 
 let cachedData = null;
 let currentTeam = null;
+let cameFromRef = false;
+
+function goBackFromBoard() {
+  if (cameFromRef && isUnlocked('ref')) {
+    showRefView();
+  } else {
+    showLanding();
+  }
+}
+
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const UNLOCK_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function getExpectedHash(key) {
+  if (!cachedData || !cachedData.passwords) return null;
+  if (key === 'ref') return cachedData.passwords['REF'] || null;
+  const team = TEAMS.find(t => t.slug === key);
+  return team ? (cachedData.passwords[team.sheetName] || null) : null;
+}
+
+function isUnlocked(key) {
+  const expected = getExpectedHash(key);
+  if (!expected) return false; // can't validate before password data has loaded
+  try {
+    const raw = localStorage.getItem('spicybingo_unlock_' + key);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.hash !== expected) return false; // password changed since — revoked
+    if (Date.now() - data.ts > UNLOCK_EXPIRY_MS) return false; // session expired
+    return true;
+  } catch (e) { return false; }
+}
+function unlock(key, hash) {
+  localStorage.setItem('spicybingo_unlock_' + key, JSON.stringify({ hash, ts: Date.now() }));
+}
+
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_LOCKOUT_MS = 60 * 1000;
+
+function getRateState(key) {
+  try {
+    return JSON.parse(localStorage.getItem('spicybingo_ratelimit_' + key)) || { fails: 0, lockUntil: 0 };
+  } catch (e) { return { fails: 0, lockUntil: 0 }; }
+}
+function recordFailure(key) {
+  const state = getRateState(key);
+  state.fails += 1;
+  if (state.fails >= RATE_LIMIT_MAX) {
+    state.lockUntil = Date.now() + RATE_LIMIT_LOCKOUT_MS;
+    state.fails = 0;
+  }
+  localStorage.setItem('spicybingo_ratelimit_' + key, JSON.stringify(state));
+}
+function recordSuccess(key) {
+  localStorage.setItem('spicybingo_ratelimit_' + key, JSON.stringify({ fails: 0, lockUntil: 0 }));
+}
+function getLockoutRemaining(key) {
+  const remaining = getRateState(key).lockUntil - Date.now();
+  return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+}
+
+async function attemptUnlock() {
+  const input = document.getElementById('gateInput');
+  const err = document.getElementById('gateError');
+  const remaining = getLockoutRemaining(currentTeam.slug);
+  if (remaining > 0) {
+    err.textContent = `⏳ Too many attempts. Try again in ${remaining}s.`;
+    err.style.display = 'block';
+    return;
+  }
+  if (!cachedData || !cachedData.passwords || !Object.keys(cachedData.passwords).length) {
+    err.textContent = '⚠ Password system not set up yet — check the Config tab & Apps Script deployment.';
+    err.style.display = 'block';
+    return;
+  }
+  const expected = cachedData.passwords[currentTeam.sheetName];
+  const hash = await sha256(input.value);
+  if (expected && hash === expected) {
+    recordSuccess(currentTeam.slug);
+    unlock(currentTeam.slug, hash);
+    err.style.display = 'none';
+    showBoard(currentTeam.slug);
+  } else {
+    recordFailure(currentTeam.slug);
+    const remainingAfter = getLockoutRemaining(currentTeam.slug);
+    err.textContent = remainingAfter > 0
+      ? `⏳ Too many attempts. Try again in ${remainingAfter}s.`
+      : '✕ Incorrect password. Try again.';
+    err.style.display = 'block';
+    input.value = '';
+    input.focus();
+  }
+}
+
+async function attemptRefUnlock() {
+  const input = document.getElementById('refGateInput');
+  const err = document.getElementById('refGateError');
+  const remaining = getLockoutRemaining('ref');
+  if (remaining > 0) {
+    err.textContent = `⏳ Too many attempts. Try again in ${remaining}s.`;
+    err.style.display = 'block';
+    return;
+  }
+  if (!cachedData || !cachedData.passwords || !Object.keys(cachedData.passwords).length) {
+    err.textContent = '⚠ Password system not set up yet — check the Config tab & Apps Script deployment.';
+    err.style.display = 'block';
+    return;
+  }
+  const expected = cachedData.passwords['REF'];
+  const hash = await sha256(input.value);
+  if (expected && hash === expected) {
+    recordSuccess('ref');
+    unlock('ref', hash);
+    err.style.display = 'none';
+    showRefView();
+  } else {
+    recordFailure('ref');
+    const remainingAfter = getLockoutRemaining('ref');
+    err.textContent = remainingAfter > 0
+      ? `⏳ Too many attempts. Try again in ${remainingAfter}s.`
+      : '✕ Incorrect password. Try again.';
+    err.style.display = 'block';
+    input.value = '';
+    input.focus();
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  if (document.activeElement === document.getElementById('gateInput')) attemptUnlock();
+  if (document.activeElement === document.getElementById('refGateInput')) attemptRefUnlock();
+});
+
+function hideAllViews() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('board-view').style.display = 'none';
+  document.getElementById('refGate').style.display = 'none';
+  document.getElementById('refView').style.display = 'none';
+  document.getElementById('site-header').style.paddingLeft = '20px';
+}
+
+function showRefGate() {
+  hideAllViews();
+  setHash('ref');
+  document.getElementById('refGate').style.display = 'block';
+  document.getElementById('refGateError').style.display = 'none';
+  document.getElementById('refGateInput').value = '';
+  document.title = 'Spicy Bingo — Ref View';
+}
+
+function showRefView() {
+  hideAllViews();
+  setHash('ref');
+  document.getElementById('refView').style.display = 'block';
+  document.title = 'Spicy Bingo — Ref View';
+  if (cachedData) renderRefCards(cachedData.teams);
+}
+
+let refInlineTeam = null;
+
+function renderRefCards(teams) {
+  const wrap = document.getElementById('refCards');
+  wrap.innerHTML = '';
+  const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
+  const sorted = [...teams].sort((a, b) => (b.total || 0) - (a.total || 0));
+  sorted.forEach((team, i) => {
+    const pct = Math.min(100, Math.round(((team.total || 0) / MAX) * 100));
+    const tColor = tColors[team.sheetName] || '#888';
+    const isOpen = refInlineTeam === team.sheetName;
+    const el = document.createElement('div');
+    el.className = 'team-card';
+    el.style.border = (isOpen ? '3px solid ' : '2px solid ') + tColor;
+    el.style.borderRadius = '8px';
+    el.style.overflow = 'hidden';
+    el.onclick = () => toggleRefInline(team.sheetName);
+    el.innerHTML = `
+      <div style="padding:18px 20px 14px;">
+        <div style="font-size:10px;color:${tColor};opacity:0.6;margin-bottom:4px;">#${i+1}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div class="tc-name" style="font-family:'Bungee',cursive;font-size:16px;color:${tColor};">${team.name}</div>
+          <div style="text-align:right;"><div style="font-family:'Bungee',cursive;font-size:22px;color:${tColor};">${team.total||0}</div><div style="font-size:8px;color:#555;">TOTAL PTS</div></div>
+        </div>
+        <div style="display:flex;gap:20px;margin-top:10px;font-size:11px;">
+          <div><b style="color:${tColor};">${team.tilePeps||0}</b> <span style="color:#555;">TIER PTS</span></div>
+          <div><b style="color:${tColor};">${team.bingoPeps||0}</b> <span style="color:#555;">BINGO PTS</span></div>
+        </div>
+        <div style="height:5px;background:#1a1a1a;border-radius:3px;margin-top:10px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#1e7a1e,#c47a00,#d44a00);"></div>
+        </div>
+      </div>
+      <div class="tc-footer" style="padding:9px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:${isOpen ? tColor : '#333'};letter-spacing:0.1em;text-transform:uppercase;text-align:center;">${isOpen ? '▲ Hide Board' : 'View Board →'}</div>`;
+    wrap.appendChild(el);
+  });
+}
+
+function toggleRefInline(sheetName) {
+  refInlineTeam = (refInlineTeam === sheetName) ? null : sheetName;
+  if (cachedData) {
+    renderRefCards(cachedData.teams);
+    renderRefInlineBoard();
+  }
+}
+
+function renderRefInlineBoard() {
+  const slot = document.getElementById('refBoardSlot');
+  if (!refInlineTeam || !cachedData) { slot.innerHTML = ''; return; }
+  const team = cachedData.teams.find(t => t.sheetName === refInlineTeam);
+  if (!team) { slot.innerHTML = ''; return; }
+
+  // Render into the normal (currently hidden) board container as usual — this
+  // reuses all the existing tile/panel rendering as-is — then clone the result
+  // into the ref view instead of relocating the live node. Inline onclick
+  // attributes (tile modals, etc.) survive cloning since they're plain HTML
+  // attributes, not JS listeners attached separately.
+  renderBoard(team);
+  const liveBoard = document.querySelector('#board-view .board');
+  const clone = liveBoard.cloneNode(true);
+  clone.style.display = 'block';
+  const cloneBackRow = clone.querySelector('#boardBackRow');
+  if (cloneBackRow) cloneBackRow.remove();
+  slot.innerHTML = '';
+  slot.appendChild(clone);
+  slot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 function getHash() { return window.location.hash.replace('#',''); }
 function setHash(h) { window.location.hash = h; }
 
 function showLanding() {
+  hideAllViews();
+  refInlineTeam = null;
+  document.getElementById('refBoardSlot').innerHTML = '';
   setHash('');
   document.getElementById('landing').style.display='block';
-  document.getElementById('board-view').style.display='none';
-  document.getElementById('site-header').style.paddingLeft='20px';
   document.title = 'Spicy Bingo — Eternal Gems';
 }
 
@@ -293,11 +554,27 @@ function showBoard(slug) {
   const team = TEAMS.find(t => t.slug === slug);
   if (!team) return;
   currentTeam = team;
+  hideAllViews();
   setHash(slug);
-  document.getElementById('landing').style.display='none';
   document.getElementById('board-view').style.display='block';
-  document.getElementById('site-header').style.paddingLeft='20px';
   document.title = 'Spicy Bingo — ' + team.name;
+
+  const backLabel = (cameFromRef && isUnlocked('ref')) ? '← Return to Ref View' : '← Return to team boards';
+  document.querySelectorAll('#gateBackRow .back-btn, #boardBackRow .back-btn').forEach(el => el.textContent = backLabel);
+
+  const refBypass = cameFromRef && isUnlocked('ref');
+  if (!isUnlocked(slug) && !refBypass) {
+    document.querySelector('#board-view .board').style.display = 'none';
+    document.getElementById('passwordGate').style.display = 'block';
+    document.getElementById('gateTeamName').textContent = team.name;
+    const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
+    document.getElementById('gateTeamName').style.color = teamColors[team.sheetName] || '#ccc';
+    document.getElementById('gateError').style.display = 'none';
+    document.getElementById('gateInput').value = '';
+    return;
+  }
+  document.getElementById('passwordGate').style.display = 'none';
+  document.querySelector('#board-view .board').style.display = 'block';
   if (cachedData) {
     const td = cachedData.teams.find(t => t.sheetName === team.sheetName);
     if (td) renderBoard(td);
@@ -307,6 +584,7 @@ function showBoard(slug) {
 window.addEventListener('hashchange', () => {
   const h = getHash();
   if (!h) showLanding();
+  else if (h === 'ref') { isUnlocked('ref') ? showRefView() : showRefGate(); }
   else showBoard(h);
 });
 
@@ -349,17 +627,40 @@ async function load() {
         TILE_DATA[Number(k)] = data.tileData[k];
       });
     }
-
-
-    // Sort by total
-    data.teams.sort((a,b) => (b.total||0) - (a.total||0));
-    data.teams.forEach((t,i) => t.rank = i+1);
+    // Alphabetical, NOT by score — card order itself would otherwise leak
+    // the ranking even with point numbers hidden from the card.
+    data.teams.sort((a,b) => a.name.localeCompare(b.name));
 
     renderLanding(data.teams);
+    renderLeaderboard(data.leaderboard);
 
+    // Re-check access every cycle now that fresh password hashes are in hand.
+    // This is what actually makes revocation work: change a password, or let
+    // a session expire, and the very next refresh (≤60s) flips the gate back
+    // on — no manual sign-out step needed anywhere.
     if (currentTeam) {
-      const td = data.teams.find(t => t.sheetName === currentTeam.sheetName);
-      if (td) renderBoard(td);
+      const refBypass = cameFromRef && isUnlocked('ref');
+      if (isUnlocked(currentTeam.slug) || refBypass) {
+        document.getElementById('passwordGate').style.display = 'none';
+        document.querySelector('#board-view .board').style.display = 'block';
+        const td = data.teams.find(t => t.sheetName === currentTeam.sheetName);
+        if (td) renderBoard(td);
+      } else if (document.getElementById('board-view').style.display === 'block') {
+        document.querySelector('#board-view .board').style.display = 'none';
+        document.getElementById('passwordGate').style.display = 'block';
+      }
+    }
+
+    if (document.getElementById('refGate').style.display === 'block' || document.getElementById('refView').style.display === 'block') {
+      if (isUnlocked('ref')) {
+        document.getElementById('refGate').style.display = 'none';
+        document.getElementById('refView').style.display = 'block';
+        renderRefCards(data.teams);
+        renderRefInlineBoard();
+      } else {
+        document.getElementById('refView').style.display = 'none';
+        document.getElementById('refGate').style.display = 'block';
+      }
     }
 
     const lu = document.getElementById('lastUpdated');
@@ -371,58 +672,77 @@ async function load() {
   }
 }
 
+function renderLeaderboard(lb) {
+  const panel = document.getElementById('leaderboardPanel');
+  const reminder = document.getElementById('leaderboardReminder');
+  // Not revealed = zero trace, not a locked teaser. This has to stay a real
+  // option: the whole feature might not be used until the very end, or not
+  // at all, and nothing here should hint that it exists until it's live.
+  if (!lb || !lb.revealed) { panel.innerHTML = ''; reminder.style.display = 'none'; return; }
+  reminder.style.display = 'block';
+
+  const headerHtml = `
+    <div style="position:relative; padding:18px 20px 10px;">
+      <div style="font-family:'Bungee',cursive; font-size:13px; letter-spacing:0.03em; background:linear-gradient(90deg,#1e7a1e,#c47a00 40%,#d44a00 70%,#cc0000); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:3px;">SPICY LEADERBOARD</div>`;
+
+  const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
+  const rows = Object.entries(lb.scores)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name, pts], i) => {
+      const tc = tColors[name] || '#ccc';
+      const shortName = name.replace(/^Team\s+/i, '');
+      return `
+        <div class="lb-row" style="display:flex; align-items:center; gap:14px; padding:14px 18px; border:1.5px solid ${tc}; border-radius:8px; background:linear-gradient(120deg, ${tc}1a 0%, #0a0a0a 60%); margin-bottom:9px; transition:transform 0.15s, box-shadow 0.15s;"
+             onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px ${tc}33';"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+          <div style="font-family:'Bungee',cursive; font-size:16px; color:${tc}; opacity:0.75; width:20px; text-align:center; flex-shrink:0;">${i + 1}</div>
+          <div style="flex:1;">
+            <div style="font-size:9px; color:${tc}; opacity:0.55; letter-spacing:0.12em; font-family:'Bungee',cursive;">TEAM</div>
+            <div style="font-family:'Bungee',cursive; font-size:15px; color:${tc};">${shortName}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Bungee',cursive; font-size:17px; color:#eee;">${pts.toLocaleString()}</div>
+            <div style="font-size:7.5px; color:#666; letter-spacing:0.08em;">TOTAL PTS</div>
+          </div>
+        </div>`;
+    }).join('');
+
+  panel.innerHTML = `
+    <div style="margin-top:60px; max-width:480px; margin-left:auto; margin-right:auto; position:relative; overflow:hidden; border-radius:10px; border:1px solid #1a1a1a; background:#0a0a0a; text-align:center; box-shadow:0 0 44px rgba(220,80,20,0.12), 0 10px 30px rgba(0,0,0,0.5);">
+      ${headerHtml}
+        <div style="font-size:9px; color:#666; letter-spacing:0.03em;">As of ${lb.asOf || ''}</div>
+      </div>
+      <div style="border-top:1px solid #1a1a1a; margin:0 20px;"></div>
+      <div style="position:relative; text-align:left; padding:14px 18px 18px;">${rows}</div>
+    </div>`;
+}
+
 function renderLanding(teams) {
   const cards = document.getElementById('cards');
   cards.innerHTML = '';
-  teams.forEach((team, idx) => {
-    const rc = team.rank <= 3 ? 'r'+team.rank : '';
+  const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
+  const tIcons = {
+    "Team Jalapeño": '<span style="font-size:34px;filter:grayscale(1) sepia(1) hue-rotate(55deg) saturate(3.5) brightness(0.8);">🌶️</span>',
+    "Team Ghost Pepper": '<span style="font-size:34px;">👻</span>',
+    "Team Carolina Reaper": '<span style="font-size:34px;">💀</span>',
+  };
+  teams.forEach((team) => {
     const el = document.createElement('div');
     el.className = 'team-card';
-    el.onclick = () => showBoard(TEAMS.find(t=>t.sheetName===team.sheetName).slug);
-    const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
+    el.onclick = () => { cameFromRef = false; showBoard(TEAMS.find(t=>t.sheetName===team.sheetName).slug); };
     const tColor = tColors[team.sheetName] || '#888';
-    const isFirst = idx === 0;
+    const nameRest = team.name.replace(/^Team\s+/i, '');
     el.style.border = '2px solid ' + tColor;
-    el.style.borderRadius = '6px';
-    el.style.position = 'relative';
+    el.style.borderRadius = '8px';
     el.style.overflow = 'hidden';
-    if (isFirst) {
-      const glowMap = {'#186618':'card-glow-g','#B83D00':'card-glow-o','#A86600':'card-glow-a','#AA0000':'card-glow-r'};
-      el.style.animation = (glowMap[tColor]||'card-glow-g') + ' 3s ease-in-out infinite';
-    }
+    el.style.background = `linear-gradient(160deg, ${tColor}22 0%, #0a0a0a 55%)`;
     el.innerHTML = `
-      <div style="padding:18px 20px 14px;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
-          <div>
-            <div style="color:${tColor};opacity:0.4;font-size:11px;letter-spacing:0.12em;margin-bottom:3px;">#${team.rank}</div>
-            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:16px;letter-spacing:0.04em;">${team.name}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:38px;line-height:1;">${team.total}</div>
-            <div style="color:${tColor};opacity:0.4;font-size:10px;letter-spacing:0.1em;">TOTAL PTS</div>
-          </div>
-        </div>
-        <div style="border-top:1px solid #111;padding-top:10px;display:flex;">
-          <div style="flex:1;text-align:center;border-right:1px solid #111;">
-            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:17px;">${team.tilePeps}</div>
-            <div style="color:${tColor};opacity:0.4;font-size:9px;letter-spacing:0.08em;">TIER PTS</div>
-          </div>
-          <div style="flex:1;text-align:center;">
-            <div style="color:${tColor};font-family:'Bungee',cursive;font-size:17px;">${team.bingoPeps}</div>
-            <div style="color:${tColor};opacity:0.4;font-size:9px;letter-spacing:0.08em;">BINGO PTS</div>
-          </div>
-        </div>
+      <div style="padding:28px 22px 24px;text-align:center;">
+        <div style="margin-bottom:12px;display:flex;justify-content:center;">${tIcons[team.sheetName] || tIcons["Team Jalapeño"]}</div>
+        <div style="color:${tColor};opacity:0.55;font-family:'Bungee',cursive;font-size:11px;letter-spacing:0.15em;margin-bottom:4px;">TEAM</div>
+        <div style="color:${tColor};font-family:'Bungee',cursive;font-size:19px;letter-spacing:0.01em;line-height:1.3;">${nameRest}</div>
       </div>
-      <div style="padding:0 20px 12px;">
-        <div style="height:4px;background:#1a1a1a;border-radius:3px;margin-bottom:4px;overflow:hidden;">
-          <div style="height:100%;width:${Math.round((team.total/2950)*100)}%;background:${(()=>{const p=Math.round((team.total/2950)*100);return p<25?'#186618':p<50?'linear-gradient(90deg,#186618,#8ab800)':p<75?'linear-gradient(90deg,#186618,#8ab800 40%,#c47a00)':'linear-gradient(90deg,#186618,#8ab800 30%,#c47a00 60%,#cc0000)'})()};border-radius:3px;min-width:${team.total>0?2:0}px;"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;">
-          <div style="font-size:8px;color:${tColor};opacity:0.4;">${team.total} pts</div>
-          <div style="font-size:8px;color:${tColor};opacity:0.4;">MAX 2,950</div>
-        </div>
-      </div>
-      <div class="tc-footer" style="padding:9px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:#333;letter-spacing:0.1em;text-transform:uppercase;text-align:center;transition:color 0.15s;">View Board →</div>`;
+      <div class="tc-footer" style="padding:10px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:#333;letter-spacing:0.1em;text-transform:uppercase;text-align:center;transition:color 0.15s;">View Board →</div>`;
     el.addEventListener('mouseover', () => {
       el.style.transform = 'translateY(-3px)';
       el.style.boxShadow = '0 0 18px ' + tColor + '44';
@@ -453,7 +773,7 @@ function renderBoard(team) {
   document.getElementById('mScore').textContent = team.total;
   document.getElementById('mTile').textContent  = team.tilePeps;
   document.getElementById('mBingo').textContent = team.bingoPeps;
-  const boardColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Naga Viper":"#A86600","Team Carolina Reaper":"#AA0000"};
+  const boardColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
   const bNameEl = document.getElementById('bTeamName');
   bNameEl.textContent = team.name;
   const tc = boardColors[team.sheetName] || '#888';
@@ -756,12 +1076,26 @@ document.addEventListener('keydown', e => {
 
 // Init
 const initHash = getHash();
-if (initHash) {
+if (initHash === 'ref') {
+  if (isUnlocked('ref')) {
+    document.getElementById('refView').style.display = 'block';
+  } else {
+    document.getElementById('refGate').style.display = 'block';
+  }
+  document.getElementById('landing').style.display = 'none';
+} else if (initHash) {
   const team = TEAMS.find(t => t.slug === initHash);
   if (team) {
     currentTeam = team;
-    document.getElementById('landing').style.display='none';
-    document.getElementById('board-view').style.display='block';
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('board-view').style.display = 'block';
+    if (!isUnlocked(initHash)) {
+      document.querySelector('#board-view .board').style.display = 'none';
+      document.getElementById('passwordGate').style.display = 'block';
+      document.getElementById('gateTeamName').textContent = team.name;
+      const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
+      document.getElementById('gateTeamName').style.color = teamColors[team.sheetName] || '#ccc';
+    }
   }
 }
 
