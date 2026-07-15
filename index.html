@@ -7,14 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { overflow-y: scroll; }
   body { background: #000; font-family: 'Oswald', sans-serif; padding: 0 20px 30px; }
   #board-view { max-width: 1320px; margin: 0 auto; }
   #site-header { display:flex; flex-direction:column; align-items:center; padding:14px 20px 8px; }
-  .logo-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 32px; }
-  .logo-frame { display: inline-flex; align-items: center; border: 3px solid #ff4500; border-radius: 6px; padding: 8px 28px 10px; position: relative; }
-  .logo-frame::before { content:''; position:absolute; inset:4px; border:1.5px solid #ff4500; border-radius:3px; }
-  .logo-spicy { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #f5b800; letter-spacing:0.04em; margin-right:12px; }
-  .logo-bingo { font-family:'Bungee',cursive; font-size:44px; color:transparent; -webkit-text-stroke:2.5px #ff4500; letter-spacing:0.04em; }
   .subtitle { text-align:center; font-size:12px; letter-spacing:0.2em; color:#444; text-transform:uppercase; margin-bottom:36px; }
   #landing { max-width:900px; margin:0 auto; }
   .standings-title { font-family:'Bungee',cursive; font-size:14px; letter-spacing:0.2em; color:#555; text-align:center; margin-bottom:14px; }
@@ -32,6 +28,8 @@
   .last-updated { text-align:center; font-size:10px; color:#222; letter-spacing:0.06em; margin-top:18px; }
   #board-view { display:none; }
   .back-btn { display:inline-block; margin-bottom:8px; font-size:12px; color:#444; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase; }
+  .nav-pill-btn { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#666; border:1px solid #333; border-radius:5px; padding:7px 14px; cursor:pointer; transition:border-color 0.15s, color 0.15s, background 0.15s; }
+  .nav-pill-btn:hover { border-color:#ff8844; color:#ff8844; background:#ff884411; }
   .back-btn:hover { color:#ff4500; }
   .outer { max-width:1320px; margin:0 auto; display:flex; gap:14px; align-items:stretch; }
   .meter-wrap { width:42px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; justify-content:flex-end; }
@@ -194,17 +192,23 @@
     <div class="tm-body" id="tm-body"></div>
   </div>
 </div>
-<div id="site-header"><div class="logo-frame"><span class="logo-spicy">SPICY</span><span class="logo-bingo">BINGO</span></div><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:10px;">Eternal Gems</div></div>
+<div id="site-header"><img src="logo.png" alt="Spicy Bingo" style="width:100%; max-width:420px; height:auto; display:block; margin:0 auto;"><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:10px;">Eternal Gems</div></div>
 <div id="landing">
   <div style="height:48px;"></div>
-  <div style="display:flex;justify-content:flex-end;max-width:1320px;margin:0 auto 4px;padding:0 20px;">
-    <div onclick="isUnlocked('ref') ? showRefView() : showRefGate();" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#666;border:1px solid #333;border-radius:5px;padding:7px 14px;cursor:pointer;">👁 Ref View</div>
+  <div id="initialLoading" style="text-align:center; padding:100px 20px; color:#555; font-size:13px; letter-spacing:0.15em; text-transform:uppercase;">Loading Event...</div>
+  <div id="landingContent" style="display:none;">
+    <div style="display:flex;justify-content:flex-end;max-width:1320px;margin:0 auto 4px;padding:0 20px;">
+      <div class="nav-pill-btn" onclick="isUnlocked('ref') ? showRefView() : showRefGate();">👁 Ref View</div>
+    </div>
+    <div class="standings-title">TEAM BOARDS</div>
+    <div class="team-cards" id="cards"><div class="loading">Loading scores...</div></div>
+    <div style="display:flex; justify-content:center; margin-top:16px;">
+      <div class="nav-pill-btn" onclick="showExampleBoard()">Preview Example Board</div>
+    </div>
+    <div id="leaderboardPanel"></div>
+    <div id="leaderboardReminder" style="text-align:center; font-size:10.5px; color:#666; margin-top:14px; line-height:1.5; display:none;">Spicy Leaderboard Standings are not live. Updates will be released periodically throughout the event.</div>
+    <div class="last-updated" id="lastUpdated"></div>
   </div>
-  <div class="standings-title">TEAM BOARDS</div>
-  <div class="team-cards" id="cards"><div class="loading">Loading scores...</div></div>
-  <div id="leaderboardPanel"></div>
-  <div id="leaderboardReminder" style="text-align:center; font-size:10.5px; color:#666; margin-top:14px; line-height:1.5; display:none;">Spicy Leaderboard Standings are not live. Updates will be released periodically throughout the event.</div>
-  <div class="last-updated" id="lastUpdated"></div>
 </div>
 
 <div id="board-view">
@@ -216,6 +220,13 @@
       <button onclick="attemptUnlock()" style="width:100%; background:linear-gradient(90deg,#c47a00,#cc0000); border:none; border-radius:6px; padding:12px; color:#fff; font-family:'Bungee',cursive; font-size:13px; letter-spacing:0.05em; cursor:pointer;">UNLOCK BOARD</button>
       <div id="gateError" style="font-size:11px; color:#ff5555; margin-top:12px; display:none;">✕ Incorrect password. Try again.</div>
       <div id="gateBackRow" style="margin-top:18px;"><span class="back-btn" onclick="goBackFromBoard()">← Return to team boards</span></div>
+    </div>
+  </div>
+  <div id="exampleMissing" style="display:none; text-align:center; padding:50px 20px 100px;">
+    <div style="width:380px; max-width:100%; box-sizing:border-box; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:10px; padding:32px 28px; margin:0 auto;">
+      <div style="font-family:'Bungee',cursive; font-size:16px; margin-bottom:8px; color:#888;">Example Board not set up yet</div>
+      <div style="font-size:12px; color:#666; line-height:1.6;">This needs a tab named exactly <b style="color:#999;">"Example Board"</b> in the spreadsheet. Once it's added and the sheet has some data filled in, it'll show up here automatically.</div>
+      <div style="margin-top:18px;"><span class="back-btn" onclick="goBackFromBoard()">← Return to team boards</span></div>
     </div>
   </div>
   <div class="board">
@@ -285,6 +296,9 @@
   <div style="padding:10px 0 6px;"><span class="back-btn" onclick="showLanding()">← Return to team boards</span></div>
   <div class="standings-title">👁 Ref View</div>
   <div class="team-cards" id="refCards"></div>
+  <div style="display:flex; justify-content:center; margin-top:16px;">
+    <div class="nav-pill-btn" onclick="toggleRefInline('__EXAMPLE__')">Preview Example Board</div>
+  </div>
   <div id="refBoardSlot"></div>
 </div>
 
@@ -449,6 +463,7 @@ document.addEventListener('keydown', (e) => {
 function hideAllViews() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('board-view').style.display = 'none';
+  document.getElementById('exampleMissing').style.display = 'none';
   document.getElementById('refGate').style.display = 'none';
   document.getElementById('refView').style.display = 'none';
   document.getElementById('site-header').style.paddingLeft = '20px';
@@ -456,6 +471,7 @@ function hideAllViews() {
 
 function showRefGate() {
   hideAllViews();
+  onExampleBoard = false;
   setHash('ref');
   document.getElementById('refGate').style.display = 'block';
   document.getElementById('refGateError').style.display = 'none';
@@ -465,6 +481,7 @@ function showRefGate() {
 
 function showRefView() {
   hideAllViews();
+  onExampleBoard = false;
   setHash('ref');
   document.getElementById('refView').style.display = 'block';
   document.title = 'Spicy Bingo — Ref View';
@@ -519,8 +536,15 @@ function toggleRefInline(sheetName) {
 function renderRefInlineBoard() {
   const slot = document.getElementById('refBoardSlot');
   if (!refInlineTeam || !cachedData) { slot.innerHTML = ''; return; }
-  const team = cachedData.teams.find(t => t.sheetName === refInlineTeam);
-  if (!team) { slot.innerHTML = ''; return; }
+
+  const isExample = refInlineTeam === '__EXAMPLE__';
+  const team = isExample ? cachedData.exampleBoard : cachedData.teams.find(t => t.sheetName === refInlineTeam);
+  if (!team) {
+    slot.innerHTML = isExample
+      ? `<div style="text-align:center; padding:30px 20px; color:#666; font-size:12px;">Example Board not set up yet — needs a tab named exactly "Example Board".</div>`
+      : '';
+    return;
+  }
 
   // Render into the normal (currently hidden) board container as usual — this
   // reuses all the existing tile/panel rendering as-is — then clone the result
@@ -535,7 +559,7 @@ function renderRefInlineBoard() {
   if (cloneBackRow) cloneBackRow.remove();
   slot.innerHTML = '';
   slot.appendChild(clone);
-  slot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // No auto-scroll here on purpose — it felt jarring when switching boards.
 }
 
 function getHash() { return window.location.hash.replace('#',''); }
@@ -544,19 +568,44 @@ function setHash(h) { window.location.hash = h; }
 function showLanding() {
   hideAllViews();
   refInlineTeam = null;
+  onExampleBoard = false;
   document.getElementById('refBoardSlot').innerHTML = '';
   setHash('');
   document.getElementById('landing').style.display='block';
   document.title = 'Spicy Bingo — Eternal Gems';
 }
 
+let onExampleBoard = false;
+
+function showExampleBoard() {
+  hideAllViews();
+  currentTeam = null;
+  cameFromRef = false;
+  onExampleBoard = true;
+  setHash('example');
+  document.getElementById('board-view').style.display = 'block';
+  document.getElementById('passwordGate').style.display = 'none';
+  document.title = 'Spicy Bingo — Example Board';
+  document.querySelectorAll('#gateBackRow .back-btn, #boardBackRow .back-btn').forEach(el => el.textContent = '← Return to team boards');
+  if (cachedData && cachedData.exampleBoard) {
+    document.getElementById('exampleMissing').style.display = 'none';
+    document.querySelector('#board-view .board').style.display = 'block';
+    renderBoard(cachedData.exampleBoard);
+  } else {
+    document.querySelector('#board-view .board').style.display = 'none';
+    document.getElementById('exampleMissing').style.display = 'block';
+  }
+}
+
 function showBoard(slug) {
   const team = TEAMS.find(t => t.slug === slug);
   if (!team) return;
   currentTeam = team;
+  onExampleBoard = false;
   hideAllViews();
   setHash(slug);
   document.getElementById('board-view').style.display='block';
+  document.getElementById('exampleMissing').style.display = 'none';
   document.title = 'Spicy Bingo — ' + team.name;
 
   const backLabel = (cameFromRef && isUnlocked('ref')) ? '← Return to Ref View' : '← Return to team boards';
@@ -585,6 +634,7 @@ window.addEventListener('hashchange', () => {
   const h = getHash();
   if (!h) showLanding();
   else if (h === 'ref') { isUnlocked('ref') ? showRefView() : showRefGate(); }
+  else if (h === 'example') { showExampleBoard(); }
   else showBoard(h);
 });
 
@@ -633,6 +683,8 @@ async function load() {
 
     renderLanding(data.teams);
     renderLeaderboard(data.leaderboard);
+    document.getElementById('initialLoading').style.display = 'none';
+    document.getElementById('landingContent').style.display = 'block';
 
     // Re-check access every cycle now that fresh password hashes are in hand.
     // This is what actually makes revocation work: change a password, or let
@@ -663,11 +715,29 @@ async function load() {
       }
     }
 
+    if (onExampleBoard) {
+      if (data.exampleBoard) {
+        document.getElementById('exampleMissing').style.display = 'none';
+        document.querySelector('#board-view .board').style.display = 'block';
+        renderBoard(data.exampleBoard);
+      } else {
+        document.querySelector('#board-view .board').style.display = 'none';
+        document.getElementById('exampleMissing').style.display = 'block';
+      }
+    } else {
+      document.getElementById('exampleMissing').style.display = 'none';
+    }
+
     const lu = document.getElementById('lastUpdated');
     if (lu) lu.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
   } catch(e) {
     console.error(e);
-    document.getElementById('cards').innerHTML = '<div class="loading">Failed to load: ' + e.message + '</div>';
+    const landingVisible = document.getElementById('landingContent').style.display !== 'none';
+    if (landingVisible) {
+      document.getElementById('cards').innerHTML = '<div class="loading">Failed to load: ' + e.message + '</div>';
+    } else {
+      document.getElementById('initialLoading').textContent = 'Having trouble loading — retrying...';
+    }
     setTimeout(load, 15000);
   }
 }
@@ -1083,6 +1153,11 @@ if (initHash === 'ref') {
     document.getElementById('refGate').style.display = 'block';
   }
   document.getElementById('landing').style.display = 'none';
+} else if (initHash === 'example') {
+  onExampleBoard = true;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('board-view').style.display = 'block';
+  document.querySelector('#board-view .board').style.display = 'block';
 } else if (initHash) {
   const team = TEAMS.find(t => t.slug === initHash);
   if (team) {
