@@ -839,7 +839,10 @@ function tierNum(s) {
   if (s==='T2') return 2; if (s==='T1') return 1; return 0;
 }
 
+let displayedTeamData = null;
+
 function renderBoard(team) {
+  displayedTeamData = team;
   document.getElementById('mFill').style.height = Math.min(100,(team.total/MAX)*100)+'%';
   document.getElementById('mScore').textContent = team.total;
   document.getElementById('mTile').textContent  = team.tilePeps;
@@ -1077,12 +1080,9 @@ function openModal(tileNum, tileName) {
 
   // Tier 4 Completion — with status badges
   let reqDone = false, caDone = false;
-  if (cachedData && currentTeam) {
-    const td = cachedData.teams.find(t => t.sheetName === currentTeam.sheetName);
-    if (td) {
-      const tl = (td.tiles||[]).find(t => t.num == tileNum);
-      if (tl) { reqDone = !!tl.reqDone; caDone = !!tl.caDone; }
-    }
+  if (displayedTeamData) {
+    const tl = (displayedTeamData.tiles||[]).find(t => t.num == tileNum);
+    if (tl) { reqDone = !!tl.reqDone; caDone = !!tl.caDone; }
   }
   const mkBadge = (done) => done
     ? '<div style="position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:3px;background:#0a1a0a;border:1px solid #18661844;border-radius:3px;padding:2px 5px;"><span style="color:#186618;font-size:10px;">&#10003;</span><span style="font-size:8px;color:#186618;letter-spacing:0.06em;">Complete</span></div>'
