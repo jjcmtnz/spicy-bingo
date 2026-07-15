@@ -969,44 +969,7 @@ const TILE_DATA = {
 };
 
 
-// Tooltip logic
-const tooltip = document.getElementById('tile-tooltip');
-let tooltipVisible = false;
 
-function showTooltip(e, tileNum, tileName) {
-  const data = TILE_DATA[tileNum];
-  if (!data) return;
-  let html = `<div class="tt-title">${tileName}</div>`;
-  html += `<div class="tt-section">Qualifying Drops</div>`;
-  data.items.forEach(item => { html += `<div class="tt-item">• ${item}</div>`; });
-  if (data.req) { html += `<div class="tt-section">T4 Drop Req</div><div class="tt-req">✦ ${data.req}</div>`; }
-  if (data.ca)  { html += `<div class="tt-section">T4 CA</div><div class="tt-ca">✦ ${data.ca}${data.caNotes ? ' — ' + data.caNotes : ''}</div>`; }
-  tooltip.innerHTML = html;
-  positionTooltip(e);
-  tooltip.classList.add('visible');
-  tooltipVisible = true;
-}
-
-function positionTooltip(e) {
-  const x = e.clientX + 14;
-  const y = e.clientY + 14;
-  const tw = tooltip.offsetWidth || 280;
-  const th = tooltip.offsetHeight || 200;
-  tooltip.style.left = (x + tw > window.innerWidth ? x - tw - 28 : x) + 'px';
-  tooltip.style.top  = (y + th > window.innerHeight ? y - th - 28 : y) + 'px';
-}
-
-function hideTooltip() {
-  tooltip.classList.remove('visible');
-  tooltipVisible = false;
-}
-
-document.addEventListener('mousemove', e => {
-  if (tooltipVisible) positionTooltip(e);
-});
-document.addEventListener('click', e => {
-  if (!e.target.closest('.tile')) hideTooltip();
-});
 
 
 // Tile modal
