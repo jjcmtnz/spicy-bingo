@@ -123,6 +123,7 @@
   .ltot { font-size:9px; color:#555; }
   .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
+  @media(max-width:600px){ .ref-corner-btn { position:static !important; display:flex; justify-content:flex-end; padding:0 20px; margin:10px 0 0; } }
 
   /* Mobile/tablet: hover doesn't exist, so simplify badges to dots and truncate long tile names */
   @media(max-width:768px){
@@ -192,12 +193,12 @@
     <div class="tm-body" id="tm-body"></div>
   </div>
 </div>
-<div id="site-header"><img src="logo.png" alt="Spicy Bingo" style="width:100%; max-width:420px; height:auto; display:block; margin:0 auto;"><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:10px;">Eternal Gems</div></div>
+<div id="site-header"><img src="logo.png" alt="Spicy Bingo" style="width:100%; max-width:420px; height:auto; display:block; margin:0 auto;"><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:0px;">Eternal Gems</div></div>
 <div id="landing">
   <div style="height:20px;"></div>
   <div id="initialLoading" style="text-align:center; padding:100px 20px; color:#555; font-size:13px; letter-spacing:0.15em; text-transform:uppercase;">Loading Event...</div>
   <div id="landingContent" style="display:none;">
-    <div style="display:flex;justify-content:flex-end;max-width:1320px;margin:0 auto 4px;padding:0 20px;">
+    <div class="ref-corner-btn" style="position:fixed; top:16px; right:16px; z-index:50;">
       <div class="nav-pill-btn" onclick="isUnlocked('ref') ? showRefView() : showRefGate();">👁 Ref View</div>
     </div>
     <div class="standings-title">TEAM BOARDS</div>
