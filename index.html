@@ -747,7 +747,7 @@ async function load() {
     } else {
       document.getElementById('initialLoading').textContent = 'Having trouble loading — retrying...';
     }
-    setTimeout(load, 15000);
+    setTimeout(load, 15000 + Math.random() * 15000); // 15-30s, randomized so retries spread out instead of everyone hitting the server at the exact same moment
   }
 }
 
@@ -1153,7 +1153,13 @@ if (initHash === 'ref') {
 }
 
 load();
-setInterval(load, 60000);
+function scheduleNextPoll() {
+  // 50-70s, randomized each cycle so 70 people's browsers don't all hit the
+  // server in the exact same instant every time — this is what actually
+  // clears a pile-up instead of recreating it every cycle.
+  setTimeout(async () => { await load(); scheduleNextPoll(); }, 50000 + Math.random() * 20000);
+}
+scheduleNextPoll();
 </script>
 </body>
 </html>
