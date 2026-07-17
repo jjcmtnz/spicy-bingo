@@ -126,7 +126,10 @@
   .ltot { font-size:9px; color:#555; }
   .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} }
-  @media(max-width:600px){ .ref-corner-btn { position:static !important; display:flex; justify-content:flex-end; padding:0 20px; margin:10px 0 0; } }
+  @media(max-width:600px){
+    #landingContent { display:flex !important; flex-direction:column; }
+    .ref-corner-btn { position:static !important; order:99; display:flex; justify-content:center; padding:0 20px; margin:24px 0 0; }
+  }
 
   /* Mobile/tablet: hover doesn't exist, so simplify badges to dots and truncate long tile names */
   @media(max-width:768px){
