@@ -553,11 +553,6 @@ function renderRefInlineBoard() {
     return;
   }
 
-  // Render into the normal (currently hidden) board container as usual — this
-  // reuses all the existing tile/panel rendering as-is — then clone the result
-  // into the ref view instead of relocating the live node. Inline onclick
-  // attributes (tile modals, etc.) survive cloning since they're plain HTML
-  // attributes, not JS listeners attached separately.
   renderBoard(team);
   const liveBoard = document.querySelector('#board-view .board');
   const clone = liveBoard.cloneNode(true);
@@ -566,7 +561,6 @@ function renderRefInlineBoard() {
   if (cloneBackRow) cloneBackRow.remove();
   slot.innerHTML = '';
   slot.appendChild(clone);
-  // No auto-scroll here on purpose — it felt jarring when switching boards.
 }
 
 function getHash() { return window.location.hash.replace('#',''); }
@@ -650,7 +644,6 @@ window.addEventListener('hashchange', () => {
   else showBoard(h);
 });
 
-// JSONP fetch
 function fetchData(attempt) {
   attempt = attempt || 1;
   return new Promise((resolve, reject) => {
@@ -689,8 +682,6 @@ async function load() {
         TILE_DATA[Number(k)] = data.tileData[k];
       });
     }
-    // Alphabetical, NOT by score — card order itself would otherwise leak
-    // the ranking even with point numbers hidden from the card.
     data.teams.sort((a,b) => a.name.localeCompare(b.name));
 
     renderLanding(data.teams);
@@ -698,10 +689,6 @@ async function load() {
     document.getElementById('initialLoading').style.display = 'none';
     document.getElementById('landingContent').style.display = 'block';
 
-    // Re-check access every cycle now that fresh password hashes are in hand.
-    // This is what actually makes revocation work: change a password, or let
-    // a session expire, and the very next refresh (≤60s) flips the gate back
-    // on — no manual sign-out step needed anywhere.
     if (currentTeam) {
       const refBypass = cameFromRef && isUnlocked('ref');
       if (isUnlocked(currentTeam.slug) || refBypass) {
@@ -757,9 +744,6 @@ async function load() {
 function renderLeaderboard(lb) {
   const panel = document.getElementById('leaderboardPanel');
   const reminder = document.getElementById('leaderboardReminder');
-  // Not revealed = zero trace, not a locked teaser. This has to stay a real
-  // option: the whole feature might not be used until the very end, or not
-  // at all, and nothing here should hint that it exists until it's live.
   if (!lb || !lb.revealed) { panel.innerHTML = ''; reminder.style.display = 'none'; return; }
   reminder.style.display = 'block';
 
@@ -867,7 +851,6 @@ function renderBoard(team) {
   const bTotalEl = document.getElementById('bTotal');
   const bTotalLbl = document.getElementById('bTotalLbl');
 
-  // Update logo row border color to match team
   const logoRow = document.querySelector('.logo-row');
   if (logoRow) { logoRow.style.borderBottom = 'none'; }
   document.getElementById('bTotal').textContent = team.total;
@@ -879,7 +862,6 @@ function renderBoard(team) {
     'linear-gradient(90deg,#186618,#8ab800 30%,#c47a00 60%,#cc0000)';
   document.getElementById('bProgressFill').style.background = grad;
   document.getElementById('bTile').textContent  = team.tilePeps;
-  // colors set via HTML
   document.getElementById('bBingo').textContent = team.bingoPeps;
 
   const bTileLbl = document.getElementById('bTileLbl');
@@ -975,7 +957,6 @@ const TILE_DATA = {
 
 
 
-// Tile modal
 
 const TILE_ROW_COLORS = {
   1:'#AA0000',2:'#AA0000',3:'#AA0000',4:'#AA0000',5:'#AA0000',
@@ -1021,7 +1002,6 @@ function openModal(tileNum, tileName) {
   tmTitle.style.color = '';
   const thEl = document.getElementById('tm-thresholds');
   if (thEl) thEl.innerHTML = '';
-  // Build threshold HTML for drops needed box
   let threshHtml = '';
   if (threshStr) {
     const parts = threshStr.split('·').map(s => s.trim());
@@ -1036,7 +1016,6 @@ function openModal(tileNum, tileName) {
   }
   let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
 
-  // Drops Needed — red label
   html += '<div>';
   html += '<div style="font-size:11px;font-weight:700;color:#AA0000;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Drops Needed</div>';
   html += threshHtml;
@@ -1044,7 +1023,6 @@ function openModal(tileNum, tileName) {
 
   html += '<div style="border-top:1px solid #1a1a1a;"></div>';
 
-  // Tile Info — orange label (only if notes exist)
   if (data.notes) {
     html += '<div>';
     html += '<div style="font-size:11px;font-weight:700;color:#B83D00;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Tile Info</div>';
@@ -1053,7 +1031,6 @@ function openModal(tileNum, tileName) {
     html += '<div style="border-top:1px solid #1a1a1a;"></div>';
   }
 
-  // Tier 4 Completion — with status badges
   let reqDone = false, caDone = false;
   if (displayedTeamData) {
     const tl = (displayedTeamData.tiles||[]).find(t => t.num == tileNum);
@@ -1097,7 +1074,6 @@ function openModal(tileNum, tileName) {
 
   html += '<div style="border-top:1px solid #1a1a1a;"></div>';
 
-  // Valid Drops — green label
   html += '<div>';
   html += '<div style="font-size:11px;font-weight:700;color:#186618;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Valid Drops</div>';
   html += '<div style="font-size:13px;color:#aaa;line-height:1.9;">';
@@ -1120,7 +1096,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.getElementById('tile-modal-overlay').classList.remove('visible');
 });
 
-// Init
 const initHash = getHash();
 if (initHash === 'ref') {
   if (isUnlocked('ref')) {
@@ -1157,9 +1132,6 @@ if (initHash === 'ref') {
 
 load();
 function scheduleNextPoll() {
-  // 50-70s, randomized each cycle so 70 people's browsers don't all hit the
-  // server in the exact same instant every time — this is what actually
-  // clears a pile-up instead of recreating it every cycle.
   setTimeout(async () => { await load(); scheduleNextPoll(); }, 50000 + Math.random() * 20000);
 }
 scheduleNextPoll();
