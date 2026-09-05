@@ -340,9 +340,17 @@ function goBackFromBoard() {
   }
 }
 
-async function sha256(text) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+const PBKDF2_ITERATIONS = 300000;
+
+async function deriveHash(text, saltKey) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(text), 'PBKDF2', false, ['deriveBits']);
+  const salt = enc.encode('spicybingo-' + saltKey);
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+    keyMaterial, 256
+  );
+  return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 const UNLOCK_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -410,7 +418,7 @@ async function attemptUnlock() {
     return;
   }
   const expected = cachedData.passwords[currentTeam.sheetName];
-  const hash = await sha256(input.value);
+  const hash = await deriveHash(input.value, currentTeam.slug);
   if (expected && hash === expected) {
     recordSuccess(currentTeam.slug);
     unlock(currentTeam.slug, hash);
@@ -443,7 +451,7 @@ async function attemptRefUnlock() {
     return;
   }
   const expected = cachedData.passwords['REF'];
-  const hash = await sha256(input.value);
+  const hash = await deriveHash(input.value, 'ref');
   if (expected && hash === expected) {
     recordSuccess('ref');
     unlock('ref', hash);
