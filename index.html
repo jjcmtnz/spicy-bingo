@@ -624,7 +624,7 @@ function showBoard(slug) {
   if (!isUnlocked(slug) && !refBypass) {
     document.querySelector('#board-view .board').style.display = 'none';
     document.getElementById('passwordGate').style.display = 'block';
-    document.getElementById('gateTeamName').innerHTML = `<div style="margin-bottom:6px;">${getTeamIcon(team.sheetName, 30)}</div>${team.name}`;
+    document.getElementById('gateTeamName').innerHTML = team.name;
     const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
     const tColor = teamColors[team.sheetName] || '#B83D00';
     document.getElementById('gateTeamName').style.color = tColor;
@@ -789,14 +789,6 @@ function renderLeaderboard(lb) {
     </div>`;
 }
 
-function getTeamIcon(sheetName, size) {
-  size = size || 34;
-  if (sheetName === "Team Jalapeño") return `<span style="font-size:${size}px;filter:grayscale(1) sepia(1) hue-rotate(55deg) saturate(3.5) brightness(0.8);">🌶️</span>`;
-  if (sheetName === "Team Ghost Pepper") return `<span style="font-size:${size}px;">👻</span>`;
-  if (sheetName === "Team Carolina Reaper") return `<span style="font-size:${size}px;">💀</span>`;
-  return `<span style="font-size:${size}px;">🌶️</span>`;
-}
-
 function renderLanding(teams) {
   const cards = document.getElementById('cards');
   cards.innerHTML = '';
@@ -813,7 +805,6 @@ function renderLanding(teams) {
     el.style.background = `linear-gradient(160deg, ${tColor}22 0%, #0a0a0a 55%)`;
     el.innerHTML = `
       <div style="padding:28px 22px 24px;text-align:center;">
-        <div style="margin-bottom:12px;display:flex;justify-content:center;">${getTeamIcon(team.sheetName, 34)}</div>
         <div style="color:${tColor};opacity:0.55;font-family:'Bungee',cursive;font-size:11px;letter-spacing:0.15em;margin-bottom:4px;">TEAM</div>
         <div style="color:${tColor};font-family:'Bungee',cursive;font-size:19px;letter-spacing:0.01em;line-height:1.3;">${nameRest}</div>
       </div>
@@ -853,7 +844,7 @@ function renderBoard(team) {
   document.getElementById('mBingo').textContent = team.bingoPeps;
   const boardColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
   const bNameEl = document.getElementById('bTeamName');
-  bNameEl.innerHTML = `<span style="vertical-align:middle; margin-right:8px;">${getTeamIcon(team.sheetName, 24)}</span><span style="vertical-align:middle;">${team.name}</span>`;
+  bNameEl.innerHTML = team.name;
   const tc = boardColors[team.sheetName] || '#888';
   bNameEl.style.color = tc;
   const bTotalEl = document.getElementById('bTotal');
@@ -1126,7 +1117,7 @@ if (initHash === 'ref') {
     if (!isUnlocked(initHash)) {
       document.querySelector('#board-view .board').style.display = 'none';
       document.getElementById('passwordGate').style.display = 'block';
-      document.getElementById('gateTeamName').innerHTML = `<div style="margin-bottom:6px;">${getTeamIcon(team.sheetName, 30)}</div>${team.name}`;
+      document.getElementById('gateTeamName').innerHTML = team.name;
       const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
       const tColor = teamColors[team.sheetName] || '#B83D00';
       document.getElementById('gateTeamName').style.color = tColor;
