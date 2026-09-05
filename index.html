@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spicy Bingo — Eternal Gems</title>
+<title>Spicy Bingo</title>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -199,7 +199,7 @@
     <div class="tm-body" id="tm-body"></div>
   </div>
 </div>
-<div id="site-header"><img src="logo.png" alt="Spicy Bingo" style="width:100%; max-width:420px; height:auto; display:block; margin:0 auto;"><div style="color:#444;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;text-align:center;margin-top:0px;">Eternal Gems</div></div>
+<div id="site-header"><img src="logo.png" alt="Spicy Bingo" style="width:100%; max-width:420px; height:auto; display:block; margin:0 auto;"></div>
 <div id="landing">
   <div style="height:20px;"></div>
   <div id="initialLoading" style="text-align:center; padding:100px 20px; color:#555; font-size:13px; letter-spacing:0.15em; text-transform:uppercase;">Loading Event...</div>
@@ -573,7 +573,7 @@ function showLanding() {
   document.getElementById('refBoardSlot').innerHTML = '';
   setHash('');
   document.getElementById('landing').style.display='block';
-  document.title = 'Spicy Bingo — Eternal Gems';
+  document.title = 'Spicy Bingo';
 }
 
 let onExampleBoard = false;
@@ -772,7 +772,7 @@ function renderLeaderboard(lb) {
     }).join('');
 
   panel.innerHTML = `
-    <div style="margin-top:60px; max-width:480px; margin-left:auto; margin-right:auto; position:relative; overflow:hidden; border-radius:10px; border:1px solid #1a1a1a; background:#0a0a0a; text-align:center; box-shadow:0 0 44px rgba(220,80,20,0.12), 0 10px 30px rgba(0,0,0,0.5);">
+    <div style="margin-top:60px; max-width:480px; margin-left:auto; margin-right:auto; position:relative; overflow:hidden; border-radius:10px; border:1px solid #1a1a1a; background:#0a0a0a; text-align:center; box-shadow:0 0 16px rgba(220,80,20,0.10), 0 6px 16px rgba(0,0,0,0.4);">
       ${headerHtml}
         <div style="font-size:9px; color:#666; letter-spacing:0.03em;">As of ${lb.asOf || ''}</div>
       </div>
