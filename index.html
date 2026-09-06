@@ -996,28 +996,51 @@ function openModal(tileNum, tileName) {
       if (tile && tile.thresholds) threshStr = tile.thresholds;
     });
   }
+  let currentDrops = null, currentTierNum = 0;
+  if (displayedTeamData) {
+    const tlForDrops = (displayedTeamData.tiles||[]).find(t => t.num == tileNum);
+    if (tlForDrops) {
+      currentDrops = tlForDrops.drops || 0;
+      currentTierNum = {'T1':1,'T2':2,'T3':3,'T4':4}[tlForDrops.tier] || 0;
+    }
+  }
   const tmTitle = document.getElementById('tm-title');
   tmTitle.textContent = tileName;
   tmTitle.style.color = '';
   const thEl = document.getElementById('tm-thresholds');
   if (thEl) thEl.innerHTML = '';
   let threshHtml = '';
+  let progressCaption = '';
   if (threshStr) {
     const parts = threshStr.split('·').map(s => s.trim());
     const labels = ['T1','T2','T3','T4'];
     const colors = ['#186618','#A86600','#B83D00','#AA0000'];
     threshHtml = '<div style="display:flex;gap:6px;">' +
-      parts.map((v,i) => '<div style="flex:1;background:#0a0a0a;border:1px solid ' + colors[i] + '55;border-radius:4px;padding:8px 6px;text-align:center;">' +
-        '<div style="color:' + colors[i] + ';font-family:Bungee,cursive;font-size:11px;">' + labels[i] + '</div>' +
-        '<div style="color:#ddd;font-size:20px;font-weight:700;line-height:1.2;">' + v + '</div>' +
-        '<div style="color:#444;font-size:8px;letter-spacing:0.06em;">DROPS</div>' +
-        '</div>').join('') + '</div>';
+      parts.map((v,i) => {
+        const target = parseInt(v) || 0;
+        const reached = currentDrops !== null && (i < 3 ? currentDrops >= target : currentTierNum >= 4);
+        const bg = reached ? colors[i] + '1a' : '#0a0a0a';
+        const border = reached ? '1.5px solid ' + colors[i] : '1px solid ' + colors[i] + '55';
+        const labelColor = reached ? colors[i] : colors[i];
+        const dropsColor = reached ? '#fff' : '#ddd';
+        const subColor = reached ? colors[i] : '#444';
+        return '<div style="flex:1;background:' + bg + ';border:' + border + ';border-radius:4px;padding:8px 6px;text-align:center;">' +
+          '<div style="color:' + labelColor + ';font-family:Bungee,cursive;font-size:11px;">' + labels[i] + '</div>' +
+          '<div style="color:' + dropsColor + ';font-size:20px;font-weight:700;line-height:1.2;">' + v + '</div>' +
+          '<div style="color:' + subColor + ';font-size:8px;letter-spacing:0.06em;">DROPS</div>' +
+          '</div>';
+      }).join('') + '</div>';
+    if (currentDrops !== null) {
+      const t4Target = parseInt(parts[3]) || 0;
+      progressCaption = '<div style="text-align:center; font-size:11px; color:#888; margin-top:9px; font-family:Bungee,cursive;">' + currentDrops + '<span style="color:#444;">/' + t4Target + ' drops</span></div>';
+    }
   }
   let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
 
   html += '<div>';
   html += '<div style="font-size:11px;font-weight:700;color:#AA0000;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Drops Needed</div>';
   html += threshHtml;
+  html += progressCaption;
   html += '</div>';
 
   html += '<div style="border-top:1px solid #1a1a1a;"></div>';
