@@ -1117,6 +1117,7 @@ function openModal(tileNum, tileName) {
     const itemData = itemCounts[item.toLowerCase()];
     const count = itemData ? itemData.total : 0;
     const got = count > 0;
+    const hasPlayers = got && itemData.players && Object.keys(itemData.players).length > 0;
     const rowId = 'drop-row-' + tileNum + '-' + idx;
     const dotColor = got ? '#186618' : '#2a2a2a';
     const dotBorder = got ? 'none' : '1px solid #3a3a3a';
@@ -1125,17 +1126,22 @@ function openModal(tileNum, tileName) {
     const countHtml = got
       ? '<span style="font-family:Bungee,cursive;font-size:11px;color:#186618;background:#0a1a0a;border:1px solid #18661855;border-radius:10px;padding:2px 9px;display:inline-flex;align-items:center;gap:5px;">×' + count + ' <span id="' + rowId + '-chevron" style="font-size:8px;">▾</span></span>'
       : '<span style="font-family:Bungee,cursive;font-size:11px;color:#333;">—</span>';
-    const clickAttr = got ? ' onclick="toggleDropExpand(\'' + rowId + '\')" style="cursor:pointer;"' : '';
-    html += '<div' + clickAttr + '><div style="font-size:13px;color:' + textColor + ';padding:6px 0;border-bottom:1px solid #151515;display:flex;align-items:center;justify-content:space-between;">' +
+    const clickAttr = hasPlayers ? ' onclick="toggleDropExpand(\'' + rowId + '\')" style="cursor:pointer;"' : '';
+    const rowBorder = hasPlayers ? 'none' : '1px solid #151515';
+    html += '<div' + clickAttr + '><div style="font-size:13px;color:' + textColor + ';padding:6px 0;border-bottom:' + rowBorder + ';display:flex;align-items:center;justify-content:space-between;">' +
       '<span style="display:flex;align-items:center;"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:8px;background:' + dotColor + ';border:' + dotBorder + ';' + dotShadow + '"></span>' + item + '</span>' +
       countHtml +
       '</div>';
-    if (got && itemData.players) {
-      html += '<div id="' + rowId + '" style="display:none;padding:2px 0 10px 16px;">';
+    if (hasPlayers) {
+      html += '<div id="' + rowId + '" style="display:none;">';
+      html += '<div style="position:relative; margin:2px 0 0; padding:4px 0 4px 20px;">';
+      html += '<div style="position:absolute; left:8px; top:0; bottom:0; width:1px; background:#186618aa;"></div>';
       Object.keys(itemData.players).forEach(playerName => {
         const pCount = itemData.players[playerName];
-        html += '<div style="font-size:12px;color:#aaa;padding:4px 0;">' + playerName + ' <span style="color:#186618;font-family:Bungee,cursive;font-size:10px;margin-left:4px;">×' + pCount + '</span></div>';
+        html += '<div style="font-size:12px;color:#ccc;padding:3px 0;">' + playerName + ' <span style="color:#3ecf3e;font-family:Bungee,cursive;font-size:10px;">×' + pCount + '</span></div>';
       });
+      html += '</div>';
+      html += '<div style="border-top:1px solid #151515; margin-top:8px;"></div>';
       html += '</div>';
     }
     html += '</div>';
