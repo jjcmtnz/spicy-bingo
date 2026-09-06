@@ -964,6 +964,15 @@ const TILE_ROW_COLORS = {
   16:'#759900',17:'#759900',18:'#759900',19:'#759900',20:'#759900',
   21:'#186618',22:'#186618',23:'#186618',24:'#186618',25:'#186618',
 };
+function toggleDropExpand(rowId) {
+  const panel = document.getElementById(rowId);
+  const chevron = document.getElementById(rowId + '-chevron');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (chevron) chevron.style.transform = isOpen ? 'none' : 'rotate(180deg)';
+}
+
 function toggleLine(el, tiles) {
   const front = el.querySelector('.lc-front');
   const back = el.querySelector('.lc-back');
@@ -1104,20 +1113,32 @@ function openModal(tileNum, tileName) {
     const tlForItems = (displayedTeamData.tiles||[]).find(t => t.num == tileNum);
     if (tlForItems && tlForItems.itemCounts) itemCounts = tlForItems.itemCounts;
   }
-  data.items.forEach(item => {
-    const count = itemCounts[item.toLowerCase()] || 0;
+  data.items.forEach((item, idx) => {
+    const itemData = itemCounts[item.toLowerCase()];
+    const count = itemData ? itemData.total : 0;
     const got = count > 0;
+    const rowId = 'drop-row-' + tileNum + '-' + idx;
     const dotColor = got ? '#186618' : '#2a2a2a';
     const dotBorder = got ? 'none' : '1px solid #3a3a3a';
     const dotShadow = got ? 'box-shadow:0 0 6px #18661888;' : '';
     const textColor = got ? '#ddd' : '#999';
     const countHtml = got
-      ? '<span style="font-family:Bungee,cursive;font-size:11px;color:#186618;background:#0a1a0a;border:1px solid #18661855;border-radius:10px;padding:2px 9px;">×' + count + '</span>'
+      ? '<span style="font-family:Bungee,cursive;font-size:11px;color:#186618;background:#0a1a0a;border:1px solid #18661855;border-radius:10px;padding:2px 9px;display:inline-flex;align-items:center;gap:5px;">×' + count + ' <span id="' + rowId + '-chevron" style="font-size:8px;">▾</span></span>'
       : '<span style="font-family:Bungee,cursive;font-size:11px;color:#333;">—</span>';
-    html += '<div style="font-size:13px;color:' + textColor + ';padding:6px 0;border-bottom:1px solid #151515;display:flex;align-items:center;justify-content:space-between;">' +
+    const clickAttr = got ? ' onclick="toggleDropExpand(\'' + rowId + '\')" style="cursor:pointer;"' : '';
+    html += '<div' + clickAttr + '><div style="font-size:13px;color:' + textColor + ';padding:6px 0;border-bottom:1px solid #151515;display:flex;align-items:center;justify-content:space-between;">' +
       '<span style="display:flex;align-items:center;"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:8px;background:' + dotColor + ';border:' + dotBorder + ';' + dotShadow + '"></span>' + item + '</span>' +
       countHtml +
       '</div>';
+    if (got && itemData.players) {
+      html += '<div id="' + rowId + '" style="display:none;padding:2px 0 10px 16px;">';
+      Object.keys(itemData.players).forEach(playerName => {
+        const pCount = itemData.players[playerName];
+        html += '<div style="font-size:12px;color:#aaa;padding:4px 0;">' + playerName + ' <span style="color:#186618;font-family:Bungee,cursive;font-size:10px;margin-left:4px;">×' + pCount + '</span></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
   });
   html += '</div>';
   html += '</div>';
