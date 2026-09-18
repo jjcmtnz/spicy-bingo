@@ -1080,7 +1080,7 @@ function openModal(tileNum, tileName) {
   html += data.req ? mkBadge(reqDone) : '';
   html += '<div style="font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:5px;">Drop Requirement</div>';
   if (data.req) {
-    html += '<div style="font-size:12px;color:#ddd;padding-right:72px;">' + data.req + '</div>';
+    html += '<div style="font-size:12px;color:#ddd;padding-right:72px;">' + data.req.replace(/\n/g,'<br>') + '</div>';
     html += '<div style="margin-top:auto;padding-top:8px;font-size:10px;color:#A8660099;">This condition can be met at any time.</div>';
   } else {
     html += '<div style="font-size:13px;color:#ddd;">None</div>';
