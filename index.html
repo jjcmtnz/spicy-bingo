@@ -131,15 +131,8 @@
     #landingContent { display:flex !important; flex-direction:column; }
     .ref-corner-btn { position:static !important; order:99; display:flex; justify-content:center; padding:0 20px; margin:24px 0 0; }
   }
-  /* Higher-specificity override for the mobile !important rule above.
-     JS uses this class (not inline style) to hide landingContent during
-     the brief window before data loads on routes that need #landing
-     visible but not its content — a bare inline display:none silently
-     loses to the mobile !important rule otherwise. Verified against a
-     real browser engine on both desktop and mobile viewports. */
   #landingContent.js-force-hidden { display:none !important; }
 
-  /* Mobile/tablet: hover doesn't exist, so simplify badges to dots and truncate long tile names */
   @media(max-width:768px){
     .grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; }
     .tile { padding:7px 5px 6px; min-width:0; }
@@ -161,7 +154,6 @@
     .lc:nth-last-child(-n+2){ border-bottom:none; }
   }
 
-  /* Tile hover + modal */
   .tile { cursor:pointer; transition: filter 0.15s, transform 0.15s; display:flex; flex-direction:column; }
   .tile:hover { filter:brightness(1.3); transform:translateY(-2px); }
 
@@ -375,7 +367,7 @@ async function deriveHash(text, saltKey) {
   return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-const UNLOCK_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+const UNLOCK_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
 function getExpectedHash(key) {
   if (!cachedData || !cachedData.passwords) return null;
@@ -386,13 +378,13 @@ function getExpectedHash(key) {
 
 function isUnlocked(key) {
   const expected = getExpectedHash(key);
-  if (!expected) return false; // can't validate before password data has loaded
+  if (!expected) return false;
   try {
     const raw = localStorage.getItem('spicybingo_unlock_' + key);
     if (!raw) return false;
     const data = JSON.parse(raw);
-    if (data.hash !== expected) return false; // password changed since — revoked
-    if (Date.now() - data.ts > UNLOCK_EXPIRY_MS) return false; // session expired
+    if (data.hash !== expected) return false;
+    if (Date.now() - data.ts > UNLOCK_EXPIRY_MS) return false;
     return true;
   } catch (e) { return false; }
 }
@@ -707,8 +699,6 @@ async function load() {
   try {
     const data = await fetchData();
     cachedData = data;
-    // Clear any "retrying..." message left over from a prior failed attempt
-    // now that we actually have fresh data.
     const gs = document.getElementById('gateLoadStatus');
     if (gs) gs.style.display = 'none';
     const rgs = document.getElementById('refGateLoadStatus');
@@ -737,12 +727,6 @@ async function load() {
         const td = data.teams.find(t => t.sheetName === currentTeam.sheetName);
         if (td) renderBoard(td);
       } else {
-        // Not actually unlocked — could be a wrong/expired session, a
-        // rotated password, or simply that the init-time localStorage
-        // guess said "probably unlocked" but the real check here says
-        // otherwise. Always show the gate rather than relying on
-        // board-view's prior display state, which may never have been
-        // set to 'block' if the init guess skipped that step.
         document.getElementById('landing').style.display = 'none';
         document.getElementById('board-view').style.display = 'block';
         document.querySelector('#board-view .board').style.display = 'none';
@@ -796,9 +780,6 @@ async function load() {
     } else {
       document.getElementById('initialLoading').textContent = 'Having trouble loading — retrying...';
     }
-    // initialLoading can be hidden behind a password gate shown immediately
-    // (locked team page, locked ref page) — give the retry message a
-    // visible home there too, so it's never silently invisible.
     const gateStatus = document.getElementById('gateLoadStatus');
     if (gateStatus && document.getElementById('passwordGate').style.display === 'block') {
       gateStatus.textContent = 'Having trouble loading — retrying...';
@@ -809,7 +790,7 @@ async function load() {
       refGateStatus.textContent = 'Having trouble loading — retrying...';
       refGateStatus.style.display = 'block';
     }
-    setTimeout(load, 15000 + Math.random() * 15000); // 15-30s, randomized so retries spread out instead of everyone hitting the server at the exact same moment
+    setTimeout(load, 15000 + Math.random() * 15000);
   }
 }
 
@@ -1291,53 +1272,24 @@ document.addEventListener('keydown', e => {
 
 const initHash = getHash();
 if (initHash === 'ref') {
-  // Same reasoning as the team route below: isUnlocked() can't validate
-  // against cachedData.passwords yet (load() hasn't run), so this is only
-  // a best-guess for which placeholder to show first. The real check at
-  // load() time (further down) is untouched and still decides what
-  // actually renders.
   let hasSavedRefUnlock = false;
   try { hasSavedRefUnlock = !!localStorage.getItem('spicybingo_unlock_ref'); } catch (e) {}
   if (!hasSavedRefUnlock) {
-    // Gate needs no live data — safe to show immediately.
     document.getElementById('refGate').style.display = 'block';
     document.getElementById('landing').style.display = 'none';
   } else {
-    // Guessed already unlocked — refView's team cards need real data
-    // (renderRefCards runs in load()), so keep #landing (and its
-    // "Loading Event..." pulse) visible instead of showing an empty
-    // refView grid. load() reveals the real refView once data.teams
-    // is ready — see the getHash()==='ref' check below, which doesn't
-    // depend on refGate/refView's prior display state.
     document.getElementById('landingContent').classList.add('js-force-hidden');
   }
 } else if (initHash === 'example') {
   onExampleBoard = true;
-  // Keep #landing visible so #initialLoading (its child) still shows the
-  // "Loading Event..." pulse, but hide landingContent so the team cards/
-  // leaderboard/challenges don't flash before data arrives either.
-  // Uses a class (not inline style) because a bare inline display:none
-  // silently loses to a mobile-only !important CSS rule on landingContent —
-  // verified empirically, see the CSS comment near .js-force-hidden.
   document.getElementById('landingContent').classList.add('js-force-hidden');
-  // Don't reveal the board shell yet — it's still hardcoded zeros until
-  // load() actually finishes and calls showExampleBoard(), which checks
-  // cachedData.exampleBoard before rendering.
 } else if (initHash) {
   const team = TEAMS.find(t => t.slug === initHash);
   if (team) {
     currentTeam = team;
-    // isUnlocked() needs cachedData.passwords to validate a saved hash,
-    // which doesn't exist yet at this point (load() hasn't run). So this
-    // is only a best-guess for which loading state to show — a raw
-    // localStorage presence check, not real verification. The actual
-    // authoritative isUnlocked() check still happens in load() below
-    // once real password data exists, and that's what decides what
-    // actually renders — this only picks the placeholder shown first.
     let hasSavedUnlock = false;
     try { hasSavedUnlock = !!localStorage.getItem('spicybingo_unlock_' + initHash); } catch (e) {}
     if (!hasSavedUnlock) {
-      // Gate needs no live data — safe to show immediately.
       document.getElementById('landing').style.display = 'none';
       document.getElementById('board-view').style.display = 'block';
       document.querySelector('#board-view .board').style.display = 'none';
@@ -1351,10 +1303,6 @@ if (initHash === 'ref') {
       gateBtn.style.borderColor = tColor;
       gateBtn.style.setProperty('--glow-color', tColor + '88');
     } else {
-      // Already unlocked — the board itself needs real data, so keep
-      // #landing (and its "Loading Event..." pulse) visible instead of
-      // revealing the zeroed board shell. load() reveals the real board
-      // once data.teams actually has this team's numbers.
       document.getElementById('landingContent').classList.add('js-force-hidden');
     }
   }
