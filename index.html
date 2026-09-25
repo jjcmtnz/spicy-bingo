@@ -742,7 +742,8 @@ async function load() {
       }
     }
 
-    if (document.getElementById('refGate').style.display === 'block' || document.getElementById('refView').style.display === 'block') {
+    if (getHash() === 'ref') {
+      document.getElementById('landing').style.display = 'none';
       if (isUnlocked('ref')) {
         document.getElementById('refGate').style.display = 'none';
         document.getElementById('refView').style.display = 'block';
@@ -1268,12 +1269,19 @@ if (initHash === 'ref') {
   // actually renders.
   let hasSavedRefUnlock = false;
   try { hasSavedRefUnlock = !!localStorage.getItem('spicybingo_unlock_ref'); } catch (e) {}
-  if (hasSavedRefUnlock) {
-    document.getElementById('refView').style.display = 'block';
-  } else {
+  if (!hasSavedRefUnlock) {
+    // Gate needs no live data — safe to show immediately.
     document.getElementById('refGate').style.display = 'block';
+    document.getElementById('landing').style.display = 'none';
+  } else {
+    // Guessed already unlocked — refView's team cards need real data
+    // (renderRefCards runs in load()), so keep #landing (and its
+    // "Loading Event..." pulse) visible instead of showing an empty
+    // refView grid. load() reveals the real refView once data.teams
+    // is ready — see the getHash()==='ref' check below, which doesn't
+    // depend on refGate/refView's prior display state.
+    document.getElementById('landingContent').style.display = 'none';
   }
-  document.getElementById('landing').style.display = 'none';
 } else if (initHash === 'example') {
   onExampleBoard = true;
   // Keep #landing visible so #initialLoading (its child) still shows the
