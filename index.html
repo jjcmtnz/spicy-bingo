@@ -737,6 +737,7 @@ async function load() {
     }
 
     if (onExampleBoard) {
+      document.getElementById('board-view').style.display = 'block';
       if (data.exampleBoard) {
         document.getElementById('exampleMissing').style.display = 'none';
         document.querySelector('#board-view .board').style.display = 'block';
@@ -1250,8 +1251,10 @@ if (initHash === 'ref') {
 } else if (initHash === 'example') {
   onExampleBoard = true;
   document.getElementById('landing').style.display = 'none';
-  document.getElementById('board-view').style.display = 'block';
-  document.querySelector('#board-view .board').style.display = 'block';
+  // Don't reveal the board shell yet — it's still hardcoded zeros until
+  // load() actually finishes and calls showExampleBoard(), which checks
+  // cachedData.exampleBoard before rendering. initialLoading stays visible
+  // in the meantime, same as a normal landing-page load.
 } else if (initHash) {
   const team = TEAMS.find(t => t.slug === initHash);
   if (team) {
