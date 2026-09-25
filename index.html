@@ -131,6 +131,13 @@
     #landingContent { display:flex !important; flex-direction:column; }
     .ref-corner-btn { position:static !important; order:99; display:flex; justify-content:center; padding:0 20px; margin:24px 0 0; }
   }
+  /* Higher-specificity override for the mobile !important rule above.
+     JS uses this class (not inline style) to hide landingContent during
+     the brief window before data loads on routes that need #landing
+     visible but not its content — a bare inline display:none silently
+     loses to the mobile !important rule otherwise. Verified against a
+     real browser engine on both desktop and mobile viewports. */
+  #landingContent.js-force-hidden { display:none !important; }
 
   /* Mobile/tablet: hover doesn't exist, so simplify badges to dots and truncate long tile names */
   @media(max-width:768px){
@@ -239,6 +246,7 @@
       <input id="gateInput" type="password" placeholder="TEAM PASSWORD" style="width:100%; box-sizing:border-box; background:#111; border:1px solid #2a2a2a; border-radius:6px; padding:12px 14px; color:#ddd; font-size:14px; letter-spacing:0.1em; text-align:center; margin-bottom:14px; font-family:sans-serif;">
       <button id="gateSubmitBtn" onclick="attemptUnlock()" class="gate-submit-btn">UNLOCK BOARD</button>
       <div id="gateError" style="font-size:11px; color:#ff5555; margin-top:12px; display:none;">✕ Incorrect password. Try again.</div>
+      <div id="gateLoadStatus" style="font-size:10px; color:#555; letter-spacing:0.05em; margin-top:12px; display:none; animation:loading-pulse 1.4s ease-in-out infinite;"></div>
       <div id="gateBackRow" style="margin-top:18px;"><span class="back-btn" onclick="goBackFromBoard()">← Return to team boards</span></div>
     </div>
   </div>
@@ -308,6 +316,7 @@
     <input id="refGateInput" type="password" placeholder="REF PASSWORD" style="width:100%; box-sizing:border-box; background:#111; border:1px solid #2a2a2a; border-radius:6px; padding:12px 14px; color:#ddd; font-size:14px; letter-spacing:0.1em; text-align:center; margin-bottom:14px; font-family:sans-serif;">
     <button onclick="attemptRefUnlock()" class="gate-submit-btn" style="background:#B83D00; border-color:#d44a00; --glow-color:#d44a0077;">ENTER</button>
     <div id="refGateError" style="font-size:11px; color:#ff5555; margin-top:12px; display:none;">✕ Incorrect password. Try again.</div>
+    <div id="refGateLoadStatus" style="font-size:10px; color:#555; letter-spacing:0.05em; margin-top:12px; display:none; animation:loading-pulse 1.4s ease-in-out infinite;"></div>
     <div style="margin-top:18px;"><span class="back-btn" onclick="showLanding()">← Return to team boards</span></div>
   </div>
 </div>
@@ -698,6 +707,12 @@ async function load() {
   try {
     const data = await fetchData();
     cachedData = data;
+    // Clear any "retrying..." message left over from a prior failed attempt
+    // now that we actually have fresh data.
+    const gs = document.getElementById('gateLoadStatus');
+    if (gs) gs.style.display = 'none';
+    const rgs = document.getElementById('refGateLoadStatus');
+    if (rgs) rgs.style.display = 'none';
     if (data.tileData) {
       Object.keys(data.tileData).forEach(k => {
         TILE_DATA[Number(k)] = data.tileData[k];
@@ -709,6 +724,7 @@ async function load() {
     renderLeaderboard(data.leaderboard);
     renderChallenges(data.challenges);
     document.getElementById('initialLoading').style.display = 'none';
+    document.getElementById('landingContent').classList.remove('js-force-hidden');
     document.getElementById('landingContent').style.display = 'block';
 
     if (currentTeam) {
@@ -779,6 +795,19 @@ async function load() {
       document.getElementById('cards').innerHTML = '<div class="loading">Failed to load: ' + e.message + '</div>';
     } else {
       document.getElementById('initialLoading').textContent = 'Having trouble loading — retrying...';
+    }
+    // initialLoading can be hidden behind a password gate shown immediately
+    // (locked team page, locked ref page) — give the retry message a
+    // visible home there too, so it's never silently invisible.
+    const gateStatus = document.getElementById('gateLoadStatus');
+    if (gateStatus && document.getElementById('passwordGate').style.display === 'block') {
+      gateStatus.textContent = 'Having trouble loading — retrying...';
+      gateStatus.style.display = 'block';
+    }
+    const refGateStatus = document.getElementById('refGateLoadStatus');
+    if (refGateStatus && document.getElementById('refGate').style.display === 'block') {
+      refGateStatus.textContent = 'Having trouble loading — retrying...';
+      refGateStatus.style.display = 'block';
     }
     setTimeout(load, 15000 + Math.random() * 15000); // 15-30s, randomized so retries spread out instead of everyone hitting the server at the exact same moment
   }
@@ -1280,14 +1309,17 @@ if (initHash === 'ref') {
     // refView grid. load() reveals the real refView once data.teams
     // is ready — see the getHash()==='ref' check below, which doesn't
     // depend on refGate/refView's prior display state.
-    document.getElementById('landingContent').style.display = 'none';
+    document.getElementById('landingContent').classList.add('js-force-hidden');
   }
 } else if (initHash === 'example') {
   onExampleBoard = true;
   // Keep #landing visible so #initialLoading (its child) still shows the
   // "Loading Event..." pulse, but hide landingContent so the team cards/
   // leaderboard/challenges don't flash before data arrives either.
-  document.getElementById('landingContent').style.display = 'none';
+  // Uses a class (not inline style) because a bare inline display:none
+  // silently loses to a mobile-only !important CSS rule on landingContent —
+  // verified empirically, see the CSS comment near .js-force-hidden.
+  document.getElementById('landingContent').classList.add('js-force-hidden');
   // Don't reveal the board shell yet — it's still hardcoded zeros until
   // load() actually finishes and calls showExampleBoard(), which checks
   // cachedData.exampleBoard before rendering.
@@ -1323,7 +1355,7 @@ if (initHash === 'ref') {
       // #landing (and its "Loading Event..." pulse) visible instead of
       // revealing the zeroed board shell. load() reveals the real board
       // once data.teams actually has this team's numbers.
-      document.getElementById('landingContent').style.display = 'none';
+      document.getElementById('landingContent').classList.add('js-force-hidden');
     }
   }
 }
