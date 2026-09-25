@@ -714,13 +714,31 @@ async function load() {
     if (currentTeam) {
       const refBypass = cameFromRef && isUnlocked('ref');
       if (isUnlocked(currentTeam.slug) || refBypass) {
+        document.getElementById('landing').style.display = 'none';
+        document.getElementById('board-view').style.display = 'block';
         document.getElementById('passwordGate').style.display = 'none';
         document.querySelector('#board-view .board').style.display = 'block';
         const td = data.teams.find(t => t.sheetName === currentTeam.sheetName);
         if (td) renderBoard(td);
-      } else if (document.getElementById('board-view').style.display === 'block') {
+      } else {
+        // Not actually unlocked — could be a wrong/expired session, a
+        // rotated password, or simply that the init-time localStorage
+        // guess said "probably unlocked" but the real check here says
+        // otherwise. Always show the gate rather than relying on
+        // board-view's prior display state, which may never have been
+        // set to 'block' if the init guess skipped that step.
+        document.getElementById('landing').style.display = 'none';
+        document.getElementById('board-view').style.display = 'block';
         document.querySelector('#board-view .board').style.display = 'none';
         document.getElementById('passwordGate').style.display = 'block';
+        document.getElementById('gateTeamName').innerHTML = currentTeam.name;
+        const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
+        const tColor = teamColors[currentTeam.sheetName] || '#B83D00';
+        document.getElementById('gateTeamName').style.color = tColor;
+        const gateBtn = document.getElementById('gateSubmitBtn');
+        gateBtn.style.background = tColor;
+        gateBtn.style.borderColor = tColor;
+        gateBtn.style.setProperty('--glow-color', tColor + '88');
       }
     }
 
@@ -737,6 +755,7 @@ async function load() {
     }
 
     if (onExampleBoard) {
+      document.getElementById('landing').style.display = 'none';
       document.getElementById('board-view').style.display = 'block';
       if (data.exampleBoard) {
         document.getElementById('exampleMissing').style.display = 'none';
@@ -1242,7 +1261,14 @@ document.addEventListener('keydown', e => {
 
 const initHash = getHash();
 if (initHash === 'ref') {
-  if (isUnlocked('ref')) {
+  // Same reasoning as the team route below: isUnlocked() can't validate
+  // against cachedData.passwords yet (load() hasn't run), so this is only
+  // a best-guess for which placeholder to show first. The real check at
+  // load() time (further down) is untouched and still decides what
+  // actually renders.
+  let hasSavedRefUnlock = false;
+  try { hasSavedRefUnlock = !!localStorage.getItem('spicybingo_unlock_ref'); } catch (e) {}
+  if (hasSavedRefUnlock) {
     document.getElementById('refView').style.display = 'block';
   } else {
     document.getElementById('refGate').style.display = 'block';
@@ -1250,18 +1276,30 @@ if (initHash === 'ref') {
   document.getElementById('landing').style.display = 'none';
 } else if (initHash === 'example') {
   onExampleBoard = true;
-  document.getElementById('landing').style.display = 'none';
+  // Keep #landing visible so #initialLoading (its child) still shows the
+  // "Loading Event..." pulse, but hide landingContent so the team cards/
+  // leaderboard/challenges don't flash before data arrives either.
+  document.getElementById('landingContent').style.display = 'none';
   // Don't reveal the board shell yet — it's still hardcoded zeros until
   // load() actually finishes and calls showExampleBoard(), which checks
-  // cachedData.exampleBoard before rendering. initialLoading stays visible
-  // in the meantime, same as a normal landing-page load.
+  // cachedData.exampleBoard before rendering.
 } else if (initHash) {
   const team = TEAMS.find(t => t.slug === initHash);
   if (team) {
     currentTeam = team;
-    document.getElementById('landing').style.display = 'none';
-    document.getElementById('board-view').style.display = 'block';
-    if (!isUnlocked(initHash)) {
+    // isUnlocked() needs cachedData.passwords to validate a saved hash,
+    // which doesn't exist yet at this point (load() hasn't run). So this
+    // is only a best-guess for which loading state to show — a raw
+    // localStorage presence check, not real verification. The actual
+    // authoritative isUnlocked() check still happens in load() below
+    // once real password data exists, and that's what decides what
+    // actually renders — this only picks the placeholder shown first.
+    let hasSavedUnlock = false;
+    try { hasSavedUnlock = !!localStorage.getItem('spicybingo_unlock_' + initHash); } catch (e) {}
+    if (!hasSavedUnlock) {
+      // Gate needs no live data — safe to show immediately.
+      document.getElementById('landing').style.display = 'none';
+      document.getElementById('board-view').style.display = 'block';
       document.querySelector('#board-view .board').style.display = 'none';
       document.getElementById('passwordGate').style.display = 'block';
       document.getElementById('gateTeamName').innerHTML = team.name;
@@ -1272,6 +1310,12 @@ if (initHash === 'ref') {
       gateBtn.style.background = tColor;
       gateBtn.style.borderColor = tColor;
       gateBtn.style.setProperty('--glow-color', tColor + '88');
+    } else {
+      // Already unlocked — the board itself needs real data, so keep
+      // #landing (and its "Loading Event..." pulse) visible instead of
+      // revealing the zeroed board shell. load() reveals the real board
+      // once data.teams actually has this team's numbers.
+      document.getElementById('landingContent').style.display = 'none';
     }
   }
 }
