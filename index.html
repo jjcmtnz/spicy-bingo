@@ -124,7 +124,8 @@
   .lc.bt1 .ln{color:#1e7a1e;} .lc.bt2 .ln{color:#c47a00;} .lc.bt3 .ln{color:#d44a00;} .lc.bt4 .ln{color:#cc0000;}
   .lb { font-family:'Bungee',cursive; font-size:13px; }
   .ltot { font-size:9px; color:#555; }
-  .loading { color:#333; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; }
+  @keyframes loading-pulse { 0%,100% { opacity:0.35; } 50% { opacity:0.9; } }
+  .loading { color:#555; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; animation:loading-pulse 1.4s ease-in-out infinite; }
   @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} #challengeCards{grid-template-columns:1fr !important;} }
   @media(max-width:600px){
     #landingContent { display:flex !important; flex-direction:column; }
@@ -208,7 +209,7 @@
 <div id="site-header"><img src="logo.png" alt="Spicy Bingo" style="width:100%; max-width:420px; height:auto; display:block; margin:0 auto;"></div>
 <div id="landing">
   <div style="height:20px;"></div>
-  <div id="initialLoading" style="text-align:center; padding:100px 20px; color:#555; font-size:13px; letter-spacing:0.15em; text-transform:uppercase;">Loading Event...</div>
+  <div id="initialLoading" style="text-align:center; padding:100px 20px; color:#555; font-size:13px; letter-spacing:0.15em; text-transform:uppercase; animation:loading-pulse 1.4s ease-in-out infinite;">Loading Event...</div>
   <div id="landingContent" style="display:none;">
     <div class="ref-corner-btn" style="position:fixed; top:16px; right:16px; z-index:50;">
       <div class="nav-pill-btn" onclick="isUnlocked('ref') ? showRefView() : showRefGate();">👁 Ref View</div>
@@ -897,7 +898,14 @@ let displayedTeamData = null;
 function renderBoard(team) {
   displayedTeamData = team;
   document.getElementById('mFill').style.height = Math.min(100,(team.total/MAX)*100)+'%';
-  document.getElementById('mScore').textContent = team.total;
+  const mScoreEl = document.getElementById('mScore');
+  if (mScoreEl.textContent !== String(team.total)) {
+    mScoreEl.style.transition = 'opacity 0.25s';
+    mScoreEl.style.opacity = '0';
+    setTimeout(() => { mScoreEl.textContent = team.total; mScoreEl.style.opacity = '1'; }, 250);
+  } else {
+    mScoreEl.textContent = team.total;
+  }
   document.getElementById('mTile').textContent  = team.tilePeps;
   document.getElementById('mBingo').textContent = team.bingoPeps;
   const boardColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
@@ -910,7 +918,16 @@ function renderBoard(team) {
 
   const logoRow = document.querySelector('.logo-row');
   if (logoRow) { logoRow.style.borderBottom = 'none'; }
-  document.getElementById('bTotal').textContent = team.total;
+  if (bTotalEl.textContent !== String(team.total)) {
+    bTotalEl.style.transition = 'opacity 0.25s';
+    bTotalEl.style.opacity = '0';
+    setTimeout(() => {
+      bTotalEl.textContent = team.total;
+      bTotalEl.style.opacity = '1';
+    }, 250);
+  } else {
+    bTotalEl.textContent = team.total;
+  }
   const pct = Math.round((team.total/2950)*100);
   document.getElementById('bProgressFill').style.width = pct + '%';
   const grad = pct < 25 ? '#186618' :
