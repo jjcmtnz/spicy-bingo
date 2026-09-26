@@ -541,23 +541,30 @@ function renderRefCards(teams) {
     el.style.borderRadius = '8px';
     el.style.overflow = 'hidden';
     el.style.flex = `0 1 ${cardBasis}`;
-    el.style.minWidth = '180px';
+    el.style.minWidth = '190px';
     el.onclick = () => toggleRefInline(team.sheetName);
     el.innerHTML = `
-      <div style="padding:18px 20px 14px;">
-        <div style="font-size:10px;color:${tColor};opacity:0.6;margin-bottom:4px;">#${i+1}</div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div class="tc-name" style="font-family:'Bungee',cursive;font-size:16px;color:${tColor};">${team.name}</div>
-          <div style="text-align:right;"><div style="font-family:'Bungee',cursive;font-size:22px;color:${tColor};">${team.total||0}</div><div style="font-size:8px;color:#555;">TOTAL PTS</div></div>
-        </div>
-        <div style="display:flex;gap:20px;margin-top:10px;font-size:11px;">
-          <div><b style="color:${tColor};">${team.tilePeps||0}</b> <span style="color:#555;">TIER PTS</span></div>
-          <div><b style="color:${tColor};">${team.bingoPeps||0}</b> <span style="color:#555;">BINGO PTS</span></div>
-        </div>
-        <div style="height:5px;background:#1a1a1a;border-radius:3px;margin-top:10px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#1e7a1e,#c47a00,#d44a00);"></div>
+      <div style="padding:16px;display:flex;gap:12px;align-items:center;">
+        <div style="font-family:'Bungee',cursive;font-size:32px;color:${tColor};opacity:0.35;flex-shrink:0;">${i+1}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div class="tc-name" style="font-family:'Bungee',cursive;font-size:14px;color:${tColor};">${team.name}</div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-family:'Bungee',cursive;font-size:22px;color:${tColor};line-height:1.1;">${team.total||0}</div>
+              <div style="font-size:7.5px;color:#666;letter-spacing:0.05em;margin-top:2px;">TOTAL PTS</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;font-size:9px;color:#555;margin-top:2px;">
+            <span><b style="color:${tColor};">${team.tilePeps||0}</b> TIER</span>
+            <span><b style="color:${tColor};">${team.bingoPeps||0}</b> BINGO</span>
+            <span><b style="color:${tColor};">${team.t4Complete||0}</b> TILES</span>
+          </div>
         </div>
       </div>
+      <div style="height:5px;background:#1a1a1a;border-radius:3px;margin:0 16px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#1e7a1e,#c47a00,#d44a00);"></div>
+      </div>
+      <div style="height:8px;"></div>
       <div class="tc-footer" style="padding:9px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:${isOpen ? tColor : '#333'};letter-spacing:0.1em;text-transform:uppercase;text-align:center;">${isOpen ? '▲ Hide Board' : 'View Board →'}</div>`;
     wrap.appendChild(el);
   });
