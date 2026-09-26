@@ -528,6 +528,9 @@ function renderRefCards(teams) {
   const wrap = document.getElementById('refCards');
   wrap.innerHTML = '';
   const sorted = [...teams].sort((a, b) => (b.total || 0) - (a.total || 0));
+  const count = sorted.length;
+  const basisByCount = { 1: '100%', 2: '48%', 3: '31%', 4: '48%', 5: '31%' };
+  const cardBasis = basisByCount[count] || '31%';
   sorted.forEach((team, i) => {
     const pct = Math.min(100, Math.round(((team.total || 0) / MAX) * 100));
     const tColor = getTeamColor(team.sheetName);
@@ -537,6 +540,8 @@ function renderRefCards(teams) {
     el.style.border = (isOpen ? '3px solid ' : '2px solid ') + tColor;
     el.style.borderRadius = '8px';
     el.style.overflow = 'hidden';
+    el.style.flex = `0 1 ${cardBasis}`;
+    el.style.minWidth = '180px';
     el.onclick = () => toggleRefInline(team.sheetName);
     el.innerHTML = `
       <div style="padding:18px 20px 14px;">
