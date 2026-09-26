@@ -210,7 +210,7 @@
   <div style="height:20px;"></div>
   <div id="initialLoading" style="text-align:center; padding:100px 20px; color:#555; font-size:13px; letter-spacing:0.15em; text-transform:uppercase; animation:loading-pulse 1.4s ease-in-out infinite;">Loading Event...</div>
   <div id="landingContent" style="display:none;">
-    <div class="ref-corner-btn" style="position:fixed; top:16px; right:16px; z-index:50;">
+    <div class="ref-corner-btn" style="display:flex; justify-content:flex-end; padding:0 4px 12px;">
       <div class="nav-pill-btn" onclick="isUnlocked('ref') ? showRefView() : showRefGate();">👁 Ref View</div>
     </div>
     <div class="standings-title" style="background:linear-gradient(90deg,#e0a020,#ff8800); -webkit-background-clip:text; background-clip:text; color:transparent;">TEAM BOARDS</div>
@@ -537,7 +537,8 @@ function renderRefCards(teams) {
     const isOpen = refInlineTeam === team.sheetName;
     const el = document.createElement('div');
     el.className = 'team-card';
-    el.style.border = (isOpen ? '3px solid ' : '2px solid ') + tColor;
+    el.style.border = '2px solid ' + tColor;
+    el.style.boxShadow = isOpen ? ('0 0 0 1px ' + tColor + ', 0 0 12px ' + tColor + '55') : 'none';
     el.style.borderRadius = '8px';
     el.style.overflow = 'hidden';
     el.style.flex = `0 1 ${cardBasis}`;
@@ -565,7 +566,13 @@ function renderRefCards(teams) {
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#1e7a1e,#c47a00,#d44a00);"></div>
       </div>
       <div style="height:8px;"></div>
-      <div class="tc-footer" style="padding:9px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:${isOpen ? tColor : '#333'};letter-spacing:0.1em;text-transform:uppercase;text-align:center;">${isOpen ? '▲ Hide Board' : 'View Board →'}</div>`;
+      <div class="tc-footer" style="padding:9px 20px;background:#111;border-top:1px solid #1a1a1a;font-size:10px;color:${isOpen ? tColor : '#333'};letter-spacing:0.1em;text-transform:uppercase;text-align:center;transition:color 0.15s;">${isOpen ? '▲ Hide Board' : 'View Board →'}</div>`;
+    el.addEventListener('mouseover', () => {
+      el.querySelector('.tc-footer').style.color = tColor;
+    });
+    el.addEventListener('mouseout', () => {
+      el.querySelector('.tc-footer').style.color = isOpen ? tColor : '#333';
+    });
     wrap.appendChild(el);
   });
 }
