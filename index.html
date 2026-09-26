@@ -14,7 +14,7 @@
   .subtitle { text-align:center; font-size:12px; letter-spacing:0.2em; color:#444; text-transform:uppercase; margin-bottom:36px; }
   #landing { max-width:900px; margin:0 auto; }
   .standings-title { font-family:'Bungee',cursive; font-size:14px; letter-spacing:0.2em; color:#555; text-align:center; margin-bottom:14px; }
-  .team-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .team-cards { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; }
   .team-card { background:#0a0a0a; border:1px solid #1a1a1a; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform 0.15s, border-color 0.15s; border-left-width:4px; }
   .team-card:hover { transform:translateY(-2px); border-color:#333; }
   .tc-header { padding:16px 18px 14px; display:flex; align-items:center; justify-content:space-between; }
@@ -126,7 +126,7 @@
   .ltot { font-size:9px; color:#555; }
   @keyframes loading-pulse { 0%,100% { opacity:0.35; } 50% { opacity:0.9; } }
   .loading { color:#555; font-size:13px; letter-spacing:0.1em; padding:60px; text-align:center; text-transform:uppercase; animation:loading-pulse 1.4s ease-in-out infinite; }
-  @media(max-width:600px){ .team-cards{grid-template-columns:1fr;} #challengeCards{grid-template-columns:1fr !important;} }
+  @media(max-width:600px){ .team-cards .team-card{flex-basis:100% !important;} #challengeCards{grid-template-columns:1fr !important;} }
   @media(max-width:600px){
     #landingContent { display:flex !important; flex-direction:column; }
     .ref-corner-btn { position:static !important; order:99; display:flex; justify-content:center; padding:0 20px; margin:24px 0 0; }
@@ -336,11 +336,16 @@ const BINGO_LINES = [
   {n:"Diagonal \u2198",t:"1, 7, 13, 19, 25"},{n:"Diagonal \u2197",t:"5, 9, 13, 17, 21"},
 ];
 const BONUS=[0,15,30,60,120], CUMUL=[0,15,45,105,225];
-const TEAMS = [
-  {name:"Team Jalapeño",   slug:"jalapeno",    sheetName:"Team Jalapeño"},
-  {name:"Team Ghost Pepper",   slug:"ghost",     sheetName:"Team Ghost Pepper"},
-  {name:"Team Carolina Reaper",slug:"carolina",  sheetName:"Team Carolina Reaper"},
-];
+let TEAMS = [];
+try {
+  const cachedTeams = localStorage.getItem('spicybingo_teams_cache');
+  if (cachedTeams) TEAMS = JSON.parse(cachedTeams);
+} catch (e) {}
+
+function getTeamColor(sheetName) {
+  const t = TEAMS.find(t => t.sheetName === sheetName);
+  return (t && t.color) ? t.color : '#B83D00';
+}
 
 let cachedData = null;
 let currentTeam = null;
@@ -522,11 +527,10 @@ let refInlineTeam = null;
 function renderRefCards(teams) {
   const wrap = document.getElementById('refCards');
   wrap.innerHTML = '';
-  const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
   const sorted = [...teams].sort((a, b) => (b.total || 0) - (a.total || 0));
   sorted.forEach((team, i) => {
     const pct = Math.min(100, Math.round(((team.total || 0) / MAX) * 100));
-    const tColor = tColors[team.sheetName] || '#888';
+    const tColor = getTeamColor(team.sheetName);
     const isOpen = refInlineTeam === team.sheetName;
     const el = document.createElement('div');
     el.className = 'team-card';
@@ -639,8 +643,7 @@ function showBoard(slug) {
     document.querySelector('#board-view .board').style.display = 'none';
     document.getElementById('passwordGate').style.display = 'block';
     document.getElementById('gateTeamName').innerHTML = team.name;
-    const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
-    const tColor = teamColors[team.sheetName] || '#B83D00';
+    const tColor = getTeamColor(team.sheetName);
     document.getElementById('gateTeamName').style.color = tColor;
     const gateBtn = document.getElementById('gateSubmitBtn');
     gateBtn.style.background = tColor;
@@ -699,6 +702,19 @@ async function load() {
   try {
     const data = await fetchData();
     cachedData = data;
+    if (data.teamConfig) {
+      TEAMS = data.teamConfig;
+      try { localStorage.setItem('spicybingo_teams_cache', JSON.stringify(TEAMS)); } catch (e) {}
+      const h = getHash();
+      const matched = TEAMS.find(t => t.slug === h);
+      if (matched) {
+        currentTeam = matched;
+      } else if (h && h !== 'ref' && h !== 'example') {
+        currentTeam = null;
+        onExampleBoard = false;
+        showLanding();
+      }
+    }
     const gs = document.getElementById('gateLoadStatus');
     if (gs) gs.style.display = 'none';
     const rgs = document.getElementById('refGateLoadStatus');
@@ -732,8 +748,7 @@ async function load() {
         document.querySelector('#board-view .board').style.display = 'none';
         document.getElementById('passwordGate').style.display = 'block';
         document.getElementById('gateTeamName').innerHTML = currentTeam.name;
-        const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
-        const tColor = teamColors[currentTeam.sheetName] || '#B83D00';
+        const tColor = getTeamColor(currentTeam.sheetName);
         document.getElementById('gateTeamName').style.color = tColor;
         const gateBtn = document.getElementById('gateSubmitBtn');
         gateBtn.style.background = tColor;
@@ -804,11 +819,10 @@ function renderLeaderboard(lb) {
     <div style="position:relative; padding:18px 20px 10px;">
       <div style="font-family:'Bungee',cursive; font-size:13px; letter-spacing:0.03em; background:linear-gradient(90deg,#1e7a1e,#c47a00 40%,#d44a00 70%,#cc0000); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:3px;">SPICY LEADERBOARD</div>`;
 
-  const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
   const rows = Object.entries(lb.scores)
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([name, pts], i) => {
-      const tc = tColors[name] || '#ccc';
+      const tc = getTeamColor(name);
       const shortName = name.replace(/^Team\s+/i, '');
       return `
         <div style="display:flex; align-items:center; gap:14px; padding:14px 18px; border:1.5px solid ${tc}; border-radius:8px; background:linear-gradient(120deg, ${tc}1a 0%, #0a0a0a 60%); margin-bottom:9px;">
@@ -882,16 +896,20 @@ function renderChallenges(challenges) {
 function renderLanding(teams) {
   const cards = document.getElementById('cards');
   cards.innerHTML = '';
-  const tColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
+  const count = teams.length;
+  const basisByCount = { 1: '100%', 2: '48%', 3: '31%', 4: '48%', 5: '31%' };
+  const cardBasis = basisByCount[count] || '31%';
   teams.forEach((team) => {
     const el = document.createElement('div');
     el.className = 'team-card';
     el.onclick = () => { cameFromRef = false; showBoard(TEAMS.find(t=>t.sheetName===team.sheetName).slug); };
-    const tColor = tColors[team.sheetName] || '#888';
+    const tColor = getTeamColor(team.sheetName);
     const nameRest = team.name.replace(/^Team\s+/i, '');
     el.style.border = '2px solid ' + tColor;
     el.style.borderRadius = '8px';
     el.style.overflow = 'hidden';
+    el.style.flex = `0 1 ${cardBasis}`;
+    el.style.minWidth = '180px';
     el.style.background = `linear-gradient(160deg, ${tColor}22 0%, #0a0a0a 55%)`;
     el.innerHTML = `
       <div style="padding:28px 22px 24px;text-align:center;">
@@ -932,10 +950,9 @@ function renderBoard(team) {
   document.getElementById('mScore').textContent = team.total;
   document.getElementById('mTile').textContent  = team.tilePeps;
   document.getElementById('mBingo').textContent = team.bingoPeps;
-  const boardColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
   const bNameEl = document.getElementById('bTeamName');
   bNameEl.innerHTML = team.name;
-  const tc = boardColors[team.sheetName] || '#888';
+  const tc = getTeamColor(team.sheetName);
   bNameEl.style.color = tc;
   const logoRow = document.querySelector('.logo-row');
   if (logoRow) { logoRow.style.borderBottom = 'none'; }
@@ -1276,8 +1293,7 @@ if (initHash === 'ref') {
       document.querySelector('#board-view .board').style.display = 'none';
       document.getElementById('passwordGate').style.display = 'block';
       document.getElementById('gateTeamName').innerHTML = team.name;
-      const teamColors = {"Team Jalapeño":"#186618","Team Ghost Pepper":"#B83D00","Team Carolina Reaper":"#AA0000"};
-      const tColor = teamColors[team.sheetName] || '#B83D00';
+      const tColor = getTeamColor(team.sheetName);
       document.getElementById('gateTeamName').style.color = tColor;
       const gateBtn = document.getElementById('gateSubmitBtn');
       gateBtn.style.background = tColor;
