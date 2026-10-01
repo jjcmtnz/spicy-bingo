@@ -374,21 +374,12 @@ async function deriveHash(text, saltKey) {
 
 const UNLOCK_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
-function getExpectedHash(key) {
-  if (!cachedData || !cachedData.passwords) return null;
-  if (key === 'ref') return cachedData.passwords['REF'] || null;
-  const team = TEAMS.find(t => t.slug === key);
-  return team ? (cachedData.passwords[team.sheetName] || null) : null;
-}
-
 function isUnlocked(key) {
-  const expected = getExpectedHash(key);
-  if (!expected) return false;
   try {
     const raw = localStorage.getItem('spicybingo_unlock_' + key);
     if (!raw) return false;
     const data = JSON.parse(raw);
-    if (data.hash !== expected) return false;
+    if (!data || !data.hash) return false;
     if (Date.now() - data.ts > UNLOCK_EXPIRY_MS) return false;
     return true;
   } catch (e) { return false; }
@@ -432,14 +423,16 @@ async function attemptUnlock() {
     err.style.display = 'block';
     return;
   }
-  if (!cachedData || !cachedData.passwords || !Object.keys(cachedData.passwords).length) {
-    err.textContent = '⚠ Password system not set up yet — check the Config tab & Apps Script deployment.';
+  const hash = await deriveHash(input.value, currentTeam.slug);
+  let ok = false;
+  try {
+    ok = await checkPasswordRemote(currentTeam.sheetName, hash);
+  } catch (e) {
+    err.textContent = '⚠ Could not reach the server to check your password. Try again.';
     err.style.display = 'block';
     return;
   }
-  const expected = cachedData.passwords[currentTeam.sheetName];
-  const hash = await deriveHash(input.value, currentTeam.slug);
-  if (expected && hash === expected) {
+  if (ok) {
     recordSuccess(currentTeam.slug);
     unlock(currentTeam.slug, hash);
     err.style.display = 'none';
@@ -465,14 +458,16 @@ async function attemptRefUnlock() {
     err.style.display = 'block';
     return;
   }
-  if (!cachedData || !cachedData.passwords || !Object.keys(cachedData.passwords).length) {
-    err.textContent = '⚠ Password system not set up yet — check the Config tab & Apps Script deployment.';
+  const hash = await deriveHash(input.value, 'ref');
+  let ok = false;
+  try {
+    ok = await checkPasswordRemote('REF', hash);
+  } catch (e) {
+    err.textContent = '⚠ Could not reach the server to check your password. Try again.';
     err.style.display = 'block';
     return;
   }
-  const expected = cachedData.passwords['REF'];
-  const hash = await deriveHash(input.value, 'ref');
-  if (expected && hash === expected) {
+  if (ok) {
     recordSuccess('ref');
     unlock('ref', hash);
     err.style.display = 'none';
@@ -718,6 +713,29 @@ function fetchData(attempt) {
       return new Promise(r => setTimeout(r, 2000 + Math.random() * 3000)).then(() => fetchData(attempt + 1));
     }
     throw err;
+  });
+}
+
+function checkPasswordRemote(key, hash) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'sbpw' + Date.now();
+    let done = false;
+    const timer = setTimeout(() => {
+      if (!done) { done = true; delete window[cbName]; reject(new Error('Timeout')); }
+    }, 15000);
+    window[cbName] = function(data) {
+      if (done) return; done = true;
+      clearTimeout(timer); delete window[cbName];
+      resolve(!!(data && data.ok));
+    };
+    const script = document.createElement('script');
+    script.src = API + '?action=checkPassword&key=' + encodeURIComponent(key) + '&hash=' + encodeURIComponent(hash) + '&callback=' + cbName + '&t=' + Date.now();
+    script.onerror = function() {
+      if (done) return; done = true;
+      clearTimeout(timer); delete window[cbName];
+      reject(new Error('Script load error'));
+    };
+    document.head.appendChild(script);
   });
 }
 
