@@ -743,7 +743,8 @@ async function load() {
         TILE_DATA[Number(k)] = data.tileData[k];
       });
     }
-    data.teams.sort((a,b) => a.name.localeCompare(b.name));
+    const displayOrder = (data.teamConfig || TEAMS).map(t => t.sheetName);
+    data.teams.sort((a,b) => displayOrder.indexOf(a.sheetName) - displayOrder.indexOf(b.sheetName));
 
     renderLanding(data.teams);
     renderLeaderboard(data.leaderboard);
