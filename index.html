@@ -423,6 +423,7 @@ function getLockoutRemaining(key) {
 }
 
 async function attemptUnlock() {
+  if (!currentTeam) return;
   const input = document.getElementById('gateInput');
   const err = document.getElementById('gateError');
   const remaining = getLockoutRemaining(currentTeam.slug);
@@ -505,6 +506,7 @@ function hideAllViews() {
 
 function showRefGate() {
   hideAllViews();
+  currentTeam = null;
   onExampleBoard = false;
   setHash('ref');
   document.getElementById('refGate').style.display = 'block';
@@ -515,6 +517,7 @@ function showRefGate() {
 
 function showRefView() {
   hideAllViews();
+  currentTeam = null;
   onExampleBoard = false;
   setHash('ref');
   document.getElementById('refView').style.display = 'block';
@@ -613,6 +616,7 @@ function setHash(h) { window.location.hash = h; }
 
 function showLanding() {
   hideAllViews();
+  currentTeam = null;
   refInlineTeam = null;
   onExampleBoard = false;
   document.getElementById('refBoardSlot').innerHTML = '';
@@ -728,10 +732,12 @@ async function load() {
       const matched = TEAMS.find(t => t.slug === h);
       if (matched) {
         currentTeam = matched;
-      } else if (h && h !== 'ref' && h !== 'example') {
+      } else {
         currentTeam = null;
-        onExampleBoard = false;
-        showLanding();
+        if (h && h !== 'ref' && h !== 'example') {
+          onExampleBoard = false;
+          showLanding();
+        }
       }
     }
     const gs = document.getElementById('gateLoadStatus');
@@ -753,7 +759,7 @@ async function load() {
     document.getElementById('landingContent').classList.remove('js-force-hidden');
     document.getElementById('landingContent').style.display = 'block';
 
-    if (currentTeam) {
+    if (currentTeam && getHash() === currentTeam.slug) {
       const refBypass = cameFromRef && isUnlocked('ref');
       if (isUnlocked(currentTeam.slug) || refBypass) {
         document.getElementById('landing').style.display = 'none';
