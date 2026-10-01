@@ -306,7 +306,7 @@
     <div style="font-family:'Bungee',cursive; font-size:16px; color:#ff8844; margin-bottom:6px; letter-spacing:0.03em;">👁 Ref View</div>
     <div style="font-size:12px; color:#666; margin-bottom:24px; line-height:1.5;">Event Ref access only.</div>
     <input id="refGateInput" type="password" placeholder="REF PASSWORD" style="width:100%; box-sizing:border-box; background:#111; border:1px solid #2a2a2a; border-radius:6px; padding:12px 14px; color:#ddd; font-size:14px; letter-spacing:0.1em; text-align:center; margin-bottom:14px; font-family:sans-serif;">
-    <button onclick="attemptRefUnlock()" class="gate-submit-btn" style="background:#B83D00; border-color:#d44a00; --glow-color:#d44a0077;">ENTER</button>
+    <button id="refGateSubmitBtn" onclick="attemptRefUnlock()" class="gate-submit-btn" style="background:#B83D00; border-color:#d44a00; --glow-color:#d44a0077;">ENTER</button>
     <div id="refGateError" style="font-size:11px; color:#ff5555; margin-top:12px; display:none;">✕ Incorrect password. Try again.</div>
     <div id="refGateLoadStatus" style="font-size:10px; color:#555; letter-spacing:0.05em; margin-top:12px; display:none; animation:loading-pulse 1.4s ease-in-out infinite;"></div>
     <div style="margin-top:18px;"><span class="back-btn" onclick="showLanding()">← Return to team boards</span></div>
@@ -417,70 +417,92 @@ async function attemptUnlock() {
   if (!currentTeam) return;
   const input = document.getElementById('gateInput');
   const err = document.getElementById('gateError');
+  const btn = document.getElementById('gateSubmitBtn');
+  if (btn.disabled) return;
   const remaining = getLockoutRemaining(currentTeam.slug);
   if (remaining > 0) {
     err.textContent = `⏳ Too many attempts. Try again in ${remaining}s.`;
     err.style.display = 'block';
     return;
   }
-  const hash = await deriveHash(input.value, currentTeam.slug);
-  let ok = false;
+  err.style.display = 'none';
+  const originalLabel = btn.textContent;
+  btn.textContent = 'VERIFYING...';
+  btn.disabled = true;
   try {
-    ok = await checkPasswordRemote(currentTeam.sheetName, hash);
-  } catch (e) {
-    err.textContent = '⚠ Could not reach the server to check your password. Try again.';
-    err.style.display = 'block';
-    return;
-  }
-  if (ok) {
-    recordSuccess(currentTeam.slug);
-    unlock(currentTeam.slug, hash);
-    err.style.display = 'none';
-    showBoard(currentTeam.slug);
-  } else {
-    recordFailure(currentTeam.slug);
-    const remainingAfter = getLockoutRemaining(currentTeam.slug);
-    err.textContent = remainingAfter > 0
-      ? `⏳ Too many attempts. Try again in ${remainingAfter}s.`
-      : '✕ Incorrect password. Try again.';
-    err.style.display = 'block';
-    input.value = '';
-    input.focus();
+    const hash = await deriveHash(input.value, currentTeam.slug);
+    let ok = false;
+    try {
+      ok = await checkPasswordRemote(currentTeam.sheetName, hash);
+    } catch (e) {
+      err.textContent = '⚠ Could not reach the server to check your password. Try again.';
+      err.style.display = 'block';
+      return;
+    }
+    if (ok) {
+      recordSuccess(currentTeam.slug);
+      unlock(currentTeam.slug, hash);
+      err.style.display = 'none';
+      showBoard(currentTeam.slug);
+    } else {
+      recordFailure(currentTeam.slug);
+      const remainingAfter = getLockoutRemaining(currentTeam.slug);
+      err.textContent = remainingAfter > 0
+        ? `⏳ Too many attempts. Try again in ${remainingAfter}s.`
+        : '✕ Incorrect password. Try again.';
+      err.style.display = 'block';
+      input.value = '';
+      input.focus();
+    }
+  } finally {
+    btn.textContent = originalLabel;
+    btn.disabled = false;
   }
 }
 
 async function attemptRefUnlock() {
   const input = document.getElementById('refGateInput');
   const err = document.getElementById('refGateError');
+  const btn = document.getElementById('refGateSubmitBtn');
+  if (btn.disabled) return;
   const remaining = getLockoutRemaining('ref');
   if (remaining > 0) {
     err.textContent = `⏳ Too many attempts. Try again in ${remaining}s.`;
     err.style.display = 'block';
     return;
   }
-  const hash = await deriveHash(input.value, 'ref');
-  let ok = false;
+  err.style.display = 'none';
+  const originalLabel = btn.textContent;
+  btn.textContent = 'VERIFYING...';
+  btn.disabled = true;
   try {
-    ok = await checkPasswordRemote('REF', hash);
-  } catch (e) {
-    err.textContent = '⚠ Could not reach the server to check your password. Try again.';
-    err.style.display = 'block';
-    return;
-  }
-  if (ok) {
-    recordSuccess('ref');
-    unlock('ref', hash);
-    err.style.display = 'none';
-    showRefView();
-  } else {
-    recordFailure('ref');
-    const remainingAfter = getLockoutRemaining('ref');
-    err.textContent = remainingAfter > 0
-      ? `⏳ Too many attempts. Try again in ${remainingAfter}s.`
-      : '✕ Incorrect password. Try again.';
-    err.style.display = 'block';
-    input.value = '';
-    input.focus();
+    const hash = await deriveHash(input.value, 'ref');
+    let ok = false;
+    try {
+      ok = await checkPasswordRemote('REF', hash);
+    } catch (e) {
+      err.textContent = '⚠ Could not reach the server to check your password. Try again.';
+      err.style.display = 'block';
+      return;
+    }
+    if (ok) {
+      recordSuccess('ref');
+      unlock('ref', hash);
+      err.style.display = 'none';
+      showRefView();
+    } else {
+      recordFailure('ref');
+      const remainingAfter = getLockoutRemaining('ref');
+      err.textContent = remainingAfter > 0
+        ? `⏳ Too many attempts. Try again in ${remainingAfter}s.`
+        : '✕ Incorrect password. Try again.';
+      err.style.display = 'block';
+      input.value = '';
+      input.focus();
+    }
+  } finally {
+    btn.textContent = originalLabel;
+    btn.disabled = false;
   }
 }
 
