@@ -742,9 +742,10 @@ function fetchData(attempt) {
   });
 }
 
-function checkPasswordRemote(key, hash) {
+function checkPasswordRemote(key, hash, attempt) {
+  attempt = attempt || 1;
   return new Promise((resolve, reject) => {
-    const cbName = 'sbpw' + Date.now();
+    const cbName = 'sbpw' + Date.now() + '_' + attempt;
     let done = false;
     const timer = setTimeout(() => {
       if (!done) { done = true; delete window[cbName]; reject(new Error('Timeout')); }
@@ -762,6 +763,9 @@ function checkPasswordRemote(key, hash) {
       reject(new Error('Script load error'));
     };
     document.head.appendChild(script);
+  }).catch(err => {
+    if (attempt < 2) return checkPasswordRemote(key, hash, attempt + 1);
+    throw err;
   });
 }
 
@@ -769,13 +773,16 @@ let loadInFlight = false;
 let retryTimer = null;
 let failCount = 0;
 
-async function load() {
+async function load(saved) {
   if (loadInFlight) return;
   loadInFlight = true;
   try {
-    const data = await fetchData();
+    const data = saved ? saved.data : await fetchData();
     if (!data || !data.teams) throw new Error((data && data.error) || 'Bad response');
-    failCount = 0;
+    if (!saved) {
+      failCount = 0;
+      try { localStorage.setItem('spicybingo_data_cache', JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {}
+    }
     cachedData = data;
     if (data.teamConfig) {
       TEAMS = data.teamConfig;
@@ -864,7 +871,7 @@ async function load() {
     }
 
     const lu = document.getElementById('lastUpdated');
-    if (lu) lu.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+    if (lu) lu.textContent = 'Last updated: ' + new Date(saved ? saved.ts : Date.now()).toLocaleTimeString() + (saved ? ' (saved copy, refreshing...)' : '');
   } catch(e) {
     console.error(e);
     failCount++;
@@ -1391,7 +1398,16 @@ if (initHash === 'ref') {
   }
 }
 
-load();
+let savedCopy = null;
+try {
+  const raw = JSON.parse(localStorage.getItem('spicybingo_data_cache'));
+  if (raw && raw.ts && raw.data && Array.isArray(raw.data.teams) && Date.now() - raw.ts < 12 * 60 * 60 * 1000) savedCopy = raw;
+} catch (e) {}
+if (savedCopy) {
+  load(savedCopy).then(() => load());
+} else {
+  load();
+}
 function scheduleNextPoll() {
   setTimeout(async () => { if (!document.hidden) await load(); scheduleNextPoll(); }, 50000 + Math.random() * 20000);
 }
