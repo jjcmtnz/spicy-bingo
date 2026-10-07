@@ -720,7 +720,7 @@ function fetchData(attempt) {
     let done = false;
     const timer = setTimeout(() => {
       if (!done) { done = true; delete window[cbName]; reject(new Error('Timeout')); }
-    }, 20000);
+    }, 40000);
     window[cbName] = function(data) {
       if (done) return; done = true;
       clearTimeout(timer); delete window[cbName];
@@ -735,7 +735,7 @@ function fetchData(attempt) {
     };
     document.head.appendChild(script);
   }).catch(err => {
-    if (attempt < 3) {
+    if (attempt < 2) {
       return new Promise(r => setTimeout(r, 2000 + Math.random() * 3000)).then(() => fetchData(attempt + 1));
     }
     throw err;
@@ -765,9 +765,17 @@ function checkPasswordRemote(key, hash) {
   });
 }
 
+let loadInFlight = false;
+let retryTimer = null;
+let failCount = 0;
+
 async function load() {
+  if (loadInFlight) return;
+  loadInFlight = true;
   try {
     const data = await fetchData();
+    if (!data || !data.teams) throw new Error((data && data.error) || 'Bad response');
+    failCount = 0;
     cachedData = data;
     if (data.teamConfig) {
       TEAMS = data.teamConfig;
@@ -859,11 +867,14 @@ async function load() {
     if (lu) lu.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
   } catch(e) {
     console.error(e);
+    failCount++;
     const landingVisible = document.getElementById('landingContent').style.display !== 'none';
-    if (landingVisible) {
-      document.getElementById('cards').innerHTML = '<div class="loading">Failed to load: ' + e.message + '</div>';
-    } else {
-      document.getElementById('initialLoading').textContent = 'Having trouble loading — retrying...';
+    if (!cachedData) {
+      if (landingVisible) {
+        document.getElementById('cards').innerHTML = '<div class="loading">Failed to load: ' + e.message + '</div>';
+      } else {
+        document.getElementById('initialLoading').textContent = 'Having trouble loading — retrying... (' + e.message + ')';
+      }
     }
     const gateStatus = document.getElementById('gateLoadStatus');
     if (gateStatus && document.getElementById('passwordGate').style.display === 'block') {
@@ -875,7 +886,12 @@ async function load() {
       refGateStatus.textContent = 'Having trouble loading — retrying...';
       refGateStatus.style.display = 'block';
     }
-    setTimeout(load, 15000 + Math.random() * 15000);
+    if (!retryTimer) {
+      const base = Math.min(60000, 15000 * Math.pow(1.5, failCount - 1));
+      retryTimer = setTimeout(() => { retryTimer = null; load(); }, base + Math.random() * 15000);
+    }
+  } finally {
+    loadInFlight = false;
   }
 }
 
@@ -1377,7 +1393,7 @@ if (initHash === 'ref') {
 
 load();
 function scheduleNextPoll() {
-  setTimeout(async () => { await load(); scheduleNextPoll(); }, 50000 + Math.random() * 20000);
+  setTimeout(async () => { if (!document.hidden) await load(); scheduleNextPoll(); }, 50000 + Math.random() * 20000);
 }
 scheduleNextPoll();
 </script>
